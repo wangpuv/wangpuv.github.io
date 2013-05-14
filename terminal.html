@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="Description" content="This is a jquery shell" />
+	<title>jquery shell</title>
+	<script src="js/jquery-1.7.1.min.js"></script>
+	<script src="js/jquery.mousewheel-min.js"></script>
+	<script src="js/jquery.terminal-min.js"></script>
+	<link href="css/jquery.terminal.css" rel="stylesheet" />
+	<!--[if IE]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<style>
+		body {
+			font-family: 'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif'
+			font-size: 12px;
+			background: #000;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="term">
+	</div>
+	<script type="text/javascript">
+		command_list = ['pwd', 'ls', 'cat', 'tail', 'clear', 'help', 'w'];
+		ls = ['skill-python', 
+			'skill-php', 
+			'skill-nginx',
+			'skill-mysql',
+			'skill-redis',
+			'skill-vim',
+			'skill-git',
+			'skill-objective-c',
+			'skill-c',
+			'skill-go',
+			'skill-javascript',
+			'skill-html-css',
+			'skill-design',
+			'\n',
+			'intro',
+			'\n',
+			'work-3gvg',
+			'work-wuditoo',
+			'work-iguess',
+			'work-xingzher',
+			'work-oncetouch',
+			'work-pianoid',
+			'\n',
+			'job-mtime',
+			'job-ifeng',
+			'job-zhihu',
+			'\n',
+			'contact'
+			];
+		ls_content = {
+			'skill-python': 'familiar. deeply used for about 2 years.',
+			'skill-php': 'familiar. deeply used for about 4 years.',
+			'skill-nginx': 'understand. used for about 3 years. \nload balance / reverse proxy / cache / site config, etc.',
+			'skill-mysql': 'familiar. used for about 4 years. Innodb / MyIsam features, Index creation, Optimization, etc.',
+			'skill-redis': 'understand++. used for about 1.5 year.',
+			'skill-vim': 'familiar. deeply used for about 3 years. never go back.',
+			'skill-git': 'familiar. used for about 2 years.',
+			'skill-objective-c': 'familiar. created 2 apps available on app store.',
+			'skill-c': 'understand. but hasn\'t created complex tools.',
+			'skill-go': 'understand. a grace, high performance, different programming language.',
+			'skill-javascript': 'understand. not so rigorous, but easy to use.',
+			'skill-html-css': 'familiar. used for about 5 years. created many sites',
+			'skill-design': 'understand. yes, i like design.',
+			'intro': 'creative / linux / simple / grace / internet / vim / apple / geek / try',
+			'work-3gvg': 'a 3g phones community. (php + mysql + nginx + html/css) <http://3gvg.leezhong.com>',
+			'work-wuditoo': 'a photograph community. (python + mysql + nginx + redis + html/css) <http://wuditoo.leezhong.com>',
+			'work-iguess': 'guess movie. (php + mysql + nginx + html/css) <http://iguess.leezhong.com>',
+			'work-xingzher': 'a travel community. (php + mysql + nginx + html/css) <http://xingzher.leezhong.com>',
+			'work-oncetouch': 'an iOS game. (objective-c) <https://itunes.apple.com/us/app/once-touch/id553150037?mt=8>',
+			'work-pianoid': 'an iOS app. (objective-c) <https://itunes.apple.com/us/app/pianoid/id608074964?mt=8>',
+			'job-mtime': '2008-2009. flash engineer. all ActionScript related projects. e.g. video player / minisite.',
+			'job-ifeng': '2010-2011. php engineer. create a php framework for internal use.',
+			'job-zhihu': '2011-2012. python engineer. register / notification / etc.',
+			'contact': 'healdream#gmail.com 15224O43389'
+		};
+		$(function(){
+			$('#term').terminal(function(command, term) {
+				if (command != '') {
+					if (command == 'help') {
+						term.echo(command_list.join('\n'));
+					} else if (command == 'ls') {
+						for (item in ls) {
+							if (ls[item] == '\n') {
+								term.echo('\n');
+								continue;
+							}
+							term.echo('-rw-r--r-- '+'jquery jquery '+ ls_content[ls[item]].length + ' ' + ls[item]);
+						}
+					} else if (command.substr(0, 3) == 'cat' || command.substr(0, 4) == 'tail') {
+						if (command.substr(0, 3) == 'cat') {
+							file = command.substr(3, command.length).trim();
+						} else {
+							file = command.substr(4, command.length).trim();
+						}
+						if ($.inArray(file, ls) == -1) {
+							if (file == '*' || file == '* ') {
+								for (key in ls) {
+									if (ls[key] == '\n') {
+										term.echo('\n');
+										continue;
+									}
+									term.echo('[[;#0f0;]'+ls[key]+']');
+									term.echo(ls_content[ls[key]]);
+								}
+							} else {
+								if (file == '') {
+									term.error('no file provided, u can use * instead.');
+								} else {
+									term.error('file not found:(');
+								}
+							}
+						} else {
+							term.echo(ls_content[file]);
+						}
+					} else if (command == 'pwd') {
+						term.echo('/home/jquery');
+					} else if (command == 'w' || command == 'top') {
+						term.echo('hello SA. this machine is running really well. load averages: 0.7 0.7 0.7')
+					} else if (command.substr(0, 2) == 'rm') {
+						term.error('u wanna delete me? u won\'t be happy if u do it.');
+					} else if (command.substr(0, 2) == 'vi') {
+						term.error('vi is not installed, u can use `cat` instead.');
+					} else if (command.substr(0, 2) == 'cd') {
+						term.error('sorry, u can\'t go anywhere else:(');
+					} else if (command.substr(0, 8) == 'shutdown') {
+						term.error('what!!! u wanna shut me down? i will kick ur ass.');
+					} else if (command.substr(0, 6) == 'reboot') {
+						term.error('no. no. don\'t this pls.')
+					} else if (command.substr(0, 2) == 'ps') {
+						term.echo('PS is a great tool, i like it.');
+					} else if (command.substr(0, 4) == 'free') {
+						term.echo('i\'m not free, there is no free lunch.');
+					} else if (command.substr(0, 4) == 'kill') {
+						term.error('kill is illegal. don\'t do this.');
+					} else if (command.substr(0, 5) == 'mkdir') {
+						term.echo('dir created! of course, it\'s impossible.');
+					}
+					else {
+						term.error('`'+command + '` is not supported');
+					}
+				}
+			}, {
+				greetings: 'Welcome! This is jquery shell test. type "help" if ur lost. visit <http://wangpuv.github.com/> if ur normal human being.',
+				name: 'shell',
+				height: $(window).height() - 20,
+				prompt: '[[;#0f0;]jquery@localhost>] '
+			});
+		});
+	</script>
+</body>
