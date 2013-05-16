@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<meta charset="utf-8" />
+    <title>Task Flow Home</title>
+    <style type="text/css" title="currentStyle">
+        @import "stylesheets/yui/reset.css";
+        @import "stylesheets/yui/base.css";
+        @import "stylesheets/yui/fonts.css";
+        @import "stylesheets/yui/grids.css";
+        @import "stylesheets/style.css";
+    </style>
+</head>
+
+<body>
+<div id="doc2">
+    <div id="hd">
+        <div id="title">
+            <h1><span style="color:red;">B</span>lue</h1>
+
+            <h2>TaskFlow</h2>
+        </div>
+
+        <div id="menu">
+            <ul>
+                <li><a href="index.html">首页</a></li>
+                <li><a href="https://github.com/wangpuv/taskflow">下载</a></li>
+                <li><a href="https://github.com/wangpuv/taskflow">项目</a></li>
+                <li><a href="document.html" style="color: #fff;background: #658A16;">文档</a></li>
+                <li><a href="waiting.html">论坛</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="bd">
+        <div id="yui-main">
+            <div class="yui-b">
+                <h2 align="center">Task Flow 部署简介</h2>
+
+                <h3>一、安装Maven2</h3>
+
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;先到官方网站下载Maven2的最新版本：<a href="http://maven.apache.org/download.html">http://maven.apache.org/download.html</a>。本人使用的Maven2版本是2.2.1。下载完以后，将Maven2解压到你所希望的目录即可。当然，Maven2是一个java工具，你必须安装的有JDK1.5及以上才可以正常运行，但是TaskFlow需要JDK6的支持，所以建议你安装JDK6。具体要求如下：</p>
+
+                <table align="center">
+                    <tr>
+                        <td style="font-weight: bolder;">JDK</td>
+                        <td>1.5 or above (this is to execute Maven - it still allows you to build against 1.3 and prior JDK's)</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bolder;">Memory</td>
+                        <td>No minimum requirement</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bolder;">Disk</td>
+                        <td>No minimum requirement. Approximately 100MB will be used for your local repository, however this will vary depending on usage and can be removed and redownloaded at any time.</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bolder;">Operating System</td>
+                        <td>No minimum requirement. On Windows, Windows NT and above or Cygwin is required for the startup scripts. Tested on Windows XP, Fedora Core and Mac OS X.</td>
+                    </tr>
+                </table>
+
+                <p>在Windows操作系统下的安装过程如下：</p>
+
+                <p align="center"><img src="images/maven2.jpg" alt="Maven2在Windows操作系统下的安装过程"></p>
+
+                <p>Win + R然后输入cmd，键入命令“mvn –version”验证安装是否正确。</p>
+
+                <p>Maven2的配置文件是C:\apache-maven-2.2.1\conf\settings.xml，一般不必修改即可使用。Maven就像个容器，它的功能由插件来发挥。可以到<a href="http://maven.apache.org/plugins/index.html">http://maven.apache.org/plugins/index.html</a>看到它的所有的插件功能。</p>
+
+
+                <h3>二、配置数据库</h3>
+
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;将/src/main/sql/oracle下的sql导入到数据库中。注意：执行的顺序是 codetable.sql-->schema.sql-->init.sql。目前有Oracle和h2两种选择，你也可以根据自己的情况转成自己需要的sql，但是程序中需要在配置文件和主键生成等地方进行修改。</p>
+
+                <p>Oracle相信大家都很熟悉了，我是直接用PLSQL执行sql语句导入的。</p>
+
+                <p align="center"><img src="images/oraclesql.jpg" alt="oracle sql"></p>
+
+                <p>对于Oracle还有一个地方需要修改，就是每一个实体类里关于表名的注释都需要加上schema = "你的schema名"，否则会找不到表。（这个问题有时间我会进一步看一下，暂时先这样解决吧。）</p>
+
+                <p>H2是一个开源数据库，它小巧而功能齐全，非常适合开发和测试时使用。到<a href="http://www.h2database.com">www.h2database.com</a>上下载最新版本，然后执行/h2/bin/h2.bat启动H2数据库，会弹出浏览器让你建立数据库链接。JDBC URL中填入jdbc:h2:tcp://localhost/~/taskflow，点击连接进入，然后按顺序执行sql。</p>
+
+                <p align="center"><img src="images/H2.jpg" alt="h2 sql"></p>
+
+                <p>导入sql之后，需要修改配置文件。找到/src/main/resources/application.properties文件，修改database settings为你自己的环境。</p>
+
+                <h3>三、用Maven2启动项目</h3>
+
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maven2安装成功以后，在命令行进入TaskFlow项目所在目录，执行命令mvn jetty:run。在执行过程中，maven会连接网络下载所需要的jar包，所以请耐心等待，并保持网络畅通。执行完成以后，jetty就启动了，你可以在http://localhost:9090/taskflow/中查看了。登录用户是admin密码是admin，也可以用user登录，当然你也可以添加新用户。注意，9090端口不要冲突，否则无法启动。</p>
+
+                <p align="center"><img src="images/jettyrun.jpg" alt="mvn jetty:run"></p>
+
+                <h3>预览项目图片：</h3>
+
+                <p align="center"><img src="images/login.jpg" alt="登陆界面"></p>
+
+                <p align="center"><img src="images/page.jpg" alt="内部内容"></p>
+
+                <h3>备注</h3>
+
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;本人曾编写过一个简单的Maven2入门文档，欢迎下载<a href="http://code.google.com/p/taskflow/downloads/list">Maven2快速上手指南</a>。如果有问题可以<a href= "mailto:wangpuv@gmail.com">发邮件给我</a>！</p>
+            </div>
+        </div>
+    </div>
+    <div id="ft">Copyright &copy; 2005-2010 Blue</div>
+</div>
+</body>
+</html>
