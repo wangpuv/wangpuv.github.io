@@ -6,13 +6,13 @@ paginate:         6
 permalink:        /:title
 
 title:            WangPuV's Blog
-url:              http://wangpuv.github.com
+url:              http://wangpuv.github.io
 feed:             /atom.xml
 author:
     name:         WangPuV
     twitter:      twitter.com/wangpuv
 description:      "WangPuV\'s Blog"
-author_info:      <a href="http://wangpuv.github.com/about">WangPuV</a>
+author_info:      <a href="http://wangpuv.github.io/about">WangPuV</a>
 
 copyright:
     - Design by <a href="http://beiyuu.com/about" title="BeiYuu" target="_blank">BeiYuu</a> &copy; 2013
