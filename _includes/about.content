@@ -9,7 +9,7 @@
             </div>
             <div class="about-left about-more">
                 <h2>Project</h2>
-                <a href="/taskflow" title="Task Flow is a tasks manage tool.">TaskFlow</a><br/>
+                <a href="/taskflow" title="Task Flow is a tasks manage tool." class="external" target="_blank">TaskFlow</a><br/>
             </div>
             <div class="about-left about-more">
                 <h2>Learn</h2>
@@ -29,7 +29,7 @@
         </div>
 
         <div class="copyright right">
-            <p>Design by <a href="http://beiyuu.com/about" title="BeiYuu" target="_blank">BeiYuu</a> © 2013</p>
+            <p>Design by <a href="http://beiyuu.com/about" title="BeiYuu" class="external" target="_blank">BeiYuu</a> © 2013</p>
         </div>
     </div>
 </div>
