@@ -3,7 +3,7 @@ layout:           default
 ---
 <div id="head">
     <div class='logo'>
-        <a href="/" title="Home">WangPuV's Blog</a>
+        <a href="/" title="Home">WangPuV.com</a><b>Blog</b>
     </div>
 </div>
 
@@ -11,30 +11,4 @@ layout:           default
     {{ content }}
 </div>
 
-<div id="about">
-    <div class="about-content">
-        <div class="clearfix">
-            <div class="about-left">
-                <h2>Contact</h2>
-                <div class="weibo-con">
-                    <iframe width="100%" height="75" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=75&fansRow=2&ptype=1&speed=0&skin=1&isTitle=0&noborder=0&isWeibo=0&isFans=0&uid=1757474191&verifier=4d3c970d&colors=d6f3f7,262626,666666,0082cb,ecfbfd&dpc=1"></iframe>
-                </div>
-            </div>
-            <div class="about-left about-more">
-                <h2>Project</h2>
-                <a href="http://wangpuv.github.io/taskflow" title="Task Flow is a tasks manage tool.">TaskFlow</a><br/>
-            </div>
-            <div class="about-left about-more">
-                <h2>About</h2>
-                <p>
-                    Code<a href="https://github.com/wangpuv" class="external" target="_blank">@GitHub</a><br/>
-                    Photo<a href="http://instagram.com/wangpuv/" class="external" target="_blank">@Instagram</a>
-                </p>
-            </div>
-        </div>
-
-        <div class="copyright right">
-            <p>Design by <a href="http://beiyuu.com/about" title="BeiYuu" target="_blank">BeiYuu</a> © 2013</p>
-        </div>
-    </div>
-</div>
+{% include about.content %}

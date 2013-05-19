@@ -2,7 +2,7 @@
  *
  * Author:           BeiYuu
  * Contact:          beiyuu.com
- *
+ * Modify:           WangPuV
  */
 
 /* 重置浏览器CSS */
@@ -71,15 +71,18 @@ pre ol{margin-left:25px;list-style-type:decimal;}
 /************layout style*****************/
 #head {width:100%;height:60px;margin-bottom:20px;}
 #content {width:650px;margin:0 auto;min-height:400px;height:auto !important;height:400px;}
+#learn-content {width:1000px;margin:0 auto;min-height:400px;height:auto !important;height:400px;}
 
 /***************header style************/
 #head .logo {font-size:30px;font-weight:bold;margin-top:18px;padding-left:20px;}
 #head .logo a{color:#999;}
 #head .logo a:hover {text-decoration:none;color:#666;}
 #head .logo a:active {position:relative;top:1px;opacity:0.9;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(opacity=90)";filter:alpha(opacity=90);}
+#head .logo b{font-size:22px;font-style:italic;position:absolute;right:20px;}
 
 /****************entry style**************/
 #content .entry{margin-bottom:50px;}
+#learn-content .entry{margin-bottom:50px;}
 .entry ul{margin-bottom:25px;margin-left:25px;margin-top:-15px;}
 .entry ul li{margin-bottom:5px;list-style:disc;line-height:1.5em;}
 .entry ol{margin-bottom:25px;margin-left:25px;margin-top:-15px;}
@@ -124,7 +127,7 @@ h3.about {color:#777;margin-top:20px;font-size:22px;margin-bottom:10px}
 #menuIndex li.h3{padding-left:25px;}
 
 #about{background:#262626;width:100%;margin:0 auto;border-top:6px solid #026b8c;overflow:hidden;margin-top:30px;font-size:14px;line-height:1.6em;}
-#about .about-content {width:720px;margin:50px auto;}
+#about .about-content {width:1000px;margin:50px auto;}
 #about h2{color:#bbb;font-size:24px;font-weight:bold;border-bottom:1px solid #444;line-height:45px;}
 #about .about-left{float:left;width:200px;color:#999;}
 #about .about-more {margin-left:60px;}
@@ -141,6 +144,7 @@ h3.about {color:#777;margin-top:20px;font-size:22px;margin-bottom:10px}
     #head {height:25px;}
     #head .logo{font-size:22px;padding-left:8px;text-align:center;}
     #content {width:95%;margin:0 auto;}
+    #learn-content {width:95%;margin:0 auto;}
 
     h2{font-size:20px;}
     h3{font-size:16px;}
@@ -151,7 +155,10 @@ h3.about {color:#777;margin-top:20px;font-size:22px;margin-bottom:10px}
     .entry img{max-width:90%;}
     .entry pre ol li{margin-bottom:0;line-height:1em;}
     .entry pre code{line-height:1em;font-size:12px;}
-    
+
+    .category ul {display:block;margin:0 auto;width:95%;}
+    .category li {padding:10px;}
+
     .index-artical ul {display:block;margin:0 auto;width:95%;}
     .index-artical .index-mid {display:none;}
     .index-artical .index-left {padding:0;}
