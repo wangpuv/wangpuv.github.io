@@ -1,8 +1,8 @@
 ---
 layout:     post
-title:      getPath、getAbsolutePath、getCanonicalPath的不同
+title:      Path AbsolutePath CanonicalPath的不同
 category: java
-description: File的这几个取得path的方法各有不同，主要有：getPath()、getAbsolutePath()、getCanonicalPath() ...
+description: File的这几个取得path的方法各有不同 ...
 ---
 
 ## getPath()
