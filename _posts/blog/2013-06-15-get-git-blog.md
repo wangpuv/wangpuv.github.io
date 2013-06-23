@@ -63,7 +63,7 @@ description:    像写代码一样写博客，无限的自由，随意的装饰�
     $ gem install jekyll
 
 ### 5.安装 Python
-什么？还要安装 Python ？是的，如果你想要代码高亮的话， Python 是必须安装的。建议你安装在 Windows 下比较好使的 [ActivePython][] 2.*，3.*版本可能与 jekyll 有兼容性问题。
+什么？还要安装 Python ？是的，如果你想要代码高亮的话， Python 是必须安装的。建议你安装在 Windows 下比较好使的 [ActivePython][] 2.x，3.x版本可能与 jekyll 有兼容性问题。
 
 ### 6.创建你的博客吧
 使用 [jekyll][] 命令创建博客。
