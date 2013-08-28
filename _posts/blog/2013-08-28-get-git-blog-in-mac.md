@@ -15,7 +15,7 @@ description:    之前介绍了在 windows 环境搭建这样的博客环境，�
 
 ## 在Mac上搭建本地博客环境
 
-之前在 windows 上搭建本地博客环境的博客：[我的这个博客是怎样搭建起来的][1]。
+之前在 windows 上搭建本地博客环境的博客：[我的这个博客是怎样搭建起来的][2]。
 
 好了，废话不多说，来讲讲我是怎样在这台 AIR 上搭建 [jekyll][] 博客环境的。
 
@@ -103,6 +103,6 @@ rvm 在安装 ruby 的时候也安装了 gem，查看一下版本：
 [Homebrew]:       http://brew.sh/                                     "Homebrew"
 [JewelryBox]:       http://jewelrybox.unfiniti.com］/                                     "JewelryBox"
 [1]:            {{ page.url}}                                           ({{ page.title }})
-[2]:            http://wangpuv.com/get-git-blog/             "我的这个博客是怎样搭建起来的"
+[2]:            /get-git-blog             "我的这个博客是怎样搭建起来的"
 [3]:				http://www.hoowolf.net/2012/03/29/installing-ruby-on-rails-on-mac-os-x-lion/	"在Mac OS X Lion下安装Ruby on Rails"
 [4]:            http://liang.eu/mac/forgot-macports-now-we-have-homebrew             "忘掉恶心丑陋的MacPorts吧, 现在有了Homebrew"
