@@ -1,6 +1,6 @@
 ---
 layout:         post
-title:          千万不要 Copy 网上的命令直接运行
+title:          千万别Copy网上的命令直接运行
 category:       blog
 description:    想不起来 linux 命令了，上网搜一下， Copy ，执行吧，慢！危险就在你身边……
 ---
