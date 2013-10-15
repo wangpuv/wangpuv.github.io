@@ -13,45 +13,53 @@ table.noborder th, table.noborder td {
 
 /* header */
 #title h1 {
-    font-size: 180%;
-    letter-spacing: .1em;
-    margin: 0.5em 0;
-}
-
-#title h2 {
-    font-size: 120%;
+    font-size: 200%;
     color: #BACE87;
     letter-spacing: .1em;
-    margin: 0.5em 0;
+    margin: 0.6em 0.5em 0 0;
+    float: left;
+}
+
+#title h1:first-letter {
+    font-size: 120%;
+    color: #658A16;
+}
+
+#title h1 a {
+    text-decoration: none;
+}
+
+div .clear {
+    clear: both;
 }
 
 #menu {
-    border-top: 4px solid #658A16;
-    border-bottom: 2px solid #658A16;
+    margin-top: 1em;
 }
 
 #menu ul {
-    margin: 0 0 0 0;
-    padding: 1em 1em 2.2em 0;
+    margin: 0;
+    padding-top: 0;
     font-weight: bold;
     background: #BACE87;    
 }
 
 #menu ul li {
-    margin: -1em 0 0 0;
     padding: 1em 0 1em 0;
-    display: inline;
     float: left;
 }
 
-#menu ul a {
-    padding: 1.1em 3em 1em 3em;
+#menu a:link, a:visited {
+    border-top: 4px solid #658A16;
+    border-bottom: 2px solid #658A16;
+    padding: 1em 105px 1em 105px;
     text-decoration: none;
     color: #658A16;
+    background: #BACE87;
 }
 
-#menu a:hover {
-    color: #fff;
+#menu a:hover, a:active {
+    color: ghostwhite;
     background: #658A16;
 }
 
