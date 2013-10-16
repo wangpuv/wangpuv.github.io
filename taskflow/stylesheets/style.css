@@ -46,6 +46,7 @@ div .clear {
 
 #menu ul li {
     padding: 1em 0 1em 0;
+	list-style-type: none;
     float: left;
 }
 
