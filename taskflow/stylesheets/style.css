@@ -20,14 +20,46 @@ table.noborder th, table.noborder td {
     float: left;
 }
 
-#title h1:first-letter {
+#title h1#name:first-letter {
     font-size: 120%;
     color: #658A16;
 }
 
-#title h1 a {
-    text-decoration: none;
+/* 隐藏字母效果 start */
+div#surround {
+    width: 3.8em;
+    height: 2.1em;
+    margin: 1em;
+    float: right;
 }
+
+div#cover {
+    width: 1em;
+    height: 2.6em;
+    border-left: 1px solid #e8e8e8;
+    background-color: #ffffff;
+    float: right;
+}
+
+h1#hidden {
+    color: red;
+    font-size: 200%;
+    margin: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+div.hover {
+    width: 2em;
+    height: 2em;
+    margin: 0 0 0 1.8em;
+}
+
+div.hover:hover {
+    margin: 0 0 0 1.2em;
+    cursor: pointer;
+}
+/* 隐藏字母效果 end */
 
 div .clear {
     clear: both;
@@ -41,7 +73,7 @@ div .clear {
     margin: 0;
     padding-top: 0;
     font-weight: bold;
-    background: #BACE87;    
+    background: #BACE87;
 }
 
 #menu ul li {
