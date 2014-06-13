@@ -10,6 +10,7 @@
             <div class="about-left about-more">
                 <h2>Project</h2>
                 <a href="/taskflow" title="Task Flow is a tasks manage tool." class="external" target="_blank">TaskFlow</a><br/>
+                <a href="https://github.com/wangpuv/sDBx" title="schema and DB to XML by jaxb2." class="external" target="_blank">sDBx</a><br/>
             </div>
             <div class="about-left about-more">
                 <h2>Learn</h2>
