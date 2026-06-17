@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect x="1.25" y="1.25" width="61.5" height="61.5" rx="13" fill="#F6F2EA" stroke="#E2DDD2" stroke-width="1.5"/>
+  <text x="32" y="34" text-anchor="middle" dominant-baseline="central"
+        font-family="Georgia, 'Times New Roman', 'Songti SC', serif" font-weight="700"
+        font-size="29" letter-spacing="0.5" fill="#262220">WP</text>
+</svg>
