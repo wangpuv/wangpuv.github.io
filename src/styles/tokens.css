@@ -1,0 +1,76 @@
+/* ============================================================
+   Design tokens — warm editorial system
+   Color defined in OKLCH for perceptual consistency across themes.
+   ============================================================ */
+
+:root {
+  /* Type families */
+  --font-display: 'Fraunces', 'Times New Roman', Georgia, serif;
+  --font-body: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Modular type scale (1.25 major-third), fluid via clamp */
+  --step--1: clamp(0.83rem, 0.79rem + 0.18vw, 0.94rem);
+  --step-0:  clamp(1rem, 0.95rem + 0.24vw, 1.13rem);
+  --step-1:  clamp(1.2rem, 1.11rem + 0.45vw, 1.5rem);
+  --step-2:  clamp(1.44rem, 1.28rem + 0.8vw, 2rem);
+  --step-3:  clamp(1.73rem, 1.46rem + 1.35vw, 2.66rem);
+  --step-4:  clamp(2.07rem, 1.62rem + 2.27vw, 3.55rem);
+  --step-5:  clamp(2.49rem, 1.74rem + 3.74vw, 4.74rem);
+  --step-6:  clamp(2.99rem, 1.78rem + 6.05vw, 6.31rem);
+
+  /* Spacing scale (rem) */
+  --space-2xs: 0.5rem;
+  --space-xs:  0.75rem;
+  --space-s:   1rem;
+  --space-m:   1.5rem;
+  --space-l:   2.5rem;
+  --space-xl:  4rem;
+  --space-2xl: 6rem;
+  --space-3xl: 9rem;
+
+  /* Structure */
+  --measure: 68ch;            /* readable line length */
+  --content-max: 1180px;      /* page max width */
+  --radius: 4px;
+  --radius-lg: 10px;
+  --border-w: 1px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 160ms;
+  --dur-med: 380ms;
+  --dur-slow: 680ms;
+}
+
+/* ---------- Light (paper) ---------- */
+:root,
+[data-theme='light'] {
+  --bg:        oklch(98.4% 0.008 80);    /* warm off-white paper */
+  --surface:   oklch(100% 0 0);          /* clean white card */
+  --ink:       oklch(22% 0.012 60);      /* warm near-black */
+  --ink-soft:  oklch(38% 0.012 60);
+  --muted:     oklch(54% 0.012 60);      /* secondary text */
+  --faint:     oklch(72% 0.01 70);       /* captions, meta */
+  --line:      oklch(88% 0.008 75);      /* hairline borders */
+  --line-soft: oklch(93% 0.006 78);
+  --accent:    oklch(54% 0.17 36);       /* terracotta-red */
+  --accent-ink: oklch(48% 0.18 36);      /* accent text on paper */
+  --on-accent: oklch(98% 0.01 80);
+  --shadow: 0 1px 3px oklch(22% 0.012 60 / 0.08), 0 8px 24px oklch(22% 0.012 60 / 0.06);
+}
+
+/* ---------- Dark (ink) ---------- */
+[data-theme='dark'] {
+  --bg:        oklch(16% 0.01 60);       /* warm near-black */
+  --surface:   oklch(20% 0.012 60);
+  --ink:       oklch(93% 0.012 80);
+  --ink-soft:  oklch(82% 0.012 80);
+  --muted:     oklch(68% 0.012 75);
+  --faint:     oklch(54% 0.012 70);
+  --line:      oklch(30% 0.012 60);
+  --line-soft: oklch(25% 0.012 60);
+  --accent:    oklch(70% 0.15 40);       /* brighter terracotta */
+  --accent-ink: oklch(76% 0.15 42);
+  --on-accent: oklch(18% 0.012 60);
+  --shadow: 0 1px 3px oklch(0% 0 0 / 0.4), 0 10px 30px oklch(0% 0 0 / 0.35);
+}
