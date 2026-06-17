@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom'
 import { profile } from '../data/profile'
 import { ui } from '../i18n/strings'
 import { useLanguage } from '../i18n/LanguageContext'
+import { copyEmail } from '../lib/contact'
 
 export default function Footer() {
   const { lang } = useLanguage()
   const t = ui[lang]
   const p = profile[lang]
   const year = new Date().getFullYear()
+  const email = profile.social.find((s) => s.label === 'Email')
 
   return (
     <footer className="footer">
@@ -16,10 +18,14 @@ export default function Footer() {
         <div className="footer__grid">
           <div className="footer__lead">
             <p className="eyebrow">{t.footer.getInTouch}</p>
-            <Link to="/contact" className="footer__cta display">
+            <a
+              href={email.href}
+              className="footer__cta display"
+              onClick={(e) => { e.preventDefault(); copyEmail(email.display, t.emailCopied) }}
+            >
               {t.footer.cta}
               <span className="arrow" aria-hidden="true"> →</span>
-            </Link>
+            </a>
           </div>
 
           <nav className="footer__cols" aria-label="Footer">
@@ -35,13 +41,22 @@ export default function Footer() {
             <div>
               <p className="meta footer__col-title">{t.footer.elsewhere}</p>
               <ul className="footer__list">
-                {profile.social.map((s) => (
-                  <li key={s.label}>
-                    <a className="link" href={s.href} target="_blank" rel="noreferrer">
-                      {t.social[s.label] || s.label}
-                    </a>
-                  </li>
-                ))}
+                {profile.social.map((s) => {
+                  const isEmail = s.label === 'Email'
+                  return (
+                    <li key={s.label}>
+                      <a
+                        className="link"
+                        href={s.href}
+                        {...(isEmail
+                          ? { onClick: (e) => { e.preventDefault(); copyEmail(s.display, t.emailCopied) } }
+                          : { target: '_blank', rel: 'noreferrer' })}
+                      >
+                        {t.social[s.label] || s.label}
+                      </a>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           </nav>

@@ -2,14 +2,14 @@ import { projects } from '../data/projects'
 import { ui } from '../i18n/strings'
 import { useLanguage } from '../i18n/LanguageContext'
 import Reveal from '../components/Reveal'
-import ProjectCard from '../components/ProjectCard'
+import ProjectItem from '../components/ProjectItem'
 
 export default function Work() {
   const { lang } = useLanguage()
   const t = ui[lang]
 
   return (
-    <section className="section page-top">
+    <section className="section page-top work-page">
       <div className="wrap">
         <Reveal className="page-head">
           <p className="eyebrow">{t.work.eyebrow}</p>
@@ -20,7 +20,7 @@ export default function Work() {
         <div className="work-list work-list--full">
           {projects.map((proj, i) => (
             <Reveal key={proj.slug} delay={i * 70}>
-              <ProjectCard project={proj} index={i} />
+              <ProjectItem project={proj} index={i} />
             </Reveal>
           ))}
         </div>

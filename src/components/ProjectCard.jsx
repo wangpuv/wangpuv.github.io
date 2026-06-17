@@ -11,7 +11,7 @@ export default function ProjectCard({ project, index }) {
 
   return (
     <Link
-      to={`/work/${project.slug}`}
+      to="/work"
       className="work-row"
       style={{ '--row-accent': project.accent }}
     >

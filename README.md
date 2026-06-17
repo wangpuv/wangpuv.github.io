@@ -1,7 +1,8 @@
-# Personal Site — Wang Pu
+# Wang Pu Personal Site
 
-A multi-page portfolio built with **React + Vite**. Warm editorial design system
-with light/dark themes. Pages: Home, Work (+ project detail), About, Contact.
+A bilingual personal technical site built with **React + Vite**. It presents
+Wang Pu's backend engineering, system architecture, and AI engineering work with
+light/dark themes. Pages: Home, Projects (+ detail), About, Contact.
 
 ## Run it
 
@@ -12,15 +13,19 @@ npm run build    # production build → dist/
 npm run preview  # preview the production build
 ```
 
-## Replace the placeholder content
+## Content
 
-All copy lives in two files — no CMS, just edit these:
+All copy lives in data files — no CMS:
 
 - **`src/data/profile.js`** — your name, role, hero text, about paragraphs,
-  skills, experience timeline, and social links (email/GitHub/LinkedIn/Twitter).
+  skills, experience timeline, and social links.
 - **`src/data/projects.js`** — your projects. Each entry's `slug` becomes the
   URL (`/work/<slug>`). Add or remove entries freely; the Work list and detail
   pages regenerate automatically.
+- **`src/i18n/strings.js`** — shared UI labels and page chrome in Chinese and
+  English.
+
+Do not add phone numbers or education background to the public site.
 
 The project detail page uses a generated accent gradient (`accent` field) as a
 stand-in for a hero image. To use a real image instead, drop files in `public/`

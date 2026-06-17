@@ -8,10 +8,10 @@ export default function About() {
   const t = ui[lang]
   const p = profile[lang]
 
-  const title = lang === 'zh' ? `我是${p.name}，${p.role}。` : `${p.name}, ${p.role.toLowerCase()}.`
+  const title = p.aboutTitle
 
   return (
-    <section className="section page-top">
+    <section className="section page-top about">
       <div className="wrap">
         <Reveal className="page-head">
           <p className="eyebrow">{t.about.eyebrow}</p>
@@ -37,6 +37,21 @@ export default function About() {
               </div>
             ))}
           </Reveal>
+        </div>
+
+        <hr className="rule about__sep" />
+
+        <Reveal>
+          <p className="eyebrow">{t.about.achievements}</p>
+        </Reveal>
+        <div className="achievement-grid">
+          {p.achievements.map((achievement, i) => (
+            <Reveal key={`${achievement.metric}-${achievement.label}`} className="achievement" delay={i * 50}>
+              <p className="achievement__metric display">{achievement.metric}</p>
+              <p className="achievement__label">{achievement.label}</p>
+              <p className="muted achievement__detail">{achievement.detail}</p>
+            </Reveal>
+          ))}
         </div>
 
         <hr className="rule about__sep" />

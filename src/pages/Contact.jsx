@@ -2,6 +2,7 @@ import { profile } from '../data/profile'
 import { ui } from '../i18n/strings'
 import { useLanguage } from '../i18n/LanguageContext'
 import Reveal from '../components/Reveal'
+import { copyEmail } from '../lib/contact'
 
 export default function Contact() {
   const { lang } = useLanguage()
@@ -21,7 +22,11 @@ export default function Contact() {
 
         {email && (
           <Reveal delay={60}>
-            <a href={email.href} className="contact__email display">
+            <a
+              href={email.href}
+              className="contact__email display"
+              onClick={(e) => { e.preventDefault(); copyEmail(email.display, t.emailCopied) }}
+            >
               {email.display}
             </a>
           </Reveal>
