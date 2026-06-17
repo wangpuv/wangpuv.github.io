@@ -1,17 +1,23 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { profile } from '../data/profile'
+import { ui } from '../i18n/strings'
+import { useLanguage } from '../i18n/LanguageContext'
 import ThemeToggle from './ThemeToggle'
-
-const links = [
-  { to: '/work', label: 'Work' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
-]
+import LanguageToggle from './LanguageToggle'
 
 export default function Nav() {
+  const { lang } = useLanguage()
+  const t = ui[lang]
+  const p = profile[lang]
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+
+  const links = [
+    { to: '/work', label: t.nav.work },
+    { to: '/about', label: t.nav.about },
+    { to: '/contact', label: t.nav.contact },
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -31,7 +37,7 @@ export default function Nav() {
       <div className="wrap nav__inner">
         <Link to="/" className="nav__brand" onClick={() => setOpen(false)}>
           <span className="nav__mark">{profile.initials}</span>
-          <span className="nav__name">{profile.name}</span>
+          <span className="nav__name">{p.name}</span>
         </Link>
 
         <nav className="nav__links" aria-label="Primary">
@@ -47,6 +53,7 @@ export default function Nav() {
         </nav>
 
         <div className="nav__actions">
+          <LanguageToggle />
           <ThemeToggle />
           <button
             type="button"

@@ -1,24 +1,32 @@
 import { profile } from '../data/profile'
+import { ui } from '../i18n/strings'
+import { useLanguage } from '../i18n/LanguageContext'
 import Reveal from '../components/Reveal'
 
 export default function About() {
+  const { lang } = useLanguage()
+  const t = ui[lang]
+  const p = profile[lang]
+
+  const title = lang === 'zh' ? `我是${p.name}，${p.role}。` : `${p.name}, ${p.role.toLowerCase()}.`
+
   return (
     <section className="section page-top">
       <div className="wrap">
         <Reveal className="page-head">
-          <p className="eyebrow">About</p>
-          <h1 className="display page-title">{profile.name}, {profile.role.toLowerCase()}.</h1>
+          <p className="eyebrow">{t.about.eyebrow}</p>
+          <h1 className="display page-title">{title}</h1>
         </Reveal>
 
         <div className="about__grid">
           <Reveal className="about__bio stack">
-            {profile.about.map((para, i) => (
+            {p.about.map((para, i) => (
               <p key={i} className={i === 0 ? 'lead' : ''}>{para}</p>
             ))}
           </Reveal>
 
           <Reveal className="about__skills" delay={80}>
-            {profile.skills.map((s) => (
+            {p.skills.map((s) => (
               <div key={s.group} className="about__skill-group">
                 <p className="meta about__skill-title">{s.group}</p>
                 <ul className="about__skill-list">
@@ -34,10 +42,10 @@ export default function About() {
         <hr className="rule about__sep" />
 
         <Reveal>
-          <p className="eyebrow">Experience</p>
+          <p className="eyebrow">{t.about.experience}</p>
         </Reveal>
         <ol className="timeline">
-          {profile.experience.map((e, i) => (
+          {p.experience.map((e, i) => (
             <Reveal as="li" key={i} className="timeline__item" delay={i * 70}>
               <span className="timeline__period meta">{e.period}</span>
               <div className="timeline__body">

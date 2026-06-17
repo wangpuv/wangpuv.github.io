@@ -1,10 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../i18n/LanguageContext'
 
 /**
  * Editorial work row: large index number, title, meta, tags.
  * Hover reveals the accent and nudges the title.
  */
 export default function ProjectCard({ project, index }) {
+  const { lang } = useLanguage()
+  const c = project[lang]
+
   return (
     <Link
       to={`/work/${project.slug}`}
@@ -14,11 +18,11 @@ export default function ProjectCard({ project, index }) {
       <span className="work-row__index meta">{String(index + 1).padStart(2, '0')}</span>
 
       <div className="work-row__body">
-        <h3 className="work-row__title display">{project.title}</h3>
-        <p className="work-row__summary muted">{project.summary}</p>
+        <h3 className="work-row__title display">{c.title}</h3>
+        <p className="work-row__summary muted">{c.summary}</p>
         <ul className="work-row__tags">
-          {project.tags.map((t) => (
-            <li key={t} className="tag">{t}</li>
+          {c.tags.map((tag) => (
+            <li key={tag} className="tag">{tag}</li>
           ))}
         </ul>
       </div>

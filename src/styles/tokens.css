@@ -5,8 +5,9 @@
 
 :root {
   /* Type families */
-  --font-display: 'Fraunces', 'Times New Roman', Georgia, serif;
-  --font-body: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Latin glyphs use Fraunces/Geist; CJK glyphs fall back to system serif/sans. */
+  --font-display: 'Fraunces', 'Songti SC', 'Noto Serif SC', 'Source Han Serif SC', 'STSong', Georgia, serif;
+  --font-body: 'Geist', system-ui, -apple-system, 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
 
   /* Modular type scale (1.25 major-third), fluid via clamp */
   --step--1: clamp(0.83rem, 0.79rem + 0.18vw, 0.94rem);

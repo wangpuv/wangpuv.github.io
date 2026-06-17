@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Wang Pu — Designer & Engineer. Selected work and writing." />
+    <meta name="description" content="王普 — 设计师 & 工程师。精选作品与项目。" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -11,17 +11,28 @@
       rel="stylesheet"
     />
     <script>
-      // Set theme before paint to avoid a flash of the wrong theme.
+      // Set theme + language before paint to avoid a flash of the wrong state.
       (function () {
+        var de = document.documentElement;
         try {
           var stored = localStorage.getItem('theme');
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          var theme = stored || (prefersDark ? 'dark' : 'light');
-          document.documentElement.setAttribute('data-theme', theme);
+          de.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+        } catch (e) {}
+        try {
+          var lang = localStorage.getItem('lang');
+          if (lang !== 'zh' && lang !== 'en') {
+            var langs = navigator.languages || [navigator.language || ''];
+            var lower = langs.map(function (l) { return l.toLowerCase(); });
+            var prefersZh = lower.some(function (l) { return l.indexOf('zh') === 0; });
+            var prefersEn = lower.some(function (l) { return l.indexOf('en') === 0; });
+            lang = (prefersEn && !prefersZh) ? 'en' : 'zh';
+          }
+          de.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
         } catch (e) {}
       })();
     </script>
-    <title>Wang Pu — Designer & Engineer</title>
+    <title>王普 — 设计师 & 工程师</title>
   </head>
   <body>
     <div id="root"></div>
