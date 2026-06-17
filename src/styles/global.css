@@ -46,6 +46,15 @@ ul, ol { list-style: none; padding: 0; }
 }
 h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.06; letter-spacing: -0.015em; }
 
+/* CJK display type: keep words/phrases intact, break only at punctuation or
+   spaces. The emergency break-word guards against overflow on narrow screens.
+   Scoped to headings so Chinese body text still wraps normally. */
+:lang(zh) :is(.display, h1, h2, h3):not(.about-teaser__text) {
+  word-break: keep-all;
+  line-break: strict;
+  overflow-wrap: break-word;
+}
+
 .eyebrow {
   font-family: var(--font-body);
   font-size: var(--step--1);

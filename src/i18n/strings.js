@@ -61,7 +61,7 @@ export const ui = {
     heroCta: { primary: '查看作品', secondary: '联系我' },
     home: {
       selectedWorkEyebrow: '精选作品',
-      selectedWorkTitle: '几个我引以为豪的项目。',
+      selectedWorkTitle: '几件作品，我颇为自豪。',
       allProjects: '查看全部项目 →',
       aboutEyebrow: '关于',
       moreAbout: '了解更多 →',

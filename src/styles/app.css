@@ -215,6 +215,10 @@
 .page-head { margin-bottom: var(--space-xl); max-width: 24ch; }
 .page-head .lead { margin-top: var(--space-m); max-width: var(--measure); }
 .page-title { font-size: var(--step-5); }
+/* CJK display titles need more room than the Latin character measure allows. */
+:lang(zh) .page-head { max-width: none; }
+:lang(zh) .page-title { max-width: 22ch; }
+:lang(zh) .section__title { max-width: 20ch; }
 
 /* ---------------- About page ---------------- */
 .about__grid {
