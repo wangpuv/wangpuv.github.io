@@ -17,6 +17,10 @@ export default function Reveal({ children, delay = 0, as: Tag = 'div', className
       setVisible(true)
       return
     }
+    // threshold:0 (not 0.12) so elements taller than the viewport — e.g. the
+    // bookshelf grid — still trigger; a ratio-based threshold can never be
+    // reached when the element is much taller than the screen. The negative
+    // bottom rootMargin keeps the fade firing slightly after it enters view.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -24,7 +28,7 @@ export default function Reveal({ children, delay = 0, as: Tag = 'div', className
           observer.disconnect()
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+      { threshold: 0, rootMargin: '0px 0px -10% 0px' },
     )
     observer.observe(node)
     return () => observer.disconnect()

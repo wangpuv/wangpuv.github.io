@@ -32,13 +32,13 @@ export default function Life() {
 
                   {card.photo && (
                     <figure className="life-photo">
-                      <img src={card.photo} alt={c.photoAlt} loading="lazy" />
+                      <img src={card.photo} alt={c.photoAlt} />
                     </figure>
                   )}
 
                   {card.qr && (
                     <figure className="life-qr">
-                      <img src={card.qr} alt={c.qrAlt} loading="lazy" width="160" height="160" />
+                      <img src={card.qr} alt={c.qrAlt} width="160" height="160" />
                       <figcaption className="meta">{c.qrCaption}</figcaption>
                     </figure>
                   )}
@@ -67,7 +67,7 @@ export default function Life() {
             {books.map((b, i) => (
               <li className="book" key={i}>
                 <div className="book__cover">
-                  <img src={b.cover} alt={b.title} loading="lazy" width="285" height="411" />
+                  <img src={b.cover} alt={b.title} width="285" height="411" />
                 </div>
                 <p className="book__title">{b.title}</p>
                 <p className="book__meta meta">{b.author} · {b.year}</p>
