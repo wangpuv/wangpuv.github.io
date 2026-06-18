@@ -67,10 +67,15 @@
   transition: background var(--dur-fast), color var(--dur-fast);
 }
 .theme-toggle:hover { background: var(--line-soft); color: var(--ink); }
-/* The icon lives in a span wrapper (older iOS Safari won't render an inline
-   SVG placed directly inside a <button>). Center and pin its size here. */
-.theme-toggle__icon { display: inline-flex; align-items: center; justify-content: center; }
-.theme-toggle__icon svg { display: block; width: 18px; height: 18px; }
+/* Glyph icon (sun/moon). A text glyph instead of an inline SVG, which older
+   iOS Safari (16.1) fails to render inside this button. */
+.theme-toggle__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  line-height: 1;
+}
 
 .lang-toggle {
   display: grid; place-items: center;
