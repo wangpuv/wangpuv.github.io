@@ -15,6 +15,8 @@ export default function Nav() {
 
   const links = [
     { to: '/work', label: t.nav.work },
+    { to: '/lab', label: t.nav.lab },
+    { to: '/life', label: t.nav.life },
     { to: '/about', label: t.nav.about },
     { to: '/contact', label: t.nav.contact },
   ]

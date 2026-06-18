@@ -34,6 +34,7 @@ export default function Home() {
             <Link to="/work" className="btn btn--primary">
               {t.heroCta.primary} <span className="arrow" aria-hidden="true">→</span>
             </Link>
+            <Link to="/lab" className="btn btn--outline">{t.heroCta.lab}</Link>
             <Link to="/contact" className="btn btn--ghost">{t.heroCta.secondary}</Link>
           </div>
         </div>

@@ -122,6 +122,9 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.
 .btn--primary:hover { background: var(--accent-ink); }
 .btn--ghost { border-color: var(--line); color: var(--ink); }
 .btn--ghost:hover { border-color: var(--ink); }
+.btn--outline { border-color: var(--line); color: var(--ink); }
+.btn--outline:hover,
+.btn--outline:focus-visible { border-color: var(--highlight); color: var(--highlight); }
 .btn .arrow { transition: transform var(--dur-med) var(--ease-out); }
 .btn:hover .arrow { transform: translateX(4px); }
 
