@@ -63,14 +63,16 @@
   display: grid; place-items: center;
   width: 2.2rem; height: 2.2rem;
   border-radius: 50%;
+  border: 1px solid var(--line);
   color: var(--ink-soft);
-  transition: background var(--dur-fast), color var(--dur-fast);
+  transition: border-color var(--dur-fast), color var(--dur-fast);
 }
-.theme-toggle:hover { background: var(--line-soft); color: var(--ink); }
+.theme-toggle:hover { border-color: var(--ink); color: var(--ink); }
 /* Sun/moon icon drawn via CSS mask (not an inline SVG, which older iOS Safari
    16.1 fails to render inside this button). background-color = currentColor so
    it still tints with the button color and hover state. */
 .theme-toggle__icon {
+  display: block;
   width: 18px;
   height: 18px;
   background-color: currentColor;
@@ -92,15 +94,14 @@
 
 .lang-toggle {
   display: grid; place-items: center;
-  min-width: 2.2rem; height: 2.2rem;
-  padding-inline: 0.5rem;
-  border-radius: 100px;
+  width: 2.2rem; height: 2.2rem;
+  border-radius: 50%;
   border: 1px solid var(--line);
   font-size: var(--step--1);
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--ink-soft);
-  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+  transition: color var(--dur-fast), border-color var(--dur-fast);
 }
 .lang-toggle:hover { border-color: var(--ink); color: var(--ink); }
 
