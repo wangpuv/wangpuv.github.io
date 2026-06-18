@@ -413,6 +413,17 @@
 .life-card__link { margin-top: auto; align-self: flex-start; font-weight: 500; }
 .life-card__link .arrow { display: inline-block; transition: transform var(--dur-med) var(--ease-out); }
 .life-card__link:hover .arrow { transform: translateX(4px); }
+.life-photo { margin: var(--space-xs) 0 0; }
+.life-photo img {
+  width: auto;
+  height: 200px;
+  max-width: 100%;
+  display: block;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  object-fit: contain;
+}
 .life-qr { margin: var(--space-xs) 0 0; }
 .life-qr img {
   width: 160px;

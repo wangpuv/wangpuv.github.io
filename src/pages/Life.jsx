@@ -30,6 +30,12 @@ export default function Life() {
                   <h2 className="life-card__title display">{c.title}</h2>
                   <p className="life-card__body">{c.body}</p>
 
+                  {card.photo && (
+                    <figure className="life-photo">
+                      <img src={card.photo} alt={c.photoAlt} loading="lazy" />
+                    </figure>
+                  )}
+
                   {card.qr && (
                     <figure className="life-qr">
                       <img src={card.qr} alt={c.qrAlt} loading="lazy" width="160" height="160" />
