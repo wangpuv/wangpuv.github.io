@@ -67,9 +67,10 @@
   transition: background var(--dur-fast), color var(--dur-fast);
 }
 .theme-toggle:hover { background: var(--line-soft); color: var(--ink); }
-/* Pin the icon size in CSS — older iOS Safari can collapse an inline SVG that
-   is sized only via HTML width/height attributes when it sits in a grid cell. */
-.theme-toggle svg { display: block; width: 18px; height: 18px; }
+/* The icon lives in a span wrapper (older iOS Safari won't render an inline
+   SVG placed directly inside a <button>). Center and pin its size here. */
+.theme-toggle__icon { display: inline-flex; align-items: center; justify-content: center; }
+.theme-toggle__icon svg { display: block; width: 18px; height: 18px; }
 
 .lang-toggle {
   display: grid; place-items: center;
