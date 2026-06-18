@@ -67,14 +67,27 @@
   transition: background var(--dur-fast), color var(--dur-fast);
 }
 .theme-toggle:hover { background: var(--line-soft); color: var(--ink); }
-/* Glyph icon (sun/moon). A text glyph instead of an inline SVG, which older
-   iOS Safari (16.1) fails to render inside this button. */
+/* Sun/moon icon drawn via CSS mask (not an inline SVG, which older iOS Safari
+   16.1 fails to render inside this button). background-color = currentColor so
+   it still tints with the button color and hover state. */
 .theme-toggle__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  line-height: 1;
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+.theme-toggle__icon.is-moon {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z'/%3E%3C/svg%3E");
+}
+.theme-toggle__icon.is-sun {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4.5'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(45 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(90 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(135 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(180 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(225 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(270 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(315 12 12)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4.5'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(45 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(90 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(135 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(180 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(225 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(270 12 12)'/%3E%3Crect x='11.1' y='1' width='1.8' height='3.8' rx='0.9' transform='rotate(315 12 12)'/%3E%3C/svg%3E");
 }
 
 .lang-toggle {
