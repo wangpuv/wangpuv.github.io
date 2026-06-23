@@ -80,6 +80,23 @@ export const lifeCards = [
     },
   },
   {
+    key: 'fitness',
+    accent: 'oklch(58% 0.15 25)',
+    photo: '/running-stats.png',
+    en: {
+      label: 'Fitness',
+      title: 'Running, kept up since 2021',
+      body: 'I’ve kept running since 2021 — 1,377 km logged so far. My latest personal best is a 5K in 33:19.',
+      photoAlt: 'A run summary: 5.17 km in 34:24, 401 kcal, avg pace 6’39”/km',
+    },
+    zh: {
+      label: '健身',
+      title: '从 2021 年开始，一直在跑',
+      body: '从 2021 年开始坚持跑步，目前已经跑了 1377 公里。最近一次 5 公里用时 33 分 19 秒。',
+      photoAlt: '一次跑步数据：5.17 公里、用时 34:24、401 千卡、平均配速 6’39”/公里',
+    },
+  },
+  {
     key: 'reading',
     accent: 'oklch(54% 0.17 36)',
     photo: '/infinity-cover.webp',
