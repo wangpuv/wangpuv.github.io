@@ -7,6 +7,11 @@ const SUPPORTED = ['zh', 'en']
 // Default is Chinese. Only browsers that prefer English (and not Chinese)
 // start in English. A stored manual choice always wins.
 function detectInitial() {
+  if (typeof window !== 'undefined') {
+    const routeLang = window.location.pathname.match(/^\/(zh|en)(?:\/|$)/)?.[1]
+    if (routeLang) return routeLang
+    if (window.location.pathname === '/') return 'zh'
+  }
   try {
     const stored = localStorage.getItem('lang')
     if (SUPPORTED.includes(stored)) return stored
@@ -23,8 +28,8 @@ function detectInitial() {
   return 'zh'
 }
 
-export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState(detectInitial)
+export function LanguageProvider({ children, initialLang }) {
+  const [lang, setLang] = useState(() => initialLang || detectInitial())
 
   useEffect(() => {
     document.documentElement.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en')
@@ -37,8 +42,13 @@ export function LanguageProvider({ children }) {
 
   const toggle = () => setLang((l) => (l === 'zh' ? 'en' : 'zh'))
 
+  const localizePath = (path = '/') => {
+    const clean = path === '/' ? '' : `/${path.replace(/^\/+|\/+$/g, '')}`
+    return `/${lang}${clean}/`
+  }
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang, toggle }}>
+    <LanguageContext.Provider value={{ lang, setLang, toggle, localizePath }}>
       {children}
     </LanguageContext.Provider>
   )

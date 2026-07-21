@@ -6,12 +6,12 @@ import { useLanguage } from '../i18n/LanguageContext'
  * Hover reveals the accent and nudges the title.
  */
 export default function ProjectCard({ project, index }) {
-  const { lang } = useLanguage()
+  const { lang, localizePath } = useLanguage()
   const c = project[lang]
 
   return (
     <Link
-      to="/work"
+      to={localizePath('/work')}
       className="work-row"
       style={{ '--row-accent': project.accent }}
     >

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="王普 — 后端开发工程师、架构师、AI Agent 工程师。真实工程项目与技术经历。" />
+    <meta name="description" content="王普，资深后端与 AI Agent 应用工程师。20 年软件研发经验，专注将大型后端和分布式系统能力应用到 AI Agent 产品开发。" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -17,13 +17,15 @@
       // Set theme + language before paint to avoid a flash of the wrong state.
       (function () {
         var de = document.documentElement;
+        de.classList.add('js');
         try {
           var stored = localStorage.getItem('theme');
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           de.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
         } catch (e) {}
         try {
-          var lang = localStorage.getItem('lang');
+          var routeLang = location.pathname.match(/^\/(zh|en)(?:\/|$)/);
+          var lang = routeLang ? routeLang[1] : (location.pathname === '/' ? 'zh' : localStorage.getItem('lang'));
           if (lang !== 'zh' && lang !== 'en') {
             var langs = navigator.languages || [navigator.language || ''];
             var lower = langs.map(function (l) { return l.toLowerCase(); });
@@ -35,10 +37,11 @@
         } catch (e) {}
       })();
     </script>
-    <title>王普 — 后端开发工程师 / 架构师 / AI Agent 工程师</title>
+    <!--app-head-->
+    <title>王普 — 资深后端与 AI Agent 应用工程师</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

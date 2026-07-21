@@ -34,6 +34,19 @@ ul, ol { list-style: none; padding: 0; }
   border-radius: 2px;
 }
 
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 1000;
+  padding: 0.7rem 1rem;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: var(--radius);
+  transform: translateY(-160%);
+}
+.skip-link:focus { transform: translateY(0); }
+
 /* ---------- Display typography ---------- */
 .display {
   font-family: var(--font-display);
@@ -127,15 +140,23 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.
 .btn--outline:focus-visible { border-color: var(--highlight); color: var(--highlight); }
 .btn .arrow { transition: transform var(--dur-med) var(--ease-out); }
 .btn:hover .arrow { transform: translateX(4px); }
+.btn.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  border-color: var(--line);
+  color: var(--muted);
+}
+.btn.is-disabled:hover { border-color: var(--line); color: var(--muted); transform: none; }
 
 /* ---------- Scroll reveal ---------- */
-.reveal {
+.reveal { opacity: 1; transform: none; }
+.js .reveal {
   opacity: 0;
   transform: translateY(18px);
   transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out);
   transition-delay: var(--reveal-delay, 0ms);
 }
-.reveal.is-visible { opacity: 1; transform: none; }
+.js .reveal.is-visible { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

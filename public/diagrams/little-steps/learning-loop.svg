@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" role="img" aria-labelledby="title desc">
+  <title id="title">小步学习伙伴产品闭环</title>
+  <desc id="desc">从录入真实错题、诊断确认错因、讲解与理解检查，到分层写回和下次续学的流程。</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#1e293b" stroke-width="0.5"/></pattern>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#64748b"/></marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#60a5fa"/></marker>
+    <marker id="arrow-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0,10 3.5,0 7" fill="#fb7185"/></marker>
+    <style>
+      text{font-family:'JetBrains Mono','Noto Sans SC','PingFang SC',sans-serif}
+      .title{font-size:20px;font-weight:700;fill:#f8fafc}.sub{font-size:10px;fill:#94a3b8}.name{font-size:13px;font-weight:600;fill:#f8fafc}.detail{font-size:9px;fill:#94a3b8}.step{font-size:9px;font-weight:600;fill:#fb923c}.label{font-size:8px;fill:#cbd5e1}
+    </style>
+  </defs>
+  <rect width="1000" height="520" fill="#0f172a"/><rect width="1000" height="520" fill="url(#grid)"/>
+  <text class="title" x="32" y="38">错题驱动的持续学习闭环</text>
+  <text class="sub" x="32" y="58">系统固定数据与安全边界，教学策略由 Agent 根据上下文自主选择</text>
+
+  <path d="M205 174H255" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M425 174H475" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M645 174H695" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M780 219V274" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M695 329H645" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M475 329H425" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M255 329H140V219" fill="none" stroke="#60a5fa" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <path d="M560 219V248H390V219" fill="none" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrow-rose)"/>
+  <text class="label" x="462" y="241">未确认：继续追问或修正假设</text>
+
+  <rect x="35" y="129" width="170" height="90" rx="10" fill="#0f172a"/><rect x="35" y="129" width="170" height="90" rx="10" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="1.5"/>
+  <text class="step" x="52" y="151">01 · INPUT</text><text class="name" x="120" y="177" text-anchor="middle">录入真实错题</text><text class="detail" x="120" y="197" text-anchor="middle">手动 / 截图识题 / 人工订正</text>
+
+  <rect x="255" y="129" width="170" height="90" rx="10" fill="#0f172a"/><rect x="255" y="129" width="170" height="90" rx="10" fill="rgba(6,78,59,.4)" stroke="#34d399" stroke-width="1.5"/>
+  <text class="step" x="272" y="151">02 · DIAGNOSE</text><text class="name" x="340" y="177" text-anchor="middle">形成错因假设</text><text class="detail" x="340" y="197" text-anchor="middle">Agent 自主追问，不写死教学流程</text>
+
+  <g transform="translate(560 174)"><polygon points="0,-52 85,0 0,52 -85,0" fill="#0f172a"/><polygon points="0,-52 85,0 0,52 -85,0" fill="rgba(120,53,15,.3)" stroke="#fbbf24" stroke-width="1.5"/><text class="name" y="-4" text-anchor="middle">孩子确认错因？</text><text class="detail" y="16" text-anchor="middle">hypothesis → confirmed</text></g>
+
+  <rect x="695" y="129" width="170" height="90" rx="10" fill="#0f172a"/><rect x="695" y="129" width="170" height="90" rx="10" fill="rgba(59,130,246,.3)" stroke="#60a5fa" stroke-width="1.5"/>
+  <text class="step" x="712" y="151">03 · TEACH</text><text class="name" x="780" y="177" text-anchor="middle">讲解与理解检查</text><text class="detail" x="780" y="197" text-anchor="middle">文字讲解 + 可选交互可视化</text>
+
+  <rect x="695" y="284" width="170" height="90" rx="10" fill="#0f172a"/><rect x="695" y="284" width="170" height="90" rx="10" fill="rgba(6,78,59,.4)" stroke="#34d399" stroke-width="1.5"/>
+  <text class="step" x="712" y="306">04 · VERIFY</text><text class="name" x="780" y="332" text-anchor="middle">重做与重测</text><text class="detail" x="780" y="352" text-anchor="middle">结果更新掌握状态与复习信号</text>
+
+  <rect x="475" y="284" width="170" height="90" rx="10" fill="#0f172a"/><rect x="475" y="284" width="170" height="90" rx="10" fill="rgba(76,29,149,.4)" stroke="#a78bfa" stroke-width="1.5"/>
+  <text class="step" x="492" y="306">05 · WRITE BACK</text><text class="name" x="560" y="332" text-anchor="middle">分层写回</text><text class="detail" x="560" y="352" text-anchor="middle">事实 / 画像 / 分科计划 / 历史</text>
+
+  <rect x="255" y="284" width="170" height="90" rx="10" fill="#0f172a"/><rect x="255" y="284" width="170" height="90" rx="10" fill="rgba(8,51,68,.4)" stroke="#22d3ee" stroke-width="1.5"/>
+  <text class="step" x="272" y="306">06 · RESUME</text><text class="name" x="340" y="332" text-anchor="middle">下次主动续学</text><text class="detail" x="340" y="352" text-anchor="middle">按计划、薄弱点和历史恢复上下文</text>
+
+  <rect x="35" y="284" width="170" height="90" rx="10" fill="#0f172a"/><rect x="35" y="284" width="170" height="90" rx="10" fill="rgba(30,41,59,.5)" stroke="#94a3b8" stroke-width="1.5"/>
+  <text class="step" x="52" y="306">07 · CONTINUE</text><text class="name" x="120" y="332" text-anchor="middle">新的学习会话</text><text class="detail" x="120" y="352" text-anchor="middle">不是一次性 Chatbot 对话</text>
+
+  <rect x="35" y="424" width="930" height="60" rx="9" fill="rgba(136,19,55,.25)" stroke="#fb7185" stroke-width="1" stroke-dasharray="6 4"/>
+  <text x="55" y="450" fill="#fb7185" font-size="10" font-weight="600">安全边界</text>
+  <text x="135" y="450" fill="#cbd5e1" font-size="9">AI 提议的答案未经家长确认不落库 · 未确认错因不进入薄弱点 · 交互页面失败不影响完整文字讲解</text>
+  <text x="135" y="468" fill="#94a3b8" font-size="8">当前 v1-alpha：初中阶段 / 科学 + 英语 / 本地单用户 demo</text>
+</svg>

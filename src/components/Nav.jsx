@@ -7,18 +7,17 @@ import ThemeToggle from './ThemeToggle'
 import LanguageToggle from './LanguageToggle'
 
 export default function Nav() {
-  const { lang } = useLanguage()
+  const { lang, localizePath } = useLanguage()
   const t = ui[lang]
   const p = profile[lang]
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   const links = [
-    { to: '/work', label: t.nav.work },
-    { to: '/lab', label: t.nav.lab },
-    { to: '/life', label: t.nav.life },
-    { to: '/about', label: t.nav.about },
-    { to: '/contact', label: t.nav.contact },
+    { to: localizePath('/projects/little-steps'), label: t.nav.featured },
+    { to: localizePath('/work'), label: t.nav.work },
+    { to: localizePath('/about'), label: t.nav.about },
+    { to: localizePath('/contact'), label: t.nav.contact },
   ]
 
   useEffect(() => {
@@ -34,21 +33,25 @@ export default function Nav() {
     return () => { document.body.style.overflow = '' }
   }, [open])
 
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+
   return (
     <header className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
       <div className="wrap nav__inner">
-        <Link to="/" className="nav__brand" onClick={() => setOpen(false)}>
+        <Link to={localizePath('/')} className="nav__brand" onClick={() => setOpen(false)}>
           <span className="nav__mark">{profile.initials}</span>
           <span className="nav__name">{p.name}</span>
         </Link>
 
         <nav className="nav__links" aria-label="Primary">
           {links.map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              className={({ isActive }) => `nav__link ${isActive ? 'is-active' : ''}`}
-            >
+            <NavLink key={l.to} to={l.to} className={({ isActive }) => `nav__link ${isActive ? 'is-active' : ''}`}>
               {l.label}
             </NavLink>
           ))}
@@ -60,7 +63,7 @@ export default function Nav() {
           <button
             type="button"
             className={`nav__burger ${open ? 'is-open' : ''}`}
-            aria-label="Toggle menu"
+            aria-label={lang === 'zh' ? '打开或关闭菜单' : 'Toggle menu'}
             aria-expanded={open}
             onClick={() => setOpen((o) => !o)}
           >

@@ -5,7 +5,7 @@ import { useLanguage } from '../i18n/LanguageContext'
 import { copyEmail } from '../lib/contact'
 
 export default function Footer() {
-  const { lang } = useLanguage()
+  const { lang, localizePath } = useLanguage()
   const t = ui[lang]
   const p = profile[lang]
   const year = new Date().getFullYear()
@@ -32,12 +32,12 @@ export default function Footer() {
             <div>
               <p className="meta footer__col-title">{t.footer.sitemap}</p>
               <ul className="footer__list">
-                <li><Link className="link" to="/">{t.footer.home}</Link></li>
-                <li><Link className="link" to="/work">{t.footer.work}</Link></li>
-                <li><Link className="link" to="/lab">{t.footer.lab}</Link></li>
-                <li><Link className="link" to="/life">{t.footer.life}</Link></li>
-                <li><Link className="link" to="/about">{t.footer.about}</Link></li>
-                <li><Link className="link" to="/contact">{t.footer.contact}</Link></li>
+                <li><Link className="link" to={localizePath('/')}>{t.footer.home}</Link></li>
+                <li><Link className="link" to={localizePath('/work')}>{t.footer.work}</Link></li>
+                <li><Link className="link" to={localizePath('/lab')}>{t.footer.lab}</Link></li>
+                <li><Link className="link" to={localizePath('/life')}>{t.footer.life}</Link></li>
+                <li><Link className="link" to={localizePath('/about')}>{t.footer.about}</Link></li>
+                <li><Link className="link" to={localizePath('/contact')}>{t.footer.contact}</Link></li>
               </ul>
             </div>
             <div>

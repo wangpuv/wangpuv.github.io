@@ -1,0 +1,15 @@
+# Wang Pu — Senior Backend & AI Agent Application Engineer
+
+Wang Pu has 20 years of software engineering experience across e-commerce transactions, distributed systems, high-concurrency platforms, authorization infrastructure, and directory services.
+
+Current focus: applying mature backend engineering to AI Agent products. He is independently developing Little Step Learning Partner, a local wrong-question-driven AI learning Agent.
+
+Primary pages:
+- Chinese home: https://wangpuv.github.io/zh/
+- English home: https://wangpuv.github.io/en/
+- Little Step case study: https://wangpuv.github.io/zh/projects/little-steps/
+- Engineering cases: https://wangpuv.github.io/zh/work/
+- About: https://wangpuv.github.io/zh/about/
+- Contact: mailto:wangpuv@hotmail.com
+
+Availability: Hangzhou or Shanghai; remote-friendly; available immediately.

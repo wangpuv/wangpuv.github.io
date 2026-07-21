@@ -26,8 +26,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      # SPA fallback: serve the app for deep links like /work/<slug> on refresh.
-      - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -7,22 +7,23 @@ export const profile = {
 
   en: {
     name: 'Wang Pu',
-    role: 'Backend Engineer / Architect / AI Agent Engineer',
+    role: 'Senior Backend & AI Agent Application Engineer',
     location: 'Hangzhou, China',
-    aboutTitle: 'Wang Pu, backend engineer, architect, and AI Agent engineer.',
-    heroLines: ['Backend', 'architecture,', 'and AI Agent', 'engineering.'],
+    aboutTitle: 'Senior backend experience, applied to AI Agent product engineering.',
+    heroLines: ['Large-scale backend experience,', 'applied to AI Agent products.'],
     heroIntro:
       'I build reliable backend systems, high-concurrency transaction platforms, and organization-scale permission architectures. Recently I have been shifting more of my work toward AI engineering and agentic product systems.',
     about: [
       'I am a backend engineer and architect with long-running experience in distributed systems, high-concurrency business platforms, organization-level permission systems, and large-scale directory services.',
       'At Alibaba, my work has covered Taobao transaction systems, shopping cart architecture, middleware-style delivery platforms, group-wide ACL systems, and government-grade directory services serving millions of users and hundreds of thousands of organizations.',
-      'My current focus is AI engineering: turning model capabilities into stable product features, from streaming protocols and prompt design to engineering frameworks that can be shipped and operated.',
+      'I now apply that engineering background to AI Agent products: tool use, state, orchestration, structured output, failure recovery, testing, and product delivery.',
       'Outside of engineering work, I write about reading, technology, and personal observations on my WeChat public account, A Cheng De Dai Ma.',
     ],
     skills: [
-      { group: 'Backend', items: ['Java ecosystem', 'Distributed systems', 'High-concurrency transactions', 'Service stability'] },
-      { group: 'Architecture', items: ['ACL systems', 'Directory services', 'Disaster recovery', 'Platform productization'] },
-      { group: 'AI Engineering', items: ['AI Agent workflows', 'LLM streaming protocols', 'Prompt optimization', 'AI feature architecture'] },
+      { group: 'Backend & Architecture · Core', items: ['Java / Spring ecosystem', 'Distributed systems', 'High-concurrency transactions', 'Reliability and degradation'] },
+      { group: 'Data & Middleware · Core / Used', items: ['Relational data and transactions', 'Caching, messaging, and search', 'Tair and multi-level caching', 'SQLite data modeling'] },
+      { group: 'AI Agent Applications · Used / Deepening', items: ['Agent loops and tool use', 'State and structured output', 'Streaming and failure recovery', 'Python / FastAPI (deepening)'] },
+      { group: 'Engineering Practice · Core', items: ['Architecture decisions', 'Performance governance', 'Automated tests and evals', 'Codex / Claude Code collaboration'] },
     ],
     achievements: [
       {
@@ -58,7 +59,13 @@ export const profile = {
     ],
     experience: [
       {
-        period: '2014 — 2025',
+        period: 'Sep 2025 — Present',
+        role: 'Independent Developer · AI Agent Product Engineering',
+        org: 'Little Step Learning Partner / LittleSteps / Open Source',
+        note: 'Independently building an AI learning Agent and an iOS habit app, while shipping several open-source developer tools with Codex and Claude Code as development collaborators.',
+      },
+      {
+        period: '2014 — Aug 2025',
         role: 'Technical Expert',
         org: 'Alibaba Group',
         note: 'Worked across Taobao transaction systems and enterprise intelligence; led architecture for AI product features, shopping cart reconstruction, ACL systems, and VDS directory services.',
@@ -86,22 +93,23 @@ export const profile = {
 
   zh: {
     name: '王普',
-    role: '后端开发工程师 / 架构师 / AI Agent 工程师',
+    role: '资深后端与 AI Agent 应用工程师',
     location: '中国 · 杭州',
-    aboutTitle: '我是王普，后端开发工程师、架构师和 AI Agent 工程师。',
-    heroLines: ['做后端，', '做架构，', '也在转向', 'AI Agent。'],
+    aboutTitle: '把长期后端工程经验，应用到 AI Agent 产品开发。',
+    heroLines: ['把大型后端系统经验，', '带入 AI Agent 产品开发。'],
     heroIntro:
       '我长期从事后端系统、高并发交易系统、组织级权限体系和大型目录服务建设。最近把更多精力放在 AI 工程与 Agent 化产品系统上。',
     about: [
       '我是后端开发工程师和架构师，长期关注分布式系统、高并发业务平台、组织级权限体系，以及大规模目录服务这类需要稳定性和工程深度的问题。',
       '在阿里巴巴，我参与和主导过淘宝交易链路、购物车架构、中台方案交付平台、集团级 ACL 权限系统，以及支撑百万级用户和数十万组织的政务级目录服务。',
-      '现在我正在把工程经验迁移到 AI 方向：从大模型流式协议、Prompt 优化，到可上线、可运维的 AI 功能架构和 Agent 工作流。',
+      '现在我把这些工程经验应用到 AI Agent 产品：工具调用、状态管理、任务编排、结构化输出、失败恢复、测试与交付，而不只是调用模型 API。',
       '工作之外，我也在微信公众号「阿诚的代码」写一些关于阅读、技术和个人观察的内容。',
     ],
     skills: [
-      { group: '后端工程', items: ['Java 技术体系', '分布式系统', '高并发交易', '服务稳定性'] },
-      { group: '系统架构', items: ['ACL 权限体系', '目录服务', '容灾降级', '平台产品化'] },
-      { group: 'AI 工程', items: ['AI Agent 工作流', '大模型流式协议', 'Prompt 优化', 'AI 功能架构'] },
+      { group: '后端与架构 · 核心能力', items: ['Java / Spring 技术体系', '分布式系统', '高并发交易', '稳定性与容灾降级'] },
+      { group: '数据与中间件 · 核心 / 项目使用', items: ['关系型数据与事务', '缓存、消息与搜索', 'Tair 与多级缓存', 'SQLite 数据建模'] },
+      { group: 'AI Agent 应用 · 项目使用 / 正在深入', items: ['Agent Loop 与工具调用', '状态管理与结构化输出', '流式协议与失败恢复', 'Python / FastAPI（正在深入）'] },
+      { group: '工程实践 · 核心能力', items: ['架构与技术决策', '性能与稳定性治理', '自动化测试与评测', 'Codex / Claude Code 协作开发'] },
     ],
     achievements: [
       {
@@ -137,7 +145,13 @@ export const profile = {
     ],
     experience: [
       {
-        period: '2014 — 2025',
+        period: '2025.09 — 至今',
+        role: '独立开发者｜AI Agent 产品研发',
+        org: '小步学习伙伴 / 小步打卡 / 开源项目',
+        note: '独立开发 AI 学习 Agent 与 iOS 习惯养成 App，并使用 Codex、Claude Code 协作完成多个开源开发工具。',
+      },
+      {
+        period: '2014 — 2025.08',
         role: '技术专家',
         org: '阿里巴巴集团',
         note: '先后在企业智能事业部和淘宝交易线工作，负责 AI 产品能力、购物车重构、ACL 权限体系和 VDS 目录服务等核心系统架构。',
