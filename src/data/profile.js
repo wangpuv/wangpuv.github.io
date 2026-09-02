@@ -12,11 +12,11 @@ export const profile = {
     aboutTitle: 'Wang Pu, bringing systems engineering into reliable AI agents.',
     heroLines: ['Backend depth,', 'architecture judgment,', 'and reliable', 'AI agents.'],
     heroIntro:
-      'I build reliable backend systems, high-concurrency transaction platforms, and organization-scale permission architectures. I now apply that experience to AI agent engineering, AI application architecture, and AI platforms.',
+      'I have built reliable backend systems, high-concurrency transaction platforms, and organization-scale permission architectures. I now bring that depth to AI agent engineering, AI application architecture, and AI platforms.',
     about: [
-      'I am a backend engineer and architect with long-running experience in distributed systems, high-concurrency business platforms, organization-level permission systems, and large-scale directory services.',
+      'I am a backend engineer and architect with deep experience in distributed systems, high-concurrency business platforms, organization-level permission systems, and large-scale directory services.',
       'At Alibaba, my work has covered Taobao transaction systems, shopping cart architecture, middleware-style delivery platforms, group-wide ACL systems, and government-grade directory services serving millions of users and hundreds of thousands of organizations.',
-      'My current focus is AI agent engineering: I have led the build of a complete learning agent with tool calling, trustworthy cross-session memory, bounded side effects, and a host system that keeps model behavior verifiable and recoverable.',
+      'My focus now is AI agent engineering. I have led the build of a complete learning agent with tool calling, trustworthy cross-session memory, bounded side effects, and a host system that keeps model behavior verifiable and recoverable.',
       'Outside of engineering work, I write about reading, technology, and personal observations on my WeChat public account, A Cheng De Dai Ma.',
     ],
     skills: [
@@ -43,7 +43,7 @@ export const profile = {
       {
         metric: '2 patents',
         label: 'system architecture',
-        detail: 'Delivered one national patent for large-organization address book visibility control, plus a core directory-service algorithm patent kept as an enterprise patent rather than filed nationally, since the algorithm is best left undisclosed.',
+        detail: 'One national patent for large-organization address book visibility control, plus a core directory-service algorithm patent retained at enterprise level.',
       },
       {
         metric: 'Top 2',
@@ -100,7 +100,7 @@ export const profile = {
     heroIntro:
       '我长期从事后端系统、高并发交易、组织级权限体系和大型目录服务建设。现在把这些经验用于 AI Agent 工程、AI 应用架构与 AI 平台。',
     about: [
-      '我是后端开发工程师和架构师，长期关注分布式系统、高并发业务平台、组织级权限体系，以及大规模目录服务这类需要稳定性和工程深度的问题。',
+      '我是后端工程师和架构师，长期深耕分布式系统、高并发业务平台、组织级权限体系，以及大规模目录服务——都是对稳定性和工程深度要求极高的领域。',
       '在阿里巴巴，我参与和主导过淘宝交易链路、购物车架构、中台方案交付平台、集团级 ACL 权限系统，以及支撑百万级用户和数十万组织的政务级目录服务。',
       '现在我聚焦 AI Agent 工程：已经主导构建具备工具调用、跨会话可信记忆和有界副作用的完整学习 Agent，并由宿主系统保证模型行为可验证、可恢复。',
       '工作之外，我也在微信公众号「阿诚的代码」写一些关于阅读、技术和个人观察的内容。',
@@ -129,7 +129,7 @@ export const profile = {
       {
         metric: '2 项专利',
         label: '系统架构',
-        detail: '沉淀大型组织通讯录可见性控制国家级专利，以及企业核心目录服务算法专利（因算法不宜公开未申请国家专利）。',
+        detail: '大型组织通讯录可见性控制国家级专利，以及企业级目录服务核心算法专利。',
       },
       {
         metric: 'Top 2',

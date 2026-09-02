@@ -48,7 +48,7 @@ export const thisyear = {
       },
       {
         paragraphs: [
-          "Most of this year went to family. In those ordinary days, something shifted in me that I didn't expect: I learned to genuinely listen instead of rushing to provide solutions; to understand a situation from someone else's position before making judgments. After more than a decade in technology, you start to believe every problem can be solved with architecture — but people are not systems. Accompanying a child through a difficult period, there is no architecture to rely on. You can only be present, wait, and patiently do the same things over and over until they find their own strength.",
+          "Most of this year went to family. In those ordinary days, something shifted in me that I didn't expect: I learned to genuinely listen instead of rushing to provide solutions; to understand a situation from someone else's position before making judgments. After more than a decade in technology, you start to believe every problem can be solved with architecture — but people are not systems. Walking with a child through a hard stretch, there is no architecture to fall back on. You can only show up, wait, and do the same things over and over until they find their own strength.",
         ],
       },
       {

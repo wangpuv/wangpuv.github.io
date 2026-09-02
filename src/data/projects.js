@@ -46,7 +46,7 @@ export const projects = [
       overview:
         'Taobao shopping cart sits on the critical path of e-commerce transactions. The reconstruction focused on business evolution, technical stability, and throughput under both daily traffic and major campaign peaks.',
       contributions: [
-        'Participated in core architecture design for the reconstructed shopping cart transaction flow.',
+        'Co-designed the core architecture for the reconstructed shopping cart transaction flow.',
         'Balanced business growth requirements with stability work in a high-concurrency production system.',
         'Supported daily and large-promotion scenarios with architecture changes that could be rolled out safely.',
       ],
