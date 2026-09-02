@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import Nav from './Nav'
 import Footer from './Footer'
 import Toast from './Toast'

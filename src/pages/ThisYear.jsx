@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import Reveal from '../components/Reveal'
 import { thisyear } from '../data/thisyear'
 import { useLanguage } from '../i18n/LanguageContext'

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import Reveal from '../components/Reveal'
 import AppShots from '../components/AppShots'
 import { home } from '../data/home'

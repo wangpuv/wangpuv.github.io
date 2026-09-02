@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router'
 import '@fontsource-variable/fraunces/wght.css'
 import '@fontsource-variable/fraunces/wght-italic.css'
 import '@fontsource-variable/geist/wght.css'
@@ -11,12 +11,7 @@ import './styles/global.css'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <LanguageProvider>
-      <BrowserRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
+      <BrowserRouter>
         <App />
       </BrowserRouter>
     </LanguageProvider>

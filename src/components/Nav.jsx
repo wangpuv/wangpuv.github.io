@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { NavLink, Link, useLocation } from 'react-router-dom'
+import { NavLink, Link, useLocation } from 'react-router'
 import { profile } from '../data/profile'
 import { ui } from '../i18n/strings'
 import { useLanguage } from '../i18n/LanguageContext'

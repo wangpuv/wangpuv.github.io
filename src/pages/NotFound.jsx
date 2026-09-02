@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { ui } from '../i18n/strings'
 import { useLanguage } from '../i18n/LanguageContext'
 
