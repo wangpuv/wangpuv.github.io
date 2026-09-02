@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
 import { ui } from '../i18n/strings'
+import AppShots from './AppShots'
 
 /**
  * Personal-work row that expands in place to reveal details and a link
@@ -47,6 +48,19 @@ export default function LabItem({ item, index }) {
               <p className="meta proj__label">{t.project.overview}</p>
               <p>{c.overview}</p>
             </div>
+
+            {item.shots && (
+              <div className="proj__block">
+                <p className="meta proj__label">{t.lab.screens}</p>
+                <AppShots
+                  className={`shots--lab${item.shotsLayout === 'wide' ? ' shots--wide' : ''}`}
+                  shots={item.shots}
+                  labels={c.shots}
+                  appName={c.title}
+                  label={`${c.title} — ${t.lab.screens}`}
+                />
+              </div>
+            )}
 
             <div className="proj__block">
               <p className="meta proj__label">{t.lab.highlights}</p>

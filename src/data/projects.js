@@ -16,7 +16,7 @@ export const projects = [
         'Iterated prompt strategies around category-specific comparison and decision guidance.',
         'Connected model output with shopping cart interaction patterns while keeping latency and stability under control.',
       ],
-      outcome: 'Reached 3.5%+ average daily click-through rate and became a Top 2 shopping cart click-through feature in its category context.',
+      outcome: 'Reached 3.5%+ average daily click-through rate and ranked among the shopping cart’s two highest-CTR features.',
     },
     zh: {
       title: '购物车商品 AI 智能对比',
@@ -31,7 +31,7 @@ export const projects = [
         '围绕类目化对比和决策引导持续优化 Prompt 策略。',
         '把模型输出与购物车交互链路结合，同时控制延迟、稳定性和线上风险。',
       ],
-      outcome: '日均点击率 3.5%+，在购物车点击率中位列 Top 2 场景之一。',
+      outcome: '日均点击率 3.5%+，成为购物车点击率最高的两个功能之一。',
     },
   },
   {

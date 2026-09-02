@@ -3,6 +3,10 @@
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
+/* A modal <dialog> is centred by the UA's own `margin: auto` inside its
+   `inset: 0` box. The reset above wipes it, which pins every lightbox to the
+   top-left corner, so put it back. */
+dialog { margin: auto; }
 
 html {
   -webkit-text-size-adjust: 100%;

@@ -14,7 +14,11 @@ export default function ProjectItem({ project, index }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className={`proj${open ? ' is-open' : ''}`} style={{ '--row-accent': project.accent }}>
+    <div
+      id={project.slug}
+      className={`proj${open ? ' is-open' : ''}`}
+      style={{ '--row-accent': project.accent }}
+    >
       <button
         type="button"
         className="proj__head"

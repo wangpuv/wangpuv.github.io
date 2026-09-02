@@ -4,15 +4,82 @@
 // `slug`, `year`, `accent`, `kind`, `link` are shared; translatable
 // fields live in per-item en/zh blocks. Access via lab[lang].
 // `kind` is 'app' (App Store) or 'repo' (GitHub) — drives the CTA.
+// `icon` + `shots` are optional. A shot carries both theme variants of the
+// same screen; its caption lives in each language block under `shots`,
+// keyed by `shot.key`, so captions never drift out of order.
 // ───────────────────────────────────────────────────────────
 
 export const labs = [
   {
+    slug: 'little-step-learning',
+    year: '2026',
+    // The flagship agent accent (--agent), so this row reads as the same
+    // project the home page opens with.
+    accent: 'oklch(50% 0.19 285)',
+    kind: 'repo',
+    link: 'https://github.com/wangpuv/little-step-learning',
+    // Desktop screenshot and architecture diagram, so these plates run wide
+    // and in one column rather than as a row of phone screens.
+    shotsLayout: 'wide',
+    shots: [
+      { key: 'errata', light: '/little-step-errata.webp', width: 1440, height: 900 },
+      { key: 'architecture', light: '/little-step-architecture.webp', width: 1640, height: 1210 },
+    ],
+    en: {
+      title: 'Little Step Learning Agent',
+      summary:
+        'A mistake-driven learning agent for a single student — from logging a wrong answer through teaching, evidence, and timed review.',
+      tags: ['AI Agent', 'Tool calling', 'Local-first', 'Python'],
+      overview:
+        'Little Step began with my son’s wrong answers. The hard part was never explaining one more time — it was knowing which mistakes point at the same gap, what evidence counts as real mastery, and when to check back. I defined the product and the system boundaries and owned architecture, review, and acceptance, while AI agents wrote most of the implementation. The repository is source-available under an evaluation-only licence for recruiters and technical reviewers, and ships with a demo built on synthetic learning data so a reviewer can walk the whole loop without touching a real record.',
+      highlights: [
+        'Log one wrong answer and the agent decides for itself whether to explain, probe, or re-ask, keeps the evidence, and schedules the review — the question is not finished the moment it is answered.',
+        '“Mastered” is settled by the system, never declared by the model: the agent submits evidence and a proposed action, and domain rules decide what becomes durable fact, so learning state stays traceable and can be judged again later.',
+        'Cross-session memory separates raw facts, tentative judgments, and derived projections, so the model’s guesses never harden into untraceable durable state.',
+        'The agent loop has explicit step, timeout, and cancellation boundaries; every tool write passes typed validation, transactions, and idempotency keys, with 1392 unit and integration tests guarding each state change.',
+        'Local-first: the errata and the learning record stay on the family’s own machine.',
+      ],
+      stack: ['Python 3.12', 'FastAPI', 'SQLite', 'WebSocket'],
+      shots: {
+        errata: 'Errata library',
+        architecture: 'System architecture',
+      },
+    },
+    zh: {
+      title: '小步学习 Agent',
+      summary: '一个由错题驱动的单学生学习 Agent：从录入错题，到教学、留存证据，再到定时复查。',
+      tags: ['AI Agent', '工具调用', '本地优先', 'Python'],
+      overview:
+        '这个项目从我儿子的错题开始。真正难的从来不是再讲一遍答案，而是判断哪些错题指向同一个知识点、什么证据才算真的掌握、以及什么时候该复查。我负责产品定义、系统边界、架构、代码审查和最终验收，大部分实现由 AI Agent 完成。仓库以「源码可见（仅限评估）」的方式公开，供招聘方和技术评审查看，并内附一个使用合成学习数据的 Demo，评审可以完整走一遍流程，不会接触任何真实记录。',
+      highlights: [
+        '录入一道错题，Agent 自己决定是讲解、追问还是重新出题，留下学习证据，并安排之后的复查。一道题不会因为答对一次就结束。',
+        '「已经掌握」由系统结算，不由模型宣布：模型只提交学习证据和动作建议，什么能成为持久事实交给领域规则判定，学习状态因此可以追溯，也可以重新判断。',
+        '跨会话记忆区分原始事实、暂定判断和派生投影，模型的推测不会变成不可追溯的长期状态。',
+        'Agent 循环有步数、超时和取消边界；工具写入全部经过类型校验、事务与幂等键，1392 项单元与集成测试保护每一次状态变化。',
+        '本地优先：孩子的错题和学习记录留在家里自己的机器上。',
+      ],
+      stack: ['Python 3.12', 'FastAPI', 'SQLite', 'WebSocket'],
+      shots: {
+        errata: '错题本',
+        architecture: '系统架构',
+      },
+    },
+  },
+  {
     slug: 'littlesteps',
-    year: '2025',
+    year: '2026',
     accent: 'oklch(62% 0.14 160)',
     kind: 'app',
     link: 'https://apps.apple.com/us/app/%E5%B0%8F%E6%AD%A5%E6%89%93%E5%8D%A1-%E4%B8%AD%E5%B0%8F%E5%AD%A6%E7%94%9F%E4%B9%A0%E6%83%AF%E5%85%BB%E6%88%90/id6761506709',
+    icon: '/littlesteps/icon.webp',
+    // Unretouched App Store screenshots, one pair per screen. The app ships
+    // its own light and dark themes, so each plate follows the site theme.
+    shots: [
+      { key: 'today', light: '/littlesteps/today-light.webp', dark: '/littlesteps/today-dark.webp' },
+      { key: 'rewards', light: '/littlesteps/rewards-light.webp', dark: '/littlesteps/rewards-dark.webp' },
+      { key: 'achievements', light: '/littlesteps/achievements-light.webp', dark: '/littlesteps/achievements-dark.webp' },
+      { key: 'manage', light: '/littlesteps/manage-light.webp', dark: '/littlesteps/manage-dark.webp' },
+    ],
     en: {
       title: 'LittleSteps',
       summary: 'An offline-first iOS habit app for kids aged 6–15, building good routines through daily check-ins and rewards.',
@@ -25,6 +92,12 @@ export const labs = [
         'Flexible scheduling for school days, weekends, and holidays, plus local backup.',
       ],
       stack: ['Swift', 'SwiftUI', 'Local Storage'],
+      shots: {
+        today: 'Today',
+        rewards: 'Rewards',
+        achievements: 'Achievements',
+        manage: 'Parent controls',
+      },
     },
     zh: {
       title: '小步打卡',
@@ -38,6 +111,12 @@ export const labs = [
         '支持上学日、周末、假期的灵活排程，并提供本地备份。',
       ],
       stack: ['Swift', 'SwiftUI', '本地存储'],
+      shots: {
+        today: '今日打卡',
+        rewards: '奖励兑换',
+        achievements: '成就徽章',
+        manage: '家长管理',
+      },
     },
   },
   {
@@ -140,3 +219,7 @@ export const labs = [
     },
   },
 ]
+
+// The home page introduces this app inside section 01, so it reads the same
+// entry rather than keeping a second copy of the asset paths and captions.
+export const littlesteps = labs.find((lab) => lab.slug === 'littlesteps')

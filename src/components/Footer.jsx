@@ -28,7 +28,7 @@ export default function Footer() {
             </a>
           </div>
 
-          <nav className="footer__cols" aria-label="Footer">
+          <nav className="footer__cols" aria-label={t.a11y.footerNav}>
             <div>
               <p className="meta footer__col-title">{t.footer.sitemap}</p>
               <ul className="footer__list">
@@ -37,6 +37,7 @@ export default function Footer() {
                 <li><Link className="link" to="/lab">{t.footer.lab}</Link></li>
                 <li><Link className="link" to="/life">{t.footer.life}</Link></li>
                 <li><Link className="link" to="/about">{t.footer.about}</Link></li>
+                <li><Link className="link" to="/this-year">{t.footer.thisYear}</Link></li>
                 <li><Link className="link" to="/contact">{t.footer.contact}</Link></li>
               </ul>
             </div>

@@ -7,16 +7,16 @@ export const profile = {
 
   en: {
     name: 'Wang Pu',
-    role: 'Backend Engineer / Architect / AI Agent Engineer',
+    role: 'AI Agent Engineering / AI Application Architecture / AI Platforms',
     location: 'Hangzhou, China',
-    aboutTitle: 'Wang Pu, backend engineer, architect, and AI Agent engineer.',
-    heroLines: ['Backend', 'architecture,', 'and AI Agent', 'engineering.'],
+    aboutTitle: 'Wang Pu, bringing systems engineering into reliable AI agents.',
+    heroLines: ['Backend depth,', 'architecture judgment,', 'and reliable', 'AI agents.'],
     heroIntro:
-      'I build reliable backend systems, high-concurrency transaction platforms, and organization-scale permission architectures. Recently I have been shifting more of my work toward AI engineering and agentic product systems.',
+      'I build reliable backend systems, high-concurrency transaction platforms, and organization-scale permission architectures. I now apply that experience to AI agent engineering, AI application architecture, and AI platforms.',
     about: [
       'I am a backend engineer and architect with long-running experience in distributed systems, high-concurrency business platforms, organization-level permission systems, and large-scale directory services.',
       'At Alibaba, my work has covered Taobao transaction systems, shopping cart architecture, middleware-style delivery platforms, group-wide ACL systems, and government-grade directory services serving millions of users and hundreds of thousands of organizations.',
-      'My current focus is AI engineering: turning model capabilities into stable product features, from streaming protocols and prompt design to engineering frameworks that can be shipped and operated.',
+      'My current focus is AI agent engineering: I have led the build of a complete learning agent with tool calling, trustworthy cross-session memory, bounded side effects, and a host system that keeps model behavior verifiable and recoverable.',
       'Outside of engineering work, I write about reading, technology, and personal observations on my WeChat public account, A Cheng De Dai Ma.',
     ],
     skills: [
@@ -58,6 +58,13 @@ export const profile = {
     ],
     experience: [
       {
+        period: '2025 — Present',
+        role: 'Independent developer',
+        org: 'Self-directed projects · a year with family',
+        note: 'Left Alibaba to help my child through a hard transition into middle school. During that time I designed and built LittleSteps on my own, shipping it to the App Store in 2026, and led the build of Little Step Learning Agent, covered by 1,392 unit and integration tests.',
+        link: { to: '/this-year', label: 'What this year was, and why I am back' },
+      },
+      {
         period: '2014 — 2025',
         role: 'Technical Expert',
         org: 'Alibaba Group',
@@ -86,16 +93,16 @@ export const profile = {
 
   zh: {
     name: '王普',
-    role: '后端开发工程师 / 架构师 / AI Agent 工程师',
+    role: 'AI Agent 工程 / AI 应用架构 / AI 平台',
     location: '中国 · 杭州',
-    aboutTitle: '我是王普，后端开发工程师、架构师和 AI Agent 工程师。',
-    heroLines: ['做后端，', '做架构，', '也在转向', 'AI Agent。'],
+    aboutTitle: '我是王普，把系统工程带进可靠的 AI Agent。',
+    heroLines: ['后端深度，', '架构判断，', '以及可靠的', 'AI Agent。'],
     heroIntro:
-      '我长期从事后端系统、高并发交易系统、组织级权限体系和大型目录服务建设。最近把更多精力放在 AI 工程与 Agent 化产品系统上。',
+      '我长期从事后端系统、高并发交易、组织级权限体系和大型目录服务建设。现在把这些经验用于 AI Agent 工程、AI 应用架构与 AI 平台。',
     about: [
       '我是后端开发工程师和架构师，长期关注分布式系统、高并发业务平台、组织级权限体系，以及大规模目录服务这类需要稳定性和工程深度的问题。',
       '在阿里巴巴，我参与和主导过淘宝交易链路、购物车架构、中台方案交付平台、集团级 ACL 权限系统，以及支撑百万级用户和数十万组织的政务级目录服务。',
-      '现在我正在把工程经验迁移到 AI 方向：从大模型流式协议、Prompt 优化，到可上线、可运维的 AI 功能架构和 Agent 工作流。',
+      '现在我聚焦 AI Agent 工程：已经主导构建具备工具调用、跨会话可信记忆和有界副作用的完整学习 Agent，并由宿主系统保证模型行为可验证、可恢复。',
       '工作之外，我也在微信公众号「阿诚的代码」写一些关于阅读、技术和个人观察的内容。',
     ],
     skills: [
@@ -136,6 +143,13 @@ export const profile = {
       },
     ],
     experience: [
+      {
+        period: '2025 — 至今',
+        role: '独立开发者',
+        org: '自主项目 · 家庭优先的一年',
+        note: '主动离职，陪伴孩子度过升入初中后的心理困难期；期间独立设计并开发「小步打卡」，2026 年上架 App Store，并主导构建 Little Step Learning Agent，覆盖 1392 项单元与集成测试。',
+        link: { to: '/this-year', label: '这一年发生了什么，我为什么重新出发' },
+      },
       {
         period: '2014 — 2025',
         role: '技术专家',

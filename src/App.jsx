@@ -7,6 +7,7 @@ import Lab from './pages/Lab'
 import Life from './pages/Life'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import ThisYear from './pages/ThisYear'
 import NotFound from './pages/NotFound'
 import { useLanguage } from './i18n/LanguageContext'
 import { profile } from './data/profile'
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/life" element={<Life />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/this-year" element={<ThisYear />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

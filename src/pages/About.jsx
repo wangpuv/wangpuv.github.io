@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { profile } from '../data/profile'
 import { ui } from '../i18n/strings'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -67,6 +68,14 @@ export default function About() {
                 <h3 className="timeline__role display">{e.role}</h3>
                 <p className="timeline__org">{e.org}</p>
                 <p className="muted">{e.note}</p>
+                {e.link && (
+                  <p className="timeline__link">
+                    <Link className="link" to={e.link.to}>
+                      {e.link.label}
+                      <span className="arrow" aria-hidden="true"> →</span>
+                    </Link>
+                  </p>
+                )}
               </div>
             </Reveal>
           ))}

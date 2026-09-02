@@ -5,7 +5,14 @@ import { useEffect, useRef, useState } from 'react'
  * `delay` staggers items within a group (ms).
  * `as` lets you pick the rendered element (default div).
  */
-export default function Reveal({ children, delay = 0, as: Tag = 'div', className = '', ...rest }) {
+export default function Reveal({
+  children,
+  delay = 0,
+  as: Tag = 'div',
+  className = '',
+  style,
+  ...rest
+}) {
   const ref = useRef(null)
   const [visible, setVisible] = useState(false)
 
@@ -13,7 +20,7 @@ export default function Reveal({ children, delay = 0, as: Tag = 'div', className
     const node = ref.current
     if (!node) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce) {
+    if (reduce || !('IntersectionObserver' in window)) {
       setVisible(true)
       return
     }
@@ -38,7 +45,7 @@ export default function Reveal({ children, delay = 0, as: Tag = 'div', className
     <Tag
       ref={ref}
       className={`reveal ${visible ? 'is-visible' : ''} ${className}`.trim()}
-      style={{ '--reveal-delay': `${delay}ms` }}
+      style={{ ...style, '--reveal-delay': `${delay}ms` }}
       {...rest}
     >
       {children}

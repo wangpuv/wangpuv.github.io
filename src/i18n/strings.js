@@ -6,7 +6,14 @@
 
 export const ui = {
   en: {
-    nav: { work: 'Projects', lab: 'Lab', life: 'Life', about: 'About', contact: 'Contact' },
+    nav: {
+      agent: 'Case study',
+      work: 'Projects',
+      lab: 'Products',
+      life: 'Life',
+      about: 'About',
+      contact: 'Contact',
+    },
     heroCta: { primary: 'View projects', lab: 'Lab', secondary: 'Get in touch' },
     home: {
       selectedWorkEyebrow: 'Selected projects',
@@ -27,12 +34,17 @@ export const ui = {
       outcome: 'Outcome',
     },
     lab: {
-      eyebrow: 'Lab',
-      title: 'Things I build on my own time.',
-      lead: 'Side projects and small tools I design and ship myself — a shipped iOS app and a few open-source developer plugins.',
+      eyebrow: 'Independent products',
+      title: 'Products I design and ship independently.',
+      lead: 'A learning-agent system, a shipped offline-first iOS app, and developer tools — designed, built, and maintained by me.',
       highlights: 'Highlights',
+      screens: 'Screens',
       viewApp: 'View on the App Store',
       viewRepo: 'View on GitHub',
+    },
+    shots: {
+      zoom: 'View full size',
+      close: 'Close full image',
     },
     life: {
       eyebrow: 'Life',
@@ -49,8 +61,8 @@ export const ui = {
     about: { eyebrow: 'About', achievements: 'Core achievements', experience: 'Experience' },
     contact: {
       eyebrow: 'Contact',
-      title: ['Backend, architecture,', 'or AI engineering?'],
-      lead: 'The fastest way to reach me is by email. I am interested in backend architecture, AI engineering, agentic workflows, and serious technical conversations.',
+      title: ['Agent engineering,', 'AI architecture, or platforms?'],
+      lead: 'The fastest way to reach me is by email. I am open to roles and serious technical conversations around AI agents, AI application architecture, AI platforms, and reliability engineering.',
     },
     footer: {
       getInTouch: 'Get in touch',
@@ -59,9 +71,10 @@ export const ui = {
       elsewhere: 'Elsewhere',
       home: 'Home',
       work: 'Projects',
-      lab: 'Lab',
+      lab: 'Products',
       life: 'Life',
       about: 'About',
+      thisYear: 'This year',
       contact: 'Contact',
     },
     notFound: {
@@ -71,10 +84,28 @@ export const ui = {
     },
     emailCopied: 'Email address copied — feel free to write to me.',
     social: { Email: 'Email', GitHub: 'GitHub' },
+    a11y: {
+      primaryNav: 'Primary navigation',
+      mobileNav: 'Mobile navigation',
+      footerNav: 'Footer navigation',
+      openMenu: 'Open menu',
+      closeMenu: 'Close menu',
+      switchToLight: 'Switch to light theme',
+      switchToDark: 'Switch to dark theme',
+      switchToEnglish: 'Switch to English',
+      switchToChinese: 'Switch to Chinese',
+    },
   },
 
   zh: {
-    nav: { work: '项目', lab: '小作品', life: '生活', about: '关于我', contact: '联系我' },
+    nav: {
+      agent: 'Agent 案例',
+      work: '工程项目',
+      lab: '独立产品',
+      life: '生活',
+      about: '关于我',
+      contact: '联系我',
+    },
     heroCta: { primary: '查看项目', lab: '小作品', secondary: '联系我' },
     home: {
       selectedWorkEyebrow: '精选项目',
@@ -95,12 +126,17 @@ export const ui = {
       outcome: '成果',
     },
     lab: {
-      eyebrow: '小作品',
-      title: '工作之外，我自己做的东西。',
-      lead: '一些我独立设计并完成的个人项目和小工具：一款已上架的 iOS App，以及几个开源开发者插件。',
+      eyebrow: '独立产品',
+      title: '由我独立设计并交付的产品。',
+      lead: '一套学习 Agent 系统、一款已上架的离线优先 iOS App，以及由我独立设计、实现并持续维护的开发者工具。',
       highlights: '亮点',
+      screens: '界面',
       viewApp: '在 App Store 查看',
       viewRepo: '在 GitHub 查看',
+    },
+    shots: {
+      zoom: '查看大图',
+      close: '关闭大图',
     },
     life: {
       eyebrow: '生活',
@@ -117,8 +153,8 @@ export const ui = {
     about: { eyebrow: '关于我', achievements: '核心成就', experience: '工作经历' },
     contact: {
       eyebrow: '联系我',
-      title: ['聊后端、架构，', '或 AI 工程。'],
-      lead: '找我最快的方式是发邮件。我对后端架构、AI 工程、Agent 工作流，以及严肃的技术讨论都很感兴趣。',
+      title: ['聊 Agent 工程、', 'AI 应用架构或平台。'],
+      lead: '找我最快的方式是发邮件。我期待 AI Agent、AI 应用架构、AI 平台和可靠性工程相关的机会，也欢迎严肃的技术讨论。',
     },
     footer: {
       getInTouch: '联系方式',
@@ -126,10 +162,11 @@ export const ui = {
       sitemap: '站点地图',
       elsewhere: '其他平台',
       home: '首页',
-      work: '项目',
-      lab: '小作品',
+      work: '工程项目',
+      lab: '独立产品',
       life: '生活',
       about: '关于我',
+      thisYear: '这一年',
       contact: '联系我',
     },
     notFound: {
@@ -139,5 +176,16 @@ export const ui = {
     },
     emailCopied: '已复制邮箱地址，可以给我发邮件了',
     social: { Email: '邮箱', GitHub: 'GitHub' },
+    a11y: {
+      primaryNav: '主导航',
+      mobileNav: '移动导航',
+      footerNav: '页脚导航',
+      openMenu: '打开菜单',
+      closeMenu: '关闭菜单',
+      switchToLight: '切换为亮色主题',
+      switchToDark: '切换为暗色主题',
+      switchToEnglish: '切换为英文',
+      switchToChinese: '切换为中文',
+    },
   },
 }
