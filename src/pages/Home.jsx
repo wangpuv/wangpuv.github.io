@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import Reveal from '../components/Reveal'
 import AppShots from '../components/AppShots'
@@ -17,18 +17,30 @@ function PunctuationSafeText({ text }) {
   ))
 }
 
+// A `nowrap` segment carries no break opportunity of its own, and two of them
+// sit flush against each other in the DOM. Blink happens to break at that
+// element boundary; WebKit does not, so on Safari the whole headline stayed on
+// one line and everything past the viewport was cut off by `overflow: clip`.
+// The `<wbr>` lives in the heading's own normal-wrapping context, which both
+// engines honour, and it restores exactly the break points the parts describe.
 function RichText({ parts }) {
   return parts.map((part, index) => {
     const text = <PunctuationSafeText text={part.text} />
+    let piece
     if (part.emphasis) {
-      return (
-        <em className={part.nowrap ? 'home-nowrap' : undefined} key={index}>
-          {text}
-        </em>
-      )
+      piece = <em className={part.nowrap ? 'home-nowrap' : undefined}>{text}</em>
+    } else if (part.nowrap) {
+      piece = <span className="home-nowrap">{text}</span>
+    } else {
+      piece = <span>{text}</span>
     }
-    if (part.nowrap) return <span className="home-nowrap" key={index}>{text}</span>
-    return <span key={index}>{text}</span>
+
+    return (
+      <Fragment key={index}>
+        {index > 0 && <wbr />}
+        {piece}
+      </Fragment>
+    )
   })
 }
 

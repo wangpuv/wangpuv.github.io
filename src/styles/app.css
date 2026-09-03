@@ -1497,12 +1497,20 @@
 .proj__clip { overflow: hidden; }
 .proj__body {
   display: grid;
+  /* The screenshot strip below the tablet breakpoint is a horizontal scroller
+     whose min-content width is the whole strip. An implicit `auto` column
+     adopts that width, so the block would drag every sibling paragraph past
+     the right edge of `.proj__clip`, which hides the overflow. Pinning the
+     column — and the items in it — to zero keeps the strip scrolling inside
+     the column instead of widening it. */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-l);
   max-width: 74ch;
   padding: var(--space-2xs) 0 var(--space-xl) calc(3rem + var(--space-m));
   color: var(--ink-soft);
   transition: padding-left var(--dur-med) var(--ease-out);
 }
+.proj__body > * { min-width: 0; }
 .proj:hover .proj__body, .proj.is-open .proj__body { padding-left: calc(3rem + var(--space-m) + 1.25rem); }
 .proj__label { margin-bottom: 0.5rem; color: var(--accent-ink); }
 .proj__block p { line-height: 1.7; }
