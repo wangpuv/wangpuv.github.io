@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { lifeCards } from '../data/life'
 import { books } from '../data/books'
 import { ui } from '../i18n/strings'
@@ -44,9 +45,16 @@ export default function Life() {
                   )}
 
                   {card.link && (
+                    /* Internal routes must not open a new tab. */
+                    card.link.startsWith('/') ? (
+                      <Link className="link life-card__link" to={card.link}>
+                        {c.linkText} <span className="arrow" aria-hidden="true">→</span>
+                      </Link>
+                    ) : (
                     <a className="link life-card__link" href={card.link} target="_blank" rel="noreferrer">
                       {c.linkText} <span className="arrow" aria-hidden="true">→</span>
                     </a>
+                    )
                   )}
                 </article>
               </Reveal>

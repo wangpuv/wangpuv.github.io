@@ -37,6 +37,30 @@ All text is data-driven and bilingual. When editing copy, edit data — not JSX:
 
 Components consume these with `const { lang } = useLanguage()` then index by `lang`. There is no `t()` helper — indexing is direct.
 
+### Course content (`/claude-code`)
+
+The Claude Code tutorial section is **generated**, not hand-written. `npm run
+course` reads the Obsidian source (outside this repo, at
+`~/Documents/Obsidian/will-falcon-doc/Learn Claude Code/发布预览/公众号版`, or
+`$COURSE_SRC`) and writes three things, all committed:
+
+- `src/content/course/<slug>.html` — article markup, lazily imported per lesson
+- `src/data/course.generated.js` — lesson metadata, TOC, dates, reading time
+- `public/course/*.webp` — figures, converted from PNG (24 MB → 1.2 MB)
+
+**Re-run `npm run course` after publishing a lesson**; nothing picks up new
+source automatically. Never hand-edit those three outputs.
+
+`src/data/course.js` is the hand-written half: English titles for each lesson,
+the three stage groupings, lessons 12–17 that are announced but unwritten, and
+the appendix. It merges the generated data and is what the pages import.
+
+Lesson bodies stay Chinese in both languages — English mode translates the
+chrome and contents page and shows a note on the article. The 公众号 cover
+cards are deliberately not imported (navy/yellow plates that repeat the
+headline). `markdown-it` and `sharp` are devDependencies used only by the
+build script; neither reaches the browser.
+
 ### Styling system (`src/styles/`)
 
 - `tokens.css` — design tokens in **OKLCH**: fluid type scale (`--step-*`), spacing, motion, and the light/dark color blocks. Font stacks pair Latin (Fraunces display / Geist body, loaded from Google Fonts in `index.html`) with CJK fallbacks (Songti SC / PingFang SC).

@@ -35,6 +35,7 @@ export default function Footer() {
                 <li><Link className="link" to="/">{t.footer.home}</Link></li>
                 <li><Link className="link" to="/work">{t.footer.work}</Link></li>
                 <li><Link className="link" to="/lab">{t.footer.lab}</Link></li>
+                <li><Link className="link" to="/claude-code">{t.footer.course}</Link></li>
                 <li><Link className="link" to="/life">{t.footer.life}</Link></li>
                 <li><Link className="link" to="/about">{t.footer.about}</Link></li>
                 <li><Link className="link" to="/this-year">{t.footer.thisYear}</Link></li>

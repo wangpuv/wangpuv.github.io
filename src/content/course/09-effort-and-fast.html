@@ -1,0 +1,304 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答三个问题</strong>：<code>/effort</code> 和 <code>/fast</code> 分别控制什么、怎样选择 effort 档位、什么时候值得为快速模式付费。</p>
+<p>适合：已经会选择模型和权限模式，开始关心 Claude Code 的响应质量、等待时间与使用成本的人。</p>
+<p class="lesson__stamp">📌 基于 Claude Code 官方文档与本机 Claude Code 2.1.223 核对至 2026 年 8 月。模型、价格和功能可用性变化很快，具体以当前版本的 <code>/effort</code>、<code>/fast</code> 与官方文档为准。</p>
+</blockquote>
+<h2 id="sec-7f3f59">一句话心智模型</h2>
+<p><strong><code>/effort</code> 决定“想多深”，<code>/fast</code> 决定“多快把结果送回来”。</strong></p>
+<p>它们不是同一个速度开关，而是两个相互独立的旋钮：</p>
+<ul>
+<li><code>/effort</code> 作用在模型推理层：档位越高，Claude 越愿意在复杂步骤上投入更多思考；</li>
+<li><code>/fast</code> 作用在服务速度层：模型能力不变，用更高的每 token 价格换更低的响应延迟；</li>
+<li><code>/model</code> 负责选择模型，和前两个设置可以组合使用。</li>
+</ul>
+<p>所以，快速模式不会让 Claude “少想一点”；降低 effort 才可能用更少的推理换速度和成本。</p>
+<figure class="lesson__fig"><img src="/course/09-effort-and-fast-01-comparison-two-controls.webp" alt="两个正交旋钮：effort 控制推理强度，fast 控制响应延迟与单价" width="1200" height="675" loading="lazy" decoding="async"><figcaption>两个正交旋钮：effort 控制推理强度，fast 控制响应延迟与单价</figcaption></figure>
+<h2 id="sec-72290e">一、<code>/effort</code>：调节推理强度</h2>
+<p>effort 不是固定的 thinking token 数字，而是控制自适应推理投入程度的偏好。</p>
+<p>Claude 会根据每一步的难度决定要不要展开思考，而 effort 决定它可以有多积极：</p>
+<ul>
+<li>简单任务即使使用高档位，也不一定强行进行很长的推理；</li>
+<li>复杂任务如果使用低档位，Claude 可能更快作答，但也更容易遗漏边界条件；</li>
+<li>同名档位会按模型分别校准，不能认为不同模型的 <code>high</code> 完全等价。</li>
+</ul>
+<h3 id="sec-0d99bc">1. 五个模型 effort 档位</h3>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>档位</th>
+<th>适合什么</th>
+<th>使用建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>low</code></td>
+<td>重命名、搜索、格式整理、明确的小修改</td>
+<td>只给范围小、不依赖复杂判断的任务</td>
+</tr>
+<tr>
+<td><code>medium</code></td>
+<td>日常函数编写、小型重构、成本敏感任务</td>
+<td>可以接受少量能力折中的常规工作</td>
+</tr>
+<tr>
+<td><code>high</code></td>
+<td>调试、代码审查、多文件修改</td>
+<td>大多数需要认真判断的任务从这里开始</td>
+</tr>
+<tr>
+<td><code>xhigh</code></td>
+<td>复杂 agentic 编码、深度重构、架构分析</td>
+<td>需要更深推理、能接受更多 token 时使用</td>
+</tr>
+<tr>
+<td><code>max</code></td>
+<td>极难问题、系统设计、长期未解的 bug</td>
+<td>临时使用，先验证收益是否值得成本</td>
+</tr>
+</tbody>
+</table></div><p>并不是所有模型都支持五档：</p>
+<ul>
+<li>Fable 5、Opus 5、Sonnet 5、Opus 4.8、Opus 4.7：支持 <code>low</code> 到 <code>max</code>，包括 <code>xhigh</code>；</li>
+<li>Opus 4.6、Sonnet 4.6：不支持 <code>xhigh</code>，设置后会回落到 <code>high</code>；</li>
+<li>其他没有列出的模型不支持 effort。</li>
+</ul>
+<p>当前支持 effort 的模型默认都是 <code>high</code>，只有 Opus 4.7 默认是 <code>xhigh</code>。</p>
+<h3 id="sec-708bc5">2. 哪些档位会被记住</h3>
+<p><code>low</code>、<code>medium</code>、<code>high</code>、<code>xhigh</code> 在交互式会话中设置后会跨会话保留。</p>
+<p><code>max</code> 默认只在当前会话生效，退出后不会作为长期设置保存。只有通过环境变量设置时，它才会在新会话中继续生效。</p>
+<p>这是一种有意的保护：最激进的推理档位不应该在你忘记之后一直消耗更多 token。</p>
+<h3 id="sec-d86dbf">3. <code>ultracode</code> 不是第六个模型档位</h3>
+<p><code>/effort</code> 菜单里还可能看到 <code>ultracode</code>，但它和前面五档不是同一类东西。</p>
+<p><code>ultracode</code> 是 Claude Code 层的会话设置：</p>
+<ul>
+<li>向模型发送 <code>xhigh</code>；</li>
+<li>对有分量的任务启用动态工作流编排；</li>
+<li>让 Claude 根据任务情况组织计划、执行、检查和修订；</li>
+<li>只在当前会话生效。</li>
+</ul>
+<p>可以这样理解：</p>
+<ul>
+<li><code>low</code> 到 <code>max</code> 调节一次推理愿意想多深；</li>
+<li><code>ultracode</code> 还会改变复杂任务的组织方式。</li>
+</ul>
+<p>如果动态工作流不可用，<code>ultracode</code> 只会退化为 <code>xhigh</code>。</p>
+<h3 id="sec-109226">4. <code>ultrathink</code> 只给当前一轮加力</h3>
+<p>如果只想让某个问题多想一层，不必修改整段会话的 effort。</p>
+<p>在提示词中加入：</p>
+<pre class="lesson__code lesson__code--tight"><code>ultrathink</code></pre>
+<p>Claude Code 会为这一轮加入更深入思考的上下文指令，但发送给 API 的 effort 档位不会改变。</p>
+<p>当前只有 <code>ultrathink</code> 是特殊关键词；<code>think</code>、<code>think hard</code>、<code>think more</code> 只会作为普通提示词传入。</p>
+<h2 id="sec-a0cf43">二、怎样设置 <code>/effort</code></h2>
+<p>最直接的方式是：</p>
+<pre class="lesson__code lesson__code--tight"><code>/effort</code></pre>
+<p>不带参数会打开交互式选择器。也可以直接指定档位：</p>
+<pre class="lesson__code"><code>/effort low
+/effort high
+/effort xhigh
+/effort max
+/effort auto</code></pre>
+<p><code>auto</code> 表示回到当前模型的默认档位。</p>
+<p>其他入口还有：</p>
+<ul>
+<li>在 <code>/model</code> 选择器中用左右方向键调节；</li>
+<li>启动时传入 <code>claude --effort high</code>；</li>
+<li>在设置文件中写入 <code>effortLevel</code>；</li>
+<li>通过 <code>CLAUDE_CODE_EFFORT_LEVEL</code> 环境变量强制指定；</li>
+<li>在 skill 或子代理的 frontmatter 中设置 <code>effort</code>。</li>
+</ul>
+<h3 id="sec-ecc1a5">frontmatter 示例</h3>
+<pre class="lesson__code" data-lang="yaml"><code>---
+name: security-reviewer
+description: &quot;检查认证、授权与敏感数据处理&quot;
+tools: Read, Grep, Glob
+model: opus
+effort: high
+---</code></pre>
+<p>这样可以让安全审查子代理固定使用 <code>high</code>，不必要求整个主会话都保持同一档位。</p>
+<h3 id="sec-8ec40e">设置优先级</h3>
+<p>可以先记住这条主线：</p>
+<pre class="lesson__code lesson__code--tight"><code>环境变量 &gt; 已配置档位 &gt; 模型默认值</code></pre>
+<p>skill 和子代理的 frontmatter 会覆盖会话档位，但不能覆盖环境变量。</p>
+<p>另外，<code>settings.json</code> 的 <code>effortLevel</code> 只接受 <code>low</code>、<code>medium</code>、<code>high</code>、<code>xhigh</code>。<code>max</code> 和 <code>ultracode</code> 都不适合作为普通持久化档位。</p>
+<h3 id="sec-0183cb">一个容易忽略的成本：切换档位会重建缓存</h3>
+<p>模型和 effort 都属于提示缓存的键。</p>
+<p>一段对话开始后再切换 <code>/effort</code>，下一次请求需要重新读取完整上下文。Claude Code 会在应用这类变更前提示你确认。</p>
+<p>因此，<strong>模型和 effort 最好在会话开头选好，不要在长对话中反复切换。</strong></p>
+<h2 id="sec-1c4ced">三、<code>/fast</code>：用更高价格换更低延迟</h2>
+<p>快速模式不是另一个模型，也不会主动减少推理步骤。</p>
+<p>它使用支持快速模式的同一 Opus 模型，通过速度优先的 API 配置降低响应延迟，最高可达到约 2.5 倍速度。模型的能力和质量不因此改变，但每 token 价格更高。</p>
+<h3 id="sec-68c79c">1. 当前支持哪些模型</h3>
+<p>截至本课核对时间，快速模式支持：</p>
+<ul>
+<li>Opus 5；</li>
+<li>Opus 4.8。</li>
+</ul>
+<p>它不支持 Sonnet、Haiku、Fable 和其他 Opus 版本。Opus 4.7 的快速模式已经在 2026 年 7 月移除。</p>
+<p>在 Claude Code 2.1.219 及以后版本中，快速模式默认使用 Opus 5。</p>
+<h3 id="sec-d93314">2. 怎样开关</h3>
+<p>在 Claude Code CLI 中输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/fast</code></pre>
+<p>然后按 <code>Tab</code> 切换开关。再次运行 <code>/fast</code> 可以查看并改变当前状态。</p>
+<p>开启后，提示栏会出现 <code>↯</code> 图标。如果当前不是支持快速模式的模型，Claude Code 会自动切换到 Opus。</p>
+<p>关闭快速模式后，模型仍然停留在 Opus；要换回其他模型，需要使用 <code>/model</code>。</p>
+<p>快速模式目前只支持 Claude Code CLI，不支持 VS Code 扩展。</p>
+<h3 id="sec-7e9267">3. 成本怎样计算</h3>
+<p>当前 Opus 5 和 Opus 4.8 的快速模式价格相同：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>模型</th>
+<th style="text-align:right">输入价格 / MTok</th>
+<th style="text-align:right">输出价格 / MTok</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Opus 5</td>
+<td style="text-align:right">$10</td>
+<td style="text-align:right">$50</td>
+</tr>
+<tr>
+<td>Opus 4.8</td>
+<td style="text-align:right">$10</td>
+<td style="text-align:right">$50</td>
+</tr>
+</tbody>
+</table></div><p>对 Pro、Max、Team、Enterprise 订阅用户，快速模式从 usage credits 计费，不计入订阅套餐的使用限额。</p>
+<p>这意味着：即使套餐额度还没有用完，快速模式也会从第一个 token 开始消耗 usage credits。没有开启 usage credits 时，<code>/fast</code> 无法使用。</p>
+<p>快速模式只适用于 Anthropic API 和 Claude 订阅，不支持 Amazon Bedrock、Google Cloud Agent Platform、Microsoft Foundry 和 Claude Platform on AWS。Team 与 Enterprise 组织还需要 Owner 先在管理设置中启用该功能。</p>
+<h3 id="sec-eede42">4. 为什么要在会话开头开启</h3>
+<p>一段对话第一次打开快速模式时，快速模式请求头会改变缓存键。</p>
+<p>下一次请求需要按快速模式价格重新读取整段已有上下文，而且这部分是未缓存输入。对话越长，首次切换的成本越高。</p>
+<p>例如，已有 40 万 token 的上下文，按 $10 / MTok 的快速输入价格估算，仅这次完整重读就约为 4 美元。</p>
+<p>这笔成本在同一段对话里只发生一次。之后关掉再打开不会重复，因为速度设置本身不再改变缓存键；但 <code>/clear</code> 和 <code>/compact</code> 会重新开始计算。</p>
+<p>所以最实用的规则是：</p>
+<blockquote class="lesson__aside">
+<p><strong>决定要用 fast，就在会话刚开始时打开。</strong></p>
+</blockquote>
+<h3 id="sec-2a2451">5. 快速模式默认会跨会话保留</h3>
+<p>交互式会话中打开快速模式后，它默认会在后续会话继续保持开启。</p>
+<p>这很方便，也容易让人忘记自己一直在消耗 usage credits。</p>
+<p>如果希望每个会话都重新确认，可以在设置文件中加入：</p>
+<pre class="lesson__code" data-lang="json"><code>{
+  &quot;fastModePerSessionOptIn&quot;: true
+}</code></pre>
+<p>这样每个新会话都会从关闭状态开始，需要时再手动执行 <code>/fast</code>。</p>
+<h2 id="sec-8d8b49">四、两个旋钮怎样组合</h2>
+<p>不要把“速度”当成一个维度。真正要判断的是两个问题：</p>
+<ol>
+<li>这个任务需要多深的推理？</li>
+<li>我现在对等待时间有多敏感？</li>
+</ol>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>任务场景</th>
+<th>effort</th>
+<th>fast</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>批量重命名、格式整理、明确的小修改</td>
+<td><code>low</code></td>
+<td>通常关</td>
+<td>任务简单，降低 effort 已经够快</td>
+</tr>
+<tr>
+<td>日常开发、小型重构</td>
+<td><code>medium</code> / <code>high</code></td>
+<td>关</td>
+<td>默认速度和成本更均衡</td>
+</tr>
+<tr>
+<td>代码审查、疑难调试、多文件重构</td>
+<td><code>high</code> / <code>xhigh</code></td>
+<td>通常关</td>
+<td>优先保证判断质量</td>
+</tr>
+<tr>
+<td>架构设计、极难 bug</td>
+<td><code>xhigh</code> / <code>max</code></td>
+<td>关</td>
+<td>深度优先，等待通常不是主要成本</td>
+</tr>
+<tr>
+<td>有分量的自主构建任务</td>
+<td><code>ultracode</code></td>
+<td>关</td>
+<td>让动态工作流组织复杂执行过程</td>
+</tr>
+<tr>
+<td>你盯着终端进行实时调试</td>
+<td><code>medium</code> / <code>high</code></td>
+<td>可开</td>
+<td>每轮等待会直接打断思路</td>
+</tr>
+<tr>
+<td>紧急且复杂的交互任务</td>
+<td><code>xhigh</code></td>
+<td>可开</td>
+<td>深度和低延迟都要，代价是更贵</td>
+</tr>
+<tr>
+<td><code>/loop</code>、CI、后台长任务</td>
+<td>按需</td>
+<td>关</td>
+<td>机器等待通常不值得支付速度溢价</td>
+</tr>
+</tbody>
+</table></div><figure class="lesson__fig"><img src="/course/09-effort-and-fast-02-framework-effort-fast-matrix.webp" alt="先看任务难度，再看等待敏感度：四种 effort 与 fast 组合的选择矩阵" width="1200" height="675" loading="lazy" decoding="async"><figcaption>先看任务难度，再看等待敏感度：四种 effort 与 fast 组合的选择矩阵</figcaption></figure>
+<h3 id="sec-8734c4"><code>low + fast</code> 会发生什么</h3>
+<p>这是“简单任务追求最低延迟”的组合。</p>
+<p>较低的 effort 减少复杂推理，fast 再降低输出延迟。适合你正在实时盯着终端、需要快速完成大量明确小步骤的场景。</p>
+<p>但如果任务本身不急，只用 <code>low</code> 往往已经足够，没必要再支付快速模式溢价。</p>
+<h3 id="sec-bb5682"><code>max + fast</code> 矛盾吗</h3>
+<p>不矛盾。</p>
+<p><code>max</code> 要求模型尽可能深入思考，<code>fast</code> 要求服务更快地完成同样的推理和输出。两者可以同时成立。</p>
+<p>真正的问题是成本：更多 thinking token 再乘上快速模式的高单价，很容易成为最贵的组合。</p>
+<p>因此，是否使用它取决于“节省的等待时间”是否真的比额外成本更重要，而不是两个设置在机制上冲突。</p>
+<h2 id="sec-66baab">五、一套实用决策法</h2>
+<p>开始任务前，可以按下面三步判断。</p>
+<h3 id="sec-5c69a5">第一步：先按任务难度选 effort</h3>
+<ul>
+<li>机械、明确、范围小：<code>low</code>；</li>
+<li>常规开发：<code>medium</code> 或 <code>high</code>；</li>
+<li>调试、审查、跨文件改动：<code>high</code> 或 <code>xhigh</code>；</li>
+<li>极难问题：临时使用 <code>max</code>；</li>
+<li>需要动态编排复杂执行：<code>ultracode</code>。</li>
+</ul>
+<h3 id="sec-1a1200">第二步：再判断“人在不在等”</h3>
+<ul>
+<li>人正在盯着终端、需要高频来回：考虑 fast；</li>
+<li>Claude 在后台跑，晚几分钟没有影响：关闭 fast。</li>
+</ul>
+<h3 id="sec-ed3244">第三步：在会话开头设定</h3>
+<p>先选 <code>/model</code>，再选 <code>/effort</code>，最后决定是否打开 <code>/fast</code>。</p>
+<p>这样既能避免在长上下文中重建缓存，也不容易因为反复切换而失去对成本的判断。</p>
+<h2 id="sec-752178">六、避坑清单</h2>
+<ul>
+<li>[ ] <code>/effort</code> 调推理强度，<code>/fast</code> 调服务延迟，不要把两者混成一个速度开关。</li>
+<li>[ ] <code>xhigh</code> 不是所有支持 effort 的模型都有；不支持时会回落到 <code>high</code>。</li>
+<li>[ ] <code>max</code> 只在当前会话生效，不会作为普通配置长期保存。</li>
+<li>[ ] <code>ultracode</code> 是 Claude Code 的工作流设置，不是第六个模型 effort 档位。</li>
+<li>[ ] 单轮想多一点用 <code>ultrathink</code>，整段会话改变强度才用 <code>/effort</code>。</li>
+<li>[ ] 模型和 effort 最好在会话开头选好，切换会触发缓存重建。</li>
+<li>[ ] 快速模式当前只支持 Opus 5 和 Opus 4.8。</li>
+<li>[ ] 快速模式只支持 CLI，不支持 VS Code 扩展。</li>
+<li>[ ] 订阅用户使用 fast 会直接消耗 usage credits，不走套餐内额度。</li>
+<li>[ ] 第一次在长对话中开启 fast 会按快速价格完整重读已有上下文。</li>
+<li>[ ] fast 默认跨会话保留；担心忘关时设置 <code>fastModePerSessionOptIn: true</code>。</li>
+<li>[ ] 后台任务和 CI 通常不值得为更低延迟支付溢价。</li>
+</ul>
+<h2 id="sec-8ea868">本课小结</h2>
+<p>Claude Code 的速度、质量和成本，不是靠一个开关决定的。</p>
+<p>更准确的控制方法是：</p>
+<ol>
+<li>用 <code>/model</code> 选择能力底座；</li>
+<li>用 <code>/effort</code> 按任务难度调节推理强度；</li>
+<li>只在人的等待成本真的很高时使用 <code>/fast</code>；</li>
+<li>在会话开头完成设置，避免长上下文重建缓存；</li>
+<li>复杂任务优先保证推理质量，后台任务优先控制成本。</li>
+</ol>
+<p><strong>先问任务需要想多深，再问结果需要多快回来。两个问题分开，选择就会清楚很多。</strong></p>
+

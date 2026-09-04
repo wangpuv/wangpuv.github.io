@@ -1,0 +1,151 @@
+<blockquote class="lesson__abstract">
+<p><strong>核心心法</strong>：<code>/context</code> 看 → <code>/compact</code> 压 → <code>/clear</code> 清。</p>
+<p>一句话记法：<strong>先看清楚，接着做就压，换事就清。</strong></p>
+<p>适合：已经开始用 Claude Code，想避免长对话越来越慢、越来越容易漏掉约定的人。</p>
+<p class="lesson__stamp">📌 基于 Claude Code 官方文档核对至 2026 年 6 月。产品更新较快，个别细节以官方文档与 <code>/release-notes</code> 为准。</p>
+</blockquote>
+<h2 id="sec-c76ecd">为什么要管上下文</h2>
+<p>模型有一个<strong>有限</strong>的上下文窗口（它的「工作台 / 短期记忆」）。它会被这些东西占满：系统提示词、CLAUDE.md、MCP 工具、子代理配置、<strong>对话历史</strong>，以及<strong>文件内容和工具输出</strong>。其中，读入大文件最容易迅速占满空间。</p>
+<p>填满的三个后果，由轻到重是：</p>
+<ol>
+<li><strong>变笨</strong>：窗口越满，越容易忽略中间内容（context rot，上下文腐烂），你会感觉它「忘了刚说好的规则」。</li>
+<li><strong>变贵 / 变慢</strong>：每轮都要重新处理整个上下文。</li>
+<li><strong>撞墙</strong>：上下文满了，就必须先处理才能继续。</li>
+</ol>
+<blockquote class="lesson__aside">
+<p>真正的高手靠<strong>预防</strong>：别让它读整个大文件；一个任务用一段对话；处理完的日志别一直留着。做到这三点，三件套的使用频率会大大下降。</p>
+</blockquote>
+<figure class="lesson__fig"><img src="/course/02-context-management-01-framework-context-window-budget.webp" alt="固定开销与对话、文件、工具输出共同占用有限的上下文窗口，随着占用增加会依次出现变笨、变慢和撞墙" width="1200" height="675" loading="lazy" decoding="async"><figcaption>固定开销与对话、文件、工具输出共同占用有限的上下文窗口，随着占用增加会依次出现变笨、变慢和撞墙</figcaption></figure>
+<h2 id="sec-62542c">1. <code>/context [all]</code> —— 看</h2>
+<p>这个命令会把当前上下文占用画成彩色网格，并在右侧给出分类明细。它<strong>只看不改</strong>。</p>
+<p><strong>怎么读最有效？</strong> 先看顶部的大局百分比，再把右侧明细分成两类：</p>
+<ul>
+<li><strong>固定开销</strong>：开局就在，与聊不聊无关，包括 System prompt、System tools、Custom agents、Memory files、Skills。精瘦才健康。</li>
+<li><strong>对话本身</strong>：也就是 <code>Messages</code>。这通常是占用的大头，也是 <code>/compact</code>、<code>/clear</code> 将来要处理的部分。</li>
+</ul>
+<p><strong>两个细节：</strong></p>
+<ul>
+<li><strong>MCP 工具按需加载</strong>（<code>loaded on-demand</code>），平时不计入占用，可以放心连接。</li>
+<li><strong>Skills / 插件只加载「目录摘要」</strong>，每个通常只有几十到一百多 token；真正触发时才展开完整内容，所以装得多，固定成本也很低。</li>
+</ul>
+<p><strong>经验阈值，可以先用这套粗略心理标尺：</strong></p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>占用</th>
+<th>怎么做</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lt; 50%</td>
+<td>放心干，无视它</td>
+</tr>
+<tr>
+<td>50%–70%</td>
+<td>留个心眼，看看有没有大文件赖着</td>
+</tr>
+<tr>
+<td>70%+</td>
+<td>该决策：没干完就压，换题就清</td>
+</tr>
+<tr>
+<td>接近上限</td>
+<td>会触发自动压缩，但通常已经偏晚</td>
+</tr>
+</tbody>
+</table></div><h2 id="sec-697931">2. <code>/compact [指令]</code> —— 压缩上下文</h2>
+<p>这个命令会把目前整段对话<strong>替换成一份摘要</strong>来腾空间。压缩之后，Claude 从摘要继续，<strong>不再看原始的逐字对话</strong>；没有写进摘要的细节，在它的视野里就消失了。</p>
+<p>所以，<code>/compact</code> 是<strong>有损压缩</strong>。</p>
+<p>它的心智模型是：给「失忆的未来 Claude」写一张交接 note。</p>
+<p>你可以问自己：</p>
+<blockquote class="lesson__aside">
+<p>如果换一个没参与过的新同事接手，只给他一张纸，上面必须写什么，他才能不出岔子？</p>
+</blockquote>
+<p><strong>该让它保留的内容，按价值排序是：</strong></p>
+<ol>
+<li>做过的<strong>决定 + 为什么</strong>。理由要一起留，否则以后很可能重新纠结。</li>
+<li><strong>约束 / 规则 / 约定</strong>，例如命名规范、schema、API 契约、「X 别动」。</li>
+<li><strong>当前进度</strong>：做完了什么、正在做什么、下一步是什么。</li>
+<li><strong>精确标识符</strong>：具体文件路径、函数名、字段名、报错原文。摘要很容易把它们模糊化。</li>
+<li><strong>还没解决的开放问题</strong>。</li>
+</ol>
+<p><strong>指令怎么写？</strong> 点名具体产物，不要只说「保留重点」，因为这等于没有给靶子。</p>
+<pre class="lesson__code"><code># 几乎没用
+/compact 保留重要内容
+
+# 更好的写法：给明确靶子
+/compact 保留 users/sessions 两张表的 schema 和命名规范；
+还没实现的三个端点（login/refresh/logout）；
+“错误统一用 ApiError 包装”这条约定。探索过程和日志可丢。</code></pre>
+<p><strong>一个进阶招法：</strong> 会反复用、长期需要的东西，例如 schema 和稳定约定，与其塞进一份有损摘要，不如先写进 CLAUDE.md，再执行 <code>/clear</code>，让它进入「每段对话都自动加载」的持久位置。</p>
+<p>两者的分工是：</p>
+<ul>
+<li><strong>长期约定 → CLAUDE.md（永久）</strong></li>
+<li><strong>临时过程状态 → <code>/compact</code>（临时）</strong></li>
+</ul>
+<blockquote class="lesson__aside">
+<p>摘要是有损的，别把它当作精确事实来源。压完以后，可以顺手让 Claude「列一下我们定了哪些约定」，发现漏项就趁记得立刻补上。</p>
+</blockquote>
+<h2 id="sec-ef81d5">3. <code>/clear [名称]</code> —— 清</h2>
+<p>这个命令会开一段<strong>全新的空对话</strong>，相当于把桌面一扫而空。它的别名是 <code>/new</code>、<code>/reset</code>，就是其他工具里的「新建对话 / New Chat」。</p>
+<p>旧对话并没有被删除，之后仍然可以通过 <code>/resume</code> 找回来，这会在第 6 课详细讲。</p>
+<p><strong>什么时候用？</strong></p>
+<ul>
+<li><strong>换一件不相关的事</strong>：这是占九成的用途。不要让上一件事的上下文污染下一件事。</li>
+<li><strong>任务做完了，而且上下文又满又乱</strong>：清空重来，比压出一份臃肿摘要更干净。</li>
+<li><strong>想让它「换个脑子」</strong>：Claude 钻进某个思路出不来时，清空往往比反复掰扯更有效。</li>
+</ul>
+<p><strong>什么时候不要用？</strong></p>
+<p>任务<strong>还没干完，而且仍然需要前面的来龙去脉</strong>。这时应该用 <code>/compact</code>，或者干脆继续聊。</p>
+<blockquote class="lesson__aside">
+<p><code>/clear</code> 与「退出重开」不同：重进后如果提示压缩并继续上次的内容，那是<strong>续旧</strong>（continue）；<code>/clear</code> 是<strong>主动开一段全新的、什么都不带的对话</strong>。换题时敲 <code>/clear</code>，比退出重启省事。</p>
+</blockquote>
+<figure class="lesson__fig"><img src="/course/02-context-management-02-flowchart-context-compact-clear.webp" alt="上下文管理决策：先用 context 看占用，同一任务上下文不足时用 compact 压缩后继续，切换到无关任务时用 clear 开新会话" width="1200" height="675" loading="lazy" decoding="async"><figcaption>上下文管理决策：先用 context 看占用，同一任务上下文不足时用 compact 压缩后继续，切换到无关任务时用 clear 开新会话</figcaption></figure>
+<h2 id="sec-e7f487">参数速查</h2>
+<p>三个命令<strong>都能</strong>跟参数，而且参数<strong>都可以省略</strong>：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>命令</th>
+<th>参数</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/context [all]</code></td>
+<td><code>all</code></td>
+<td>固定关键词，用来展开完整明细</td>
+</tr>
+<tr>
+<td><code>/compact [指令]</code></td>
+<td>任意文本</td>
+<td>自由文本，说明重点保留什么</td>
+</tr>
+<tr>
+<td><code>/clear [名称]</code></td>
+<td>名称</td>
+<td>可选，用来给新会话命名</td>
+</tr>
+</tbody>
+</table></div><h2 id="sec-3cc376">实操建议</h2>
+<ul>
+<li>如果你习惯「退出重进、点同意压缩」，那就是 compact 的自动档。对多数日常场景完全够用，不必刻意改变。</li>
+<li>手动 <code>/compact</code> 并补充指令是<strong>进阶可选项</strong>，留给「精细长任务已经明显在丢关键细节」时再用。没有遇到，就先当它不存在。</li>
+<li><strong>不用自己记</strong>该保留什么。可以让 Claude 帮你 recap：「我们定了哪些关键决定和约定？」长期要留的，再让它写进 CLAUDE.md。</li>
+<li>忘了细节但没有出事，往往说明那些细节本来就不关键，不必焦虑。</li>
+<li><strong>唯一值得养成、而且几乎不花时间的习惯：换不相关的活之前，顺手 <code>/clear</code>。</strong></li>
+</ul>
+<h2 id="sec-fcd746">动手练习</h2>
+<p>在你当前的一段 Claude Code 长对话里，按顺序做一次：</p>
+<ol>
+<li>输入 <code>/context</code>，看清固定开销和 <code>Messages</code> 各占多少。</li>
+<li>如果任务还没结束，先让 Claude 列出关键决定、约束、当前进度和开放问题。</li>
+<li>用一条带明确保留项的 <code>/compact</code> 压缩，再让它复述一次约定，检查是否遗漏。</li>
+<li>当前任务结束后，用 <code>/clear</code> 开一段新对话，再开始下一件不相关的事。</li>
+</ol>
+<p>你真正要形成的不是「经常敲命令」，而是一个判断习惯：<strong>先看清楚；同一件事继续做就压；换一件事就清。</strong></p>
+<h2 id="sec-5f0876">下一课</h2>
+<p><strong>第 3 课 · 模型与计划模式</strong>——什么时候换模型，什么时候先计划再动手，以及如何避免一上来就让 Claude 直接改代码。</p>
+<hr>
+<p>参考：<a href="https://code.claude.com/docs">Claude Code 官方文档</a>中的 context management、interactive mode 和 commands 等页面。</p>
+

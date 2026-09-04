@@ -1,0 +1,153 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答三个问题</strong>：CLAUDE.md 到底是什么、什么内容该写进去、为什么它必须精简（真正的原因不是省钱）。</p>
+<p>适合：刚开始用 Claude Code、想让它在自己项目里更靠谱的人。</p>
+<p class="lesson__stamp">📌 基于 Claude Code 官方文档核对于 2026 年 6 月。产品更新较快，个别细节以官方文档与 <code>/release-notes</code> 为准。</p>
+</blockquote>
+<h2 id="sec-9e1362">一句话结论</h2>
+<p>CLAUDE.md 是 Claude 进你项目的「入职文档」，<strong>每次会话开头都会被完整载入</strong>。它的价值不在「写得全」，而在「高信号」——只放<strong>项目特有、工具兜不住、每次都需要、且 Claude 不说就会做错</strong>的红线。它靠累积变臃肿，所以要<strong>定期主动删</strong>；删什么的判断只能由你（项目主人）来下。</p>
+<h2 id="sec-1b9180"><code>/init</code>：起点，不是终点</h2>
+<ul>
+<li><code>/init</code> 会扫描你的代码库，<strong>起草</strong>一份 CLAUDE.md（项目概览、构建/测试命令、目录结构、约定等）。注意它只是<strong>草稿</strong>，不是终稿。</li>
+<li>进阶：设环境变量 <code>CLAUDE_CODE_NEW_INIT=1</code> 再跑 <code>/init</code>，会进入<strong>交互式流程</strong>，连 skills、hooks、个人记忆一起带你过一遍，比默认版更完整。</li>
+<li>已有 CLAUDE.md 时，<code>/init</code> 会给改进建议，而不是覆盖。</li>
+</ul>
+<h2 id="sec-b82a8b">心智模型：一份「活文档」</h2>
+<p>每个会话都从<strong>空白上下文</strong>开始 → CLAUDE.md <strong>自动载入</strong>成为背景 → Claude 按这些规则干活 → 你发现它犯错、<strong>纠正一次</strong>（用 <code>#</code> 开头说一句，或 <code>/memory</code> 编辑）→ 写回文件 → 下一次会话自动带上这条规则。</p>
+<p>关键：它不是一次写完的配置，而是<strong>越用越准的活文档</strong>。发现 Claude 重复踩坑，就把那条规则补进去。</p>
+<figure class="lesson__fig"><img src="/course/01-init-claude-md-01-flowchart-correction-to-rule.webp" alt="把一次纠正变成长期规则：Claude 重复犯错、人工纠正、写入 CLAUDE.md、新会话自动载入" width="1200" height="675" loading="lazy" decoding="async"><figcaption>把一次纠正变成长期规则：Claude 重复犯错、人工纠正、写入 CLAUDE.md、新会话自动载入</figcaption></figure>
+<h2 id="sec-eea9e0">什么该进 CLAUDE.md：四关测试</h2>
+<p>一行内容<strong>四关同时通过</strong>，才值得留：</p>
+<ol>
+<li><strong>项目特有</strong>（不是通用好习惯）</li>
+<li><strong>工具兜不住</strong>（没被 linter / CI / hook 强制）</li>
+<li><strong>每次会话都需要</strong>（不是只在某些场景才用）</li>
+<li><strong>Claude 不被告知就会做错</strong>（它自己不会自然做对）</li>
+</ol>
+<blockquote class="lesson__aside">
+<p>最锋利的一关是第 4 关：「<strong>Claude 不说就会反复踩的那个坑</strong>」。有些规则很重要，但 Claude 本来就会照做（如写清晰命名），那它也不必进去。</p>
+</blockquote>
+<p><strong>对照例子：</strong></p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>内容</th>
+<th>判定</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>「遵循最佳实践、保持可读性」</td>
+<td>❌ 空泛，Claude 本就会</td>
+</tr>
+<tr>
+<td>「用 4 空格缩进」（已配 Prettier）</td>
+<td>❌ 工具已强制</td>
+</tr>
+<tr>
+<td>「所有金额用整数分存储，绝不用浮点」</td>
+<td>✅ 项目特有 + 工具兜不住 + 会踩坑</td>
+</tr>
+</tbody>
+</table></div><h2 id="sec-09fec4">没过四关的内容，该搬去哪（六个去处）</h2>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>去处</th>
+<th>适用</th>
+<th>动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅ <strong>KEEP</strong></td>
+<td>四关全过的承重红线</td>
+<td>留</td>
+</tr>
+<tr>
+<td>📁 <strong>SCOPE</strong></td>
+<td>只在某些文件/场景才用（测试规范、API 规范），或多步流程</td>
+<td>搬到 <code>.claude/rules/X.md</code>（带 <code>paths:</code> 作用域）或 skill，按需载入</td>
+</tr>
+<tr>
+<td>🔧 <strong>ENFORCE</strong></td>
+<td>格式/命名/可静态检查的规则</td>
+<td>改成 linter / CI / hook，删。「强制」胜过「提醒」</td>
+</tr>
+<tr>
+<td>🔗 <strong>POINTER</strong></td>
+<td>复述了 docs 里已有的设计/schema</td>
+<td>换成<strong>一行纯文字指针</strong>（「见 docs/X §Y」）</td>
+</tr>
+<tr>
+<td>🗓️ <strong>STATUS</strong></td>
+<td>带日期的进度、评审、当前选型</td>
+<td>搬到状态文档 / issue tracker / 自动记忆</td>
+</tr>
+<tr>
+<td>❌ <strong>CUT</strong></td>
+<td>通用废话、文件内重复</td>
+<td>删</td>
+</tr>
+</tbody>
+</table></div><blockquote class="lesson__aside">
+<p>「搬走」≠「删掉」：STATUS / SCOPE 的内容要落到具体新位置，别凭空消失。</p>
+</blockquote>
+<figure class="lesson__fig"><img src="/course/01-init-claude-md-02-framework-four-gates-six-destinations.webp" alt="CLAUDE.md 四关测试与 KEEP、SCOPE、ENFORCE、POINTER、STATUS、CUT 六个去处" width="1200" height="675" loading="lazy" decoding="async"><figcaption>CLAUDE.md 四关测试与 KEEP、SCOPE、ENFORCE、POINTER、STATUS、CUT 六个去处</figcaption></figure>
+<h2 id="sec-678027">两个隐蔽的反模式</h2>
+<p>不删内容，也会害你每轮背着大文档跑：</p>
+<ol>
+<li><strong><code>@</code> 导入大文档</strong>：CLAUDE.md 里的 <code>@path/to/file</code> 是<strong>导入</strong>——启动时就把整份文件展开载入、每轮都在。所以 <code>@</code> 一份 PRD/技术方案<strong>不省上下文</strong>，等于把它贴进来。→ 大文档一律用<strong>纯文字指针</strong>，<code>@</code> 只留给小而每轮都需要的文件。</li>
+<li><strong>「每次开工先读 X / 总是先读这些文档」式命令</strong>：等于命令模型每轮把大文档拉进来，又膨胀又稀释注意力，还抵消了指针的好处。→ 改成<strong>按需、定向</strong>：「动到 X 时查 doc §Y」，只读相关段落。</li>
+</ol>
+<h2 id="sec-f5c3e0">为什么一定要精简？（真正的原因不是钱）</h2>
+<p>很多人以为是省 token。但有<strong>提示缓存</strong>：命中缓存时输入 token 大约只按基础价的十分之一计费，大文件其实不贵。所以「成本」这条理由站不太住。真正的三个原因是：</p>
+<ol>
+<li><strong>模型的注意力预算</strong>（最关键）：文件越长，重要规则越和噪音抢注意力，关键的几条<strong>被遵守得更差</strong>。缓存让你「存得便宜」，但对「用得好不好」毫无帮助。</li>
+<li><strong>上下文窗口空间</strong>：缓存便宜的是单价，不是容量。大文件每轮占着窗口，留给真正干活的空间更少、更早触发压缩。</li>
+<li><strong>缓存失效</strong>：CLAUDE.md 在前缀很靠前，<strong>你每改一次就打掉一次缓存</strong>——而「打磨 CLAUDE.md」这个动作本身就在反复打破「反正缓存了」的理想态。</li>
+</ol>
+<blockquote class="lesson__aside">
+<p>升级后的心智模型：<strong>我们让它小，不是因为 token 贵，而是因为模型对高信号文件遵守得更好。</strong> 优化的是注意力，不是成本。</p>
+</blockquote>
+<p>体量基准：官方建议每个 CLAUDE.md 控制在 <strong>200 行以内</strong>；高信号实践常更紧（约 <strong>80–120 行</strong>）。</p>
+<h2 id="sec-5395ba">为什么连最强的模型也会写出臃肿的 CLAUDE.md？</h2>
+<p>不是它不会写（它能把这些原则背出来），而是：</p>
+<ul>
+<li>你让它「写/更新文档」时，写作任务的默认拉力是<strong>详尽</strong>，不是「为注意力做减法」；多写在当下显得更负责。</li>
+<li>写文件的那一刻它<strong>满脑子都是你的项目</strong>，从信息很满的视角看，每一行都像承重的——它<strong>感受不到未来空白会话里的成本</strong>。</li>
+<li>文件是<strong>一轮轮「长」出来的</strong>：每次都在加，<strong>没有哪轮在删</strong>。臃肿几乎永远是<strong>累积问题</strong>。</li>
+</ul>
+<blockquote class="lesson__aside">
+<p>所以「做减法」的判断必须由<strong>人在回路里</strong>补上。这不是模型失职，是这件事本身需要人来定目标。</p>
+</blockquote>
+<h2 id="sec-39aa13">相关机制速查</h2>
+<ul>
+<li><strong>CLAUDE.md vs 自动记忆</strong>：两套互补、都每轮载入。CLAUDE.md 是<strong>你写</strong>的长期规则；<strong>自动记忆</strong>是 Claude 根据你的纠正<strong>自己记</strong>的（存于 <code>~/.claude/projects/&lt;project&gt;/memory/</code>，<code>MEMORY.md</code> 前 200 行/25KB 载入，详情文件按需读）。长期稳定规则放前者；易变、临时的交给后者或 <code>docs/</code>。</li>
+<li><strong>路径作用域规则</strong>：<code>.claude/rules/X.md</code> 文件头写 <code>paths: [&quot;tests/**&quot;]</code>，只在 Claude 接触匹配文件时才载入——把「只在部分场景用」的规则移出每轮预算。</li>
+<li><strong>Hook</strong>：要「不管 Claude 怎么决定都必须发生」的硬约束（如提交前必跑某命令），用 hook，而不是写进 CLAUDE.md（后者只是引导、不强制）。</li>
+<li><strong>HTML 注释</strong>：CLAUDE.md 里的 <code>&lt;!-- ... --&gt;</code> 注入上下文前会被剥掉——给人看的维护备注写这里，<strong>零 token 成本</strong>。</li>
+<li><strong>命令即 skill</strong>：自定义命令现已并入 Skills；<code>.claude/commands/x.md</code> 和 <code>.claude/skills/x/SKILL.md</code> 都会生成 <code>/x</code>。Skill <strong>按需载入</strong>，不占每轮预算。</li>
+</ul>
+<h2 id="sec-fa532e">常见疑问（FAQ）</h2>
+<p><strong>Q：CLAUDE.md 常常是 Claude 自己写的，它不能自己保持精简吗？</strong><br>
+A：「知道规则」≠「被要求按规则优化」。写文档的拉力指向详尽；且它在富上下文里、感受不到未来成本；臃肿是只加不删的累积病。做减法要靠你。</p>
+<p><strong>Q：团队有一大套编码规范（比如几十页 Java 规范），要写进去吗？</strong><br>
+A：大部分不该。分流：格式/可静态检查的 → linter/CI/hook；完整规范文档 → 留 <code>docs/</code> 用指针引用；只有<strong>少数非机械、项目特有、Claude 又老犯</strong>的设计约定才蒸馏成几条进去。</p>
+<p><strong>Q：有提示缓存，大文件不就便宜了吗，为什么还要限制大小？</strong><br>
+A：钱这条确实不成立。但真正的约束是注意力（稀释）、上下文空间、和缓存失效（编辑即失效）。优化的是注意力，不是成本。</p>
+<p><strong>Q：「先读文档」和「<code>@</code> 引用」不会每轮拉大文档、token 膨胀吗？</strong><br>
+A：要分清三样：<strong>纯文字指针</strong>（惰性、便宜、不载入文档）/ <strong><code>@</code> 导入</strong>（饿汉、每轮全载）/ <strong>「先读」命令</strong>（强制全读）。后两者是反模式，见上文。</p>
+<h2 id="sec-fcd746">动手练习</h2>
+<p>给你手头项目的 CLAUDE.md 做一次瘦身审计：</p>
+<ol>
+<li>逐行过<strong>四关测试</strong>，给每行标上 KEEP / SCOPE / ENFORCE / POINTER / STATUS / CUT。</li>
+<li>把 SCOPE 和 STATUS 的内容<strong>搬到具体新位置</strong>（<code>.claude/rules/</code>、<code>docs/STATUS.md</code>、issue），不要凭空删。</li>
+<li>检查有没有 <code>@</code> 导入大文档、有没有「每次先读 X」式指令，改成纯文字指针。</li>
+<li>目标：砍到 <strong>120 行以内</strong>，红线一条不丢。</li>
+</ol>
+<blockquote class="lesson__aside">
+<p>提示：这个流程本身可以做成一个 skill（如 <code>/slim-claude-md</code>），让 Claude 先出提案、你拍板、再动手。做的过程中发现的新坑，记得回灌进 skill——工具会越用越强。</p>
+</blockquote>
+<h2 id="sec-5f0876">下一课</h2>
+<p><strong>第 2 课 · 上下文管理三件套 <code>/context</code> / <code>/compact</code> / <code>/clear</code></strong>——每天都用，直接决定 Claude 会不会「越聊越笨」。</p>
+<hr>
+<p>参考：<a href="https://code.claude.com/docs">Claude Code 官方文档</a>中的 memory、best practices、commands 等页面。</p>
+

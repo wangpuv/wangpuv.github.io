@@ -1,0 +1,381 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答三个问题</strong>：什么时候应该派子代理、当前版本怎样创建和调用子代理、什么时候才值得接入 MCP。</p>
+<p>适合：主会话经常被搜索结果、测试日志淹没，或者希望 Claude Code 读取工单、监控、数据库等外部系统的人。</p>
+<p class="lesson__stamp">📌 基于 Claude Code 官方文档与本机 Claude Code 2.1.221 核对至 2026 年 8 月。产品更新较快，具体行为以官方文档与 <code>/release-notes</code> 为准。</p>
+</blockquote>
+<h2 id="sec-9e1362">一句话结论</h2>
+<p>子代理和 MCP 都是在给 Claude Code 扩展能力，但扩展的方向不同：</p>
+<pre class="lesson__code"><code>子代理：增加分工，把支线放进独立上下文
+MCP：增加连接，让 Claude 够到外部工具和数据</code></pre>
+<p>可以把它们记成一句话：</p>
+<p><strong>子代理管“谁来做”，MCP 管“能用什么做”。</strong></p>
+<p>两者还可以组合：让一个权限受限的子代理，只连接完成任务必需的 MCP server。</p>
+<figure class="lesson__fig"><img src="/course/07-agents-and-mcp-01-comparison-subagent-vs-mcp.webp" alt="一个管分工，一个管连接：子代理负责分工，MCP 负责连接外部工具和数据" width="1200" height="675" loading="lazy" decoding="async"><figcaption>一个管分工，一个管连接：子代理负责分工，MCP 负责连接外部工具和数据</figcaption></figure>
+<h2 id="sec-9ca8f6">一、先分清几种容易混淆的 agent</h2>
+<p>Claude Code 里的“agent”现在不只一种。如果不先分清，后面很容易把命令和能力混在一起。</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>名称</th>
+<th>谁协调</th>
+<th>是否独立上下文</th>
+<th>适合情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>子代理（subagent）</td>
+<td>主会话里的 Claude</td>
+<td>是</td>
+<td>支线搜索、测试、日志分析、专项审查</td>
+</tr>
+<tr>
+<td>后台 agent session</td>
+<td>你</td>
+<td>是，完整会话</td>
+<td>多个独立任务并行，之后人工查看</td>
+</tr>
+<tr>
+<td>Agent team</td>
+<td>team lead</td>
+<td>每个成员独立</td>
+<td>需要成员共享任务并互相通信；目前仍属实验功能</td>
+</tr>
+<tr>
+<td>产品里的 agent</td>
+<td>你的应用</td>
+<td>由产品架构决定</td>
+<td>面向终端用户运行的业务逻辑</td>
+</tr>
+</tbody>
+</table></div><p>本课重点是第一种：<strong>同一个 Claude Code 会话里的子代理</strong>。</p>
+<p>还有两个长得很像的入口：</p>
+<pre class="lesson__code"><code>/agents        → 当前版本只提示你让 Claude 创建，或直接编辑 agent 文件
+claude agents  → 打开 agent view，管理多个后台会话</code></pre>
+<p>它们不是同一个东西。</p>
+<h2 id="sec-2568ed">二、子代理到底隔离了什么</h2>
+<p>子代理拥有自己的上下文窗口。它会在那里面读取文件、搜索代码、运行命令，完成后把结果交回主会话。</p>
+<p>这意味着：</p>
+<ul>
+<li>大量搜索结果、测试日志和中间试错留在子代理里；</li>
+<li>主会话通常只接收最后的报告；</li>
+<li>多个相互独立的调查可以并行进行；</li>
+<li>子代理可以使用不同的模型、工具和权限设置。</li>
+</ul>
+<p>但“独立上下文”不等于“什么都看不到”。普通子代理启动时通常会得到：</p>
+<ul>
+<li>自己的系统提示词；</li>
+<li>主会话为这次委派整理的任务说明；</li>
+<li>主会话会加载的 <code>CLAUDE.md</code> 层级与项目规则；</li>
+<li>会话启动时的 Git 状态快照；</li>
+<li>通过 <code>skills</code> 字段预加载的技能。</li>
+</ul>
+<p>内置的 <code>Explore</code> 和 <code>Plan</code> 是例外：为了保持轻量，它们不会加载 <code>CLAUDE.md</code> 和 Git 状态。</p>
+<h3 id="sec-311138">上下文隔离不等于文件隔离</h3>
+<p>普通子代理默认仍从主会话的当前工作目录开始，看到的是同一套磁盘文件。</p>
+<p>所以：</p>
+<ul>
+<li>两个 agent 同时改同一文件，仍可能互相覆盖；</li>
+<li>子代理执行的文件修改，会真实落到当前工作区；</li>
+<li>真正需要独立 checkout 时，应在定义里设置：</li>
+</ul>
+<pre class="lesson__code lesson__code--tight" data-lang="yaml"><code>isolation: worktree</code></pre>
+<p>这会让子代理在临时 Git worktree 中工作，而不仅仅是换一个上下文窗口。</p>
+<p>但它不是主会话工作区的完整复制品。临时 worktree 默认从仓库的默认分支创建，不等于复制主会话当前的 <code>HEAD</code>；主工作区里的未提交改动也不会自动出现。委派前要先确认子代理能看到完成任务所需的代码。</p>
+<h2 id="sec-6d603a">三、当前版本怎样创建子代理</h2>
+<p>旧版教程常写：</p>
+<pre class="lesson__code lesson__code--tight"><code>/agents → Create new agent → Select tools</code></pre>
+<p>这条路径已经过时。从 Claude Code 2.1.198 起，<code>/agents</code> 不再打开创建向导。</p>
+<p>现在推荐两种方式：</p>
+<ol>
+<li>直接告诉 Claude 想要什么 agent、放在哪个作用域；</li>
+<li>手动创建 Markdown 定义文件。</li>
+</ol>
+<h3 id="sec-e944e6">两个最常用的保存位置</h3>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>位置</th>
+<th>范围</th>
+<th>是否适合提交到 Git</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.claude/agents/</code></td>
+<td>当前项目</td>
+<td>适合，团队可以共享</td>
+</tr>
+<tr>
+<td><code>~/.claude/agents/</code></td>
+<td>这台机器上的所有项目</td>
+<td>不进入项目仓库，适合个人通用 agent</td>
+</tr>
+</tbody>
+</table></div><p>还可以使用 <code>--agents</code> 在启动时传入 JSON，定义只在当前会话生效；插件也可以自带 agent。</p>
+<h3 id="sec-55d4f3">一个真正只读的 reviewer</h3>
+<p>在项目中创建：</p>
+<pre class="lesson__code lesson__code--tight"><code>.claude/agents/code-reviewer.md</code></pre>
+<p>内容如下：</p>
+<pre class="lesson__code" data-lang="md"><code>---
+name: code-reviewer
+description: 审查最近的代码改动，发现正确性、安全性与可维护性问题。完成代码修改后主动使用。
+tools: Read, Grep, Glob
+model: sonnet
+---
+
+你是一名只读代码审查员。
+
+先读取相关代码，以及主会话明确提供的 diff，再按严重程度报告问题。
+每条问题必须说明文件位置、风险与建议，不要修改文件。</code></pre>
+<p>这里有两层约束：</p>
+<ul>
+<li><code>tools</code> 是硬边界：没有 <code>Edit</code>、<code>Write</code> 和 <code>Bash</code>，就无法调用这些工具；</li>
+<li>正文里的“不要修改文件”是行为说明，帮助模型理解角色。</li>
+</ul>
+<p><strong>真只读要靠工具层限制，不能只靠提示词里的承诺。</strong></p>
+<p>如果省略 <code>tools</code>，子代理会继承它可用的工具池，而不是默认只读。</p>
+<h3 id="sec-5dfccc">改完是否要重启</h3>
+<p>当前版本会监视已经存在的 <code>.claude/agents/</code> 与 <code>~/.claude/agents/</code> 目录，新增或修改文件后通常几秒内即可生效。</p>
+<p>只有两类常见情况需要重启：</p>
+<ul>
+<li>会话启动时，这个 <code>agents</code> 目录还不存在；</li>
+<li>会话使用了 <code>--disable-slash-commands</code>，不会监视这些目录。</li>
+</ul>
+<p>因此，“每次修改 agent 都必须重启”也已经不是当前版本的准确说法。</p>
+<h2 id="sec-e46e9a">四、三种调用方式</h2>
+<h3 id="sec-bc096f">1. 让 Claude 自动判断</h3>
+<p>Claude 会结合当前任务与 agent 的 <code>description</code> 决定是否委派。</p>
+<p>所以 <code>description</code> 不应只写“代码审查员”，而要写清：</p>
+<ul>
+<li>它负责什么；</li>
+<li>什么时候使用；</li>
+<li>什么时候不要使用。</li>
+</ul>
+<p>例如：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="yaml"><code>description: 审查最近的代码改动，发现正确性、安全性与可维护性问题。完成代码修改后主动使用。</code></pre>
+<h3 id="sec-1484cd">2. 显式点名一次</h3>
+<p>在输入框键入 <code>@</code>，从补全列表中选择 agent，就能保证它执行这次任务。</p>
+<p>也可以手动输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>@agent-code-reviewer 检查这次认证模块的改动</code></pre>
+<p>对于插件提供的 agent，名称可能带插件命名空间。</p>
+<h3 id="sec-2a5db5">3. 整个会话都使用这个 agent</h3>
+<pre class="lesson__code lesson__code--tight"><code>claude --agent code-reviewer</code></pre>
+<p>这不是“派出一个支线”，而是让主线程本身使用该 agent 的系统提示词、工具限制和模型。</p>
+<p>适合需要强制固定角色的专用会话。</p>
+<h2 id="sec-57679b">五、什么时候派子代理才划算</h2>
+<p>子代理不是免费的。它需要建立自己的上下文，并重新读取完成任务所需的材料。</p>
+<p>最适合委派的任务通常具备三个特点：</p>
+<pre class="lesson__code lesson__code--tight"><code>输入小 + 过程脏 + 输出小</code></pre>
+<ul>
+<li><strong>输入小</strong>：不用把主会话的大量历史重新讲一遍；</li>
+<li><strong>过程脏</strong>：会产生很多搜索结果、日志或试错记录；</li>
+<li><strong>输出小</strong>：最后只需要一份结论或清单。</li>
+</ul>
+<p>典型例子：</p>
+<ul>
+<li>跑完整测试，只汇报失败项；</li>
+<li>搜索一个模块的调用链，只返回关键路径；</li>
+<li>分析一大段日志，只给出根因和证据；</li>
+<li>分别调查认证、数据库、API 三个互不依赖的区域。</li>
+</ul>
+<p>不适合的情况：</p>
+<ul>
+<li>只改一个明确的小地方；</li>
+<li>任务需要频繁来回确认；</li>
+<li>规划、实现和测试共享大量上下文；</li>
+<li>为了一个简单动作，需要把整份设计文档重新喂一遍。</li>
+</ul>
+<p>原稿实验中曾观察到一次子代理运行显示 <code>13.0k tokens</code>。这个数字可以提醒我们“子代理有成本”，但它只是一次特定版本、模型和任务下的观测，<strong>不是固定启动税，也不是官方保证值</strong>。</p>
+<h2 id="sec-e1b8c4">六、模型、记忆与后台运行</h2>
+<h3 id="sec-034ff8">模型怎么选</h3>
+<p><code>model</code> 可以填写：</p>
+<ul>
+<li><code>inherit</code></li>
+<li><code>haiku</code></li>
+<li><code>sonnet</code></li>
+<li><code>opus</code></li>
+<li><code>fable</code></li>
+<li>具体的完整 model ID</li>
+</ul>
+<p>省成本的搜索和整理可以考虑较轻的模型；复杂审查与推理使用更强模型。实际可用范围仍取决于账号订阅、组织策略和模型开放情况。</p>
+<h3 id="sec-bbc595">记忆怎么选</h3>
+<p>通过 <code>memory</code> 字段可以让自定义子代理跨会话保存经验：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>值</th>
+<th>路径</th>
+<th>适合情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>user</code></td>
+<td><code>~/.claude/agent-memory/&lt;agent&gt;/</code></td>
+<td>跨项目的个人经验</td>
+</tr>
+<tr>
+<td><code>project</code></td>
+<td><code>.claude/agent-memory/&lt;agent&gt;/</code></td>
+<td>项目知识，适合团队共享</td>
+</tr>
+<tr>
+<td><code>local</code></td>
+<td><code>.claude/agent-memory-local/&lt;agent&gt;/</code></td>
+<td>项目知识，但只保留在本机</td>
+</tr>
+</tbody>
+</table></div><p>不写 <code>memory</code>，就是不启用持久化 agent 记忆。</p>
+<p>无状态代码审查器通常不需要记忆：每次只审当前 diff，历史印象反而可能影响判断。</p>
+<p>还要注意：启用 agent memory 后，Claude Code 会让子代理拥有管理记忆文件所需的 <code>Read</code>、<code>Write</code> 和 <code>Edit</code> 能力。如果目标是严格的“完全不写”，不要给它开启持久记忆。</p>
+<h3 id="sec-28e06d">前台与后台</h3>
+<p>当前版本通常会让子代理在后台运行；如果主会话必须拿到结果才能继续，也可能以前台方式运行。</p>
+<ul>
+<li>前台：主会话等待结果；</li>
+<li>后台：你可以继续工作，完成后收到通知；</li>
+<li><code>/tasks</code>：查看、附着或停止当前会话中的后台任务。</li>
+</ul>
+<p>这与 <code>claude agents</code> 管理的独立后台会话仍然不是同一层功能。</p>
+<h2 id="sec-acb346">七、MCP：让 Claude 连接外部系统</h2>
+<p>MCP 是 Model Context Protocol 的缩写，是模型与外部工具、数据源之间的标准协议。</p>
+<p>一个 MCP server 可以向 Claude Code 暴露：</p>
+<ul>
+<li><strong>Tools</strong>：执行查询、创建工单、发送消息、触发动作；</li>
+<li><strong>Resources</strong>：文档、数据库结构、issue 等可读取内容；</li>
+<li><strong>Prompts</strong>：由 server 提供的可复用命令模板。</li>
+</ul>
+<p>常见用途包括：</p>
+<ul>
+<li>读取 Jira、GitHub issue 或设计稿；</li>
+<li>查询 Sentry、监控平台和数据库；</li>
+<li>创建工单、草稿或自动化流程；</li>
+<li>访问 Claude Code 原生工具无法直接触达的内部系统。</li>
+</ul>
+<p>可以把判断标准记成一句话：</p>
+<p><strong>MCP 是为了够到 Claude 原生够不着的东西。</strong></p>
+<p>本地文件本来就能用 <code>Read</code>、<code>Grep</code>、<code>Glob</code> 读取，就没有必要再绕一层 MCP。</p>
+<h2 id="sec-a412ae">八、怎样添加和管理 MCP server</h2>
+<p>远程服务优先使用 HTTP：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude mcp add --transport http &lt;名称&gt; &lt;URL&gt;</code></pre>
+<p>本地进程通常使用 stdio：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude mcp add &lt;名称&gt; -- &lt;命令&gt; &lt;参数&gt;</code></pre>
+<p>常用管理命令：</p>
+<pre class="lesson__code"><code>claude mcp list
+claude mcp get &lt;名称&gt;
+claude mcp remove &lt;名称&gt;</code></pre>
+<p>进入 Claude Code 后，运行：</p>
+<pre class="lesson__code lesson__code--tight"><code>/mcp</code></pre>
+<p>可以查看连接状态、重新连接、启用或禁用 server，并为需要 OAuth 的远程服务完成登录。</p>
+<h3 id="sec-0ae893">三种作用域</h3>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>作用域</th>
+<th>加载范围</th>
+<th>是否共享</th>
+<th>存储位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>local</code></td>
+<td>当前项目</td>
+<td>否</td>
+<td><code>~/.claude.json</code> 中的项目配置</td>
+</tr>
+<tr>
+<td><code>project</code></td>
+<td>当前项目</td>
+<td>是</td>
+<td>项目根目录 <code>.mcp.json</code></td>
+</tr>
+<tr>
+<td><code>user</code></td>
+<td>所有项目</td>
+<td>否</td>
+<td><code>~/.claude.json</code></td>
+</tr>
+</tbody>
+</table></div><p><code>local</code> 是默认值。带凭证或仍在试验的 server，优先放 local；团队共同使用、且配置中不含秘密的 server，可以考虑 project。</p>
+<p>项目级 <code>.mcp.json</code> 来自仓库时，需要先通过工作区信任和 server 审批，不能让仓库自己批准自己。</p>
+<h2 id="sec-fe5b58">九、MCP 的上下文成本已经变了</h2>
+<p>旧版常见说法是：</p>
+<blockquote class="lesson__aside">
+<p>每接一个 MCP server，它的全部工具定义都会塞进上下文。</p>
+</blockquote>
+<p>当前默认行为已经不是这样。</p>
+<p>在支持 Tool Search 的官方默认环境中，Claude Code 会按需发现和加载 MCP 工具：</p>
+<ol>
+<li>会话启动时主要加载工具名称和 server instructions；</li>
+<li>真正需要某项能力时，再搜索并加载对应工具定义；</li>
+<li>只有实际用到的工具进入上下文。</li>
+</ol>
+<p>因此，在这类环境中，接入多个 MCP server 的上下文成本已经显著降低。</p>
+<p>不过，某些云平台、第三方 API 代理、不支持相关能力的模型，或者显式关闭 Tool Search 的配置，仍可能提前加载 MCP 工具定义。不要把“按需加载”当成所有环境都具备的固定行为。</p>
+<p>但“按需加载”不代表可以随便连接：</p>
+<ul>
+<li>server 仍然扩大了可访问范围；</li>
+<li>外部内容可能携带提示注入；</li>
+<li>OAuth 或 token 代表真实账号权限；</li>
+<li>写操作会在外部系统产生真实后果；</li>
+<li>工具输出过大仍会消耗上下文。</li>
+</ul>
+<p>所以 MCP 的首要成本已经不只是 token，更是<strong>信任与权限</strong>。</p>
+<h2 id="sec-52d8a0">十、把子代理与 MCP 安全地组合</h2>
+<p>假设你想让 Claude 检查 Sentry 中的错误，但不希望它修改代码，也不希望主会话加载一堆日志。</p>
+<p>可以创建一个专用子代理：</p>
+<pre class="lesson__code" data-lang="yaml"><code>---
+name: sentry-investigator
+description: 调查 Sentry 错误并返回根因、证据和修复建议；不要修改代码。
+tools: Read, Grep, mcp__sentry__get_issue, mcp__sentry__list_events
+mcpServers:
+  - sentry
+model: sonnet
+---</code></pre>
+<p>上面的 MCP tool 名称只是只读工具示例。不同 server 暴露的名称可能不同，应以该 server 的文档和当前 Claude Code 实际暴露的工具名为准，并只列出完成调查所需的读取类工具。不要直接写 <code>mcp__sentry</code> 这种 server 级通配符，否则该 server 的写入类工具也可能一起被放开。</p>
+<p>这个组合形成三道边界：</p>
+<ol>
+<li><code>description</code> 决定什么时候派它；</li>
+<li><code>tools</code> 与 <code>mcpServers</code> 决定它能碰什么；这里仅允许两个明确列出的 Sentry 只读工具；</li>
+<li>权限规则与 OAuth 决定具体动作是否允许执行。</li>
+</ol>
+<p>示例里的 <code>- sentry</code> 是复用当前会话已经配置的 server。它与“内联配置”不是一回事。</p>
+<p>如果希望 MCP server 只在这个子代理运行期间连接，需要在 <code>mcpServers</code> 中写入包含 <code>type</code>、<code>url</code> 或 <code>command</code> 等字段的完整 server 定义。这样的内联 server 会在子代理启动时连接、结束时断开，主会话不必拥有那组 MCP 工具。</p>
+<p>这正是最小权限原则：</p>
+<p><strong>只给完成这项任务所需的工具、数据和持续时间。</strong></p>
+<figure class="lesson__fig"><img src="/course/07-agents-and-mcp-02-flowchart-least-privilege.webp" alt="最小权限组合：从主会话到专用子代理、MCP server 和外部系统的三道边界" width="1200" height="675" loading="lazy" decoding="async"><figcaption>最小权限组合：从主会话到专用子代理、MCP server 和外部系统的三道边界</figcaption></figure>
+<h2 id="sec-5e009c">十一、几个容易踩的坑</h2>
+<h3 id="sec-334661">1. 把 <code>/agents</code> 当成当前版本的管理向导</h3>
+<p>2.1.198 以后，创建 agent 应让 Claude 写文件或手动编辑 <code>.claude/agents/</code>。</p>
+<h3 id="sec-05c886">2. 以为独立上下文就是独立文件系统</h3>
+<p>默认仍共用当前工作区。需要隔离修改时使用 <code>isolation: worktree</code>。</p>
+<h3 id="sec-9c3d9d">3. 只在正文写“不要修改”</h3>
+<p>提示词是行为说明，<code>tools</code> 才是能力边界。只读 reviewer 不应获得 <code>Edit</code>、<code>Write</code> 或不必要的 <code>Bash</code>。</p>
+<h3 id="sec-98e694">4. 开了 memory，却以为它仍然完全不写</h3>
+<p>agent memory 需要写记忆文件。严格无写入的 agent 不要启用持久记忆。</p>
+<h3 id="sec-b76347">5. 为了“看起来高级”而接 MCP</h3>
+<p>原生工具已经够用时，MCP 只会增加连接、信任和权限成本。</p>
+<h3 id="sec-a63f46">6. 把 Tool Search 当成安全机制</h3>
+<p>Tool Search 只是延迟加载工具定义，不会替你审查 server 是否可信，也不会替代权限规则。</p>
+<h3 id="sec-b92804">7. 忘记外部系统的写操作是真实的</h3>
+<p>创建工单、发送消息、修改数据库或触发部署，都不只是聊天里的建议。先用只读权限验证，再逐步开放写能力。</p>
+<h2 id="sec-fcd746">动手练习</h2>
+<h3 id="sec-d704bf">练习一：创建只读子代理</h3>
+<ol>
+<li>让 Claude 在 <code>.claude/agents/</code> 创建一个 <code>code-reviewer.md</code>；</li>
+<li>只给它 <code>Read</code>、<code>Grep</code>、<code>Glob</code>；</li>
+<li>用 <code>@</code> 从补全列表中选择它；</li>
+<li>让它审查一个小 diff；</li>
+<li>检查它是否只返回问题，没有修改文件。</li>
+</ol>
+<h3 id="sec-3f37d1">练习二：检查 MCP 作用域</h3>
+<ol>
+<li>运行 <code>claude mcp list</code>；</li>
+<li>查看某个 server 的作用域与连接状态；</li>
+<li>进入 Claude Code 后运行 <code>/mcp</code>；</li>
+<li>找出哪些 server 是 local、project 或 user；</li>
+<li>对每个 server 问一句：Claude 原生工具是否已经能完成同样的事？</li>
+</ol>
+<p>练习的重点不是“多接几个工具”，而是建立两个判断：</p>
+<pre class="lesson__code"><code>这条支线会不会污染主会话？
+这个外部系统是否真的值得开放给 Claude？</code></pre>
+<h2 id="sec-5f0876">下一课</h2>
+<p><strong>第 8 课 · 权限与自动模式</strong>——怎样用 allow、ask、deny 与不同权限模式，把 Claude 的行动边界真正落到配置里。</p>
+

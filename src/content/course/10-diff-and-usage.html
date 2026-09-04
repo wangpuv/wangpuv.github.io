@@ -1,0 +1,228 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答三个问题</strong>：Claude 刚才到底改了什么、这段会话消耗了多少、当前版本和连接状态是否正常。</p>
+<p>适合：已经开始让 Claude Code 修改真实项目，希望在提交代码前看清改动，并对会话成本和运行环境保持掌控的人。</p>
+<p class="lesson__stamp">📌 基于 Claude Code 官方文档与本机 Claude Code 2.1.258 核对至 2026 年 9 月。界面字段可能随账户类型和版本变化，具体以你当前看到的面板为准。</p>
+</blockquote>
+<h2 id="sec-7f3f59">一句话心智模型</h2>
+<ul>
+<li><code>/diff</code> 回答：<strong>代码改了什么？</strong></li>
+<li><code>/usage</code> 回答：<strong>这段工作消耗了什么？</strong></li>
+<li><code>/status</code> 回答：<strong>我现在运行在什么环境里？</strong></li>
+</ul>
+<p>它们基本都是展示型命令：先把事实摊开给你看，再由你决定下一步是继续修改、回退、提交，还是处理环境问题。</p>
+<h2 id="sec-329897">一、<code>/diff</code>：先看清 Claude 改了什么</h2>
+<p>在 Claude Code 中输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/diff</code></pre>
+<p>会打开交互式 diff 查看器。它最有价值的地方，不只是显示工作区相对 Git 的总改动，还能把改动按 Claude 的对话回合拆开。</p>
+<p>你可以在两类视图之间切换：</p>
+<ul>
+<li><strong>当前完整 diff</strong>：从整体上查看仓库中尚未提交的变化；</li>
+<li><strong>逐回合 diff</strong>：只看 Claude 在某一轮中写入或修改了哪些内容。</li>
+</ul>
+<p>上下方向键可以切换文件，进入文件后可以继续翻阅具体改动。当前版本还会自动刷新仓库中由外部操作产生的变化。</p>
+<h3 id="sec-087f34"><code>/diff</code>、<code>git diff</code> 和 <code>/rewind</code> 的边界</h3>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>工具</th>
+<th>解决什么问题</th>
+<th>是否修改文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/diff</code></td>
+<td>查看总改动和逐回合改动</td>
+<td>否</td>
+</tr>
+<tr>
+<td><code>git status</code> + <code>git diff</code> 系列</td>
+<td>按暂存状态检查 Git 改动</td>
+<td>否</td>
+</tr>
+<tr>
+<td><code>/rewind</code></td>
+<td>回到 Claude Code 保存的某个检查点</td>
+<td>可能会</td>
+</tr>
+</tbody>
+</table></div><p>如果只想知道“Claude 第三轮改了哪些行”，<code>/diff</code> 最方便；准备提交时，则要先用 <code>git status</code> 看清文件状态，再选择对应的 Git 命令：</p>
+<ul>
+<li><code>git diff</code>：查看工作区中尚未暂存的改动；</li>
+<li><code>git diff --cached</code>：查看已经暂存、准备进入下一次提交的改动；</li>
+<li><code>git diff HEAD</code>：查看已跟踪文件相对 <code>HEAD</code> 的全部改动。</li>
+</ul>
+<p>未跟踪文件不会出现在这些 diff 中，所以提交前不能省略 <code>git status</code>。</p>
+<figure class="lesson__fig"><img src="/course/10-diff-and-usage-01-comparison-git-check-v2.webp" alt="Claude Code 的逐回合 diff、Git 提交前检查和检查点恢复各有不同边界" width="1200" height="675" loading="lazy" decoding="async"><figcaption>Claude Code 的逐回合 diff、Git 提交前检查和检查点恢复各有不同边界</figcaption></figure>
+<h3 id="sec-0121a3"><code>/rewind</code> 只能回到累积检查点</h3>
+<p>第 5 课已经详细讲过 <code>/rewind</code> 的恢复选项和安全边界。放在本课，只需要记住它与逐回合 diff 的一个关键区别：</p>
+<p><strong><code>/diff</code> 能单独查看某一轮，<code>/rewind</code> 却不能从历史中精准摘掉中间的一轮。</strong></p>
+<p>例如，Claude 连续完成了 4 轮修改。你想撤销第 2 轮、完整保留第 3 和第 4 轮，通常不能直接依靠 <code>/rewind</code>，因为它恢复的是某个时间点的累积状态。更稳妥的办法是先用逐回合 diff 定位变化，再让 Claude 做一次新的针对性修改。</p>
+<p>同时不要忘记：Bash、外部编辑器、大多数子代理以及符号链接或硬链接产生的变化，都不能完全依赖检查点恢复。<strong>检查点负责会话内撤销，Git 负责长期历史。</strong></p>
+<h2 id="sec-83311c">二、<code>/usage</code>：一个面板里有三类不同数据</h2>
+<p>输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/usage</code></pre>
+<p>会打开用量仪表盘。最容易误读的地方，是把面板中的所有数字都理解成“这次对话用了多少”。实际上，它把三类尺度不同的数据放在了一起。</p>
+<figure class="lesson__fig"><img src="/course/10-diff-and-usage-02-framework-usage-dashboard.webp" alt="一个 /usage 面板包含当前会话、套餐限额和活动统计三类不同数据" width="1200" height="675" loading="lazy" decoding="async"><figcaption>一个 /usage 面板包含当前会话、套餐限额和活动统计三类不同数据</figcaption></figure>
+<h3 id="sec-671818">1. <code>Session</code>：当前 Claude Code 会话的消耗</h3>
+<p>顶部的 <code>Session</code> 区域用于描述当前 CLI 会话，包括：</p>
+<ul>
+<li><code>Total cost</code>：根据本地记录和公开价格计算的估算成本；</li>
+<li>API duration：API 真正处理请求的累计时间；</li>
+<li>Wall duration：从会话开始到现在经过的墙钟时间；</li>
+<li>Code changes：增加和删除的代码行数；</li>
+<li>Usage by model：按模型拆分的 token 使用量。</li>
+</ul>
+<p><code>Usage by model</code> 通常会继续分成：</p>
+<ul>
+<li>input；</li>
+<li>output；</li>
+<li>cache read；</li>
+<li>cache write。</li>
+</ul>
+<p>这些 token 的价格并不相同，因此把四类数字简单相加，往往不能直接说明成本。<code>Total cost</code> 更适合用来快速比较会话，但它仍然只是估算值；API 用户应以 Console 中的账单数据为准，订阅用户也不要把这里的估算成本误认为一笔额外扣款。</p>
+<p>执行 <code>/clear</code> 会清空当前对话上下文，并把这一块的会话统计重新从零计算。</p>
+<h3 id="sec-422135">2. Plan limits：套餐限额进度</h3>
+<p>订阅账户通常还会看到滚动使用窗口和周限额等进度条，例如当前滚动窗口用了多少、何时重置。</p>
+<p>这里显示的是<strong>账户套餐限额</strong>，不是当前聊天本身。具体出现哪些进度条、窗口有多长，会随 Pro、Max、Team、Enterprise 等计划和账户策略变化。</p>
+<p>因此不要把下面两个概念混在一起：</p>
+<ul>
+<li><code>Session</code> 区域：当前 Claude Code 会话产生的统计；</li>
+<li>套餐中的 current session 或滚动窗口：账户层面的限额窗口。</li>
+</ul>
+<p>如果账户开启了 usage credits，面板还可能出现月度花费行。它表示 usage credits 的月度支出，不等于订阅套餐又多了一层“月额度”。</p>
+<h3 id="sec-b77ecf">3. Activity stats：近期使用模式</h3>
+<p>活动统计用于观察你最近怎样使用 Claude Code，例如：</p>
+<ul>
+<li>使用了哪些 skill、子代理、插件或 MCP server；</li>
+<li>多少使用发生在超长上下文中；</li>
+<li>自动化循环等功能产生了多少活动；</li>
+<li>最近 24 小时和最近 7 天的变化。</li>
+</ul>
+<p>可以按 <code>d</code> 查看最近 24 小时，按 <code>w</code> 查看最近 7 天。</p>
+<p>这里的百分比可能是几个互相独立的观察维度。例如，“长上下文占比”和“MCP 使用占比”不是同一张饼图，不能相加凑成 100%。这些统计主要来自当前机器，也不代表你在其他设备或 claude.ai 上的全部使用情况。</p>
+<h3 id="sec-54c3ff">4. 新增的 Prompt cache 信息</h3>
+<p>从 Claude Code 2.1.251 开始，主对话第一次收到 API 响应后，<code>Session</code> 区域还可能出现 <code>Prompt cache (main)</code>。它会显示请求次数、输入 token 来自缓存的比例、cache misses、expected rebuilds，以及当前缓存是 warm 还是 cold 和对应的 TTL。</p>
+<p>这行数据只统计主对话，不包含子代理。<code>/clear</code> 会把它和整个 <code>Session</code> 区域一起重置；切换模型或改变影响缓存键的设置，则可能导致 cache miss 和重新写入缓存。面板中的 expected rebuilds 主要指 <code>/compact</code> 或旧工具结果清理等由 Claude Code 主动改写上下文的情况。</p>
+<p>如果长会话越来越贵，先观察两件事：</p>
+<ol>
+<li>上下文是否已经很长；</li>
+<li>缓存是否频繁失效或重建。</li>
+</ol>
+<p>切换到新任务时使用 <code>/clear</code>，同一任务过长时使用 <code>/compact</code>，通常比盲目追求某一个 token 数字更有意义。</p>
+<h3 id="sec-2f5dce"><code>/cost</code> 与 <code>/stats</code> 不需要另外记</h3>
+<ul>
+<li><code>/cost</code> 是 <code>/usage</code> 的别名；</li>
+<li><code>/stats</code> 也会打开同一套面板，但直接落在 Stats 标签页。</li>
+</ul>
+<p>日常使用记住 <code>/usage</code> 一个命令就够了。</p>
+<p>如果套餐数据请求失败，Claude Code 可能暂时展示近期缓存的进度条并标注时间；可以按 <code>r</code> 重试，不必把旧数据误认为实时数据。</p>
+<h2 id="sec-921fa5">三、<code>/status</code>：确认当前环境，而不是修改配置</h2>
+<p>输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/status</code></pre>
+<p>会打开 Settings 中的 Status 标签页。它是一个只读总览，而且可以在 Claude 正在响应时打开。</p>
+<p>当前页面通常包括：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>分类</th>
+<th>常见字段</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>版本</td>
+<td>Claude Code Version</td>
+</tr>
+<tr>
+<td>会话</td>
+<td>Session name、Session ID、Session kind、当前目录</td>
+</tr>
+<tr>
+<td>账户</td>
+<td>登录方式、组织、邮箱</td>
+</tr>
+<tr>
+<td>模型</td>
+<td>当前模型及其具体版本</td>
+</tr>
+<tr>
+<td>连通性</td>
+<td>MCP server 的连接、鉴权和禁用状态</td>
+</tr>
+<tr>
+<td>配置来源</td>
+<td>用户设置、项目设置、本地设置等</td>
+</tr>
+</tbody>
+</table></div><p>它最适合回答这些问题：</p>
+<ul>
+<li>我现在到底用了哪个模型？</li>
+<li>当前目录是不是预期的项目？</li>
+<li>Claude Code 版本是否正确？</li>
+<li>MCP 是已连接、待鉴权，还是被禁用？</li>
+<li>当前设置来自用户级还是项目级配置？</li>
+</ul>
+<h3 id="sec-93c5f3"><code>/status</code>、<code>/doctor</code>、<code>/config</code> 怎样分工</h3>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>命令</th>
+<th>用途</th>
+<th>是否可能修改环境</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/status</code></td>
+<td>查看版本、会话、账户、模型和连通性</td>
+<td>否</td>
+</tr>
+<tr>
+<td><code>/doctor</code></td>
+<td>检查安装和环境问题，报告后请求确认再处理</td>
+<td>确认后可能会</td>
+</tr>
+<tr>
+<td><code>/config</code></td>
+<td>手动修改 Claude Code 配置</td>
+<td>会</td>
+</tr>
+</tbody>
+</table></div><p>这里有一个版本变化需要特别注意：<strong>新版 <code>/doctor</code> 已经是一个诊断 Skill。</strong> 它会先执行检查、报告发现，再询问你是否采取修复动作。旧版本中“打开诊断界面后按 <code>f</code> 发送报告给 Claude”的操作，已经不适合当前版本。</p>
+<p>如果你只想在终端做只读诊断，也可以退出交互式会话后运行：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="bash"><code>claude doctor</code></pre>
+<p>遇到 MCP 鉴权问题用 <code>/mcp</code>，想确认现状用 <code>/status</code>，需要系统性排查环境再用 <code>/doctor</code>。</p>
+<h2 id="sec-13e614">四、一套提交前的实用检查顺序</h2>
+<p>Claude 完成一段开发工作后，可以按下面的顺序收尾：</p>
+<ol>
+<li>执行 <code>/diff</code>，先看逐回合变化，再看完整改动；</li>
+<li>对不满意的局部改动，优先让 Claude 正向修正；需要整体退回时再使用 <code>/rewind</code>；</li>
+<li>运行测试，再用 <code>git status</code>、<code>git diff</code> 和 <code>git diff --cached</code> 检查准备提交的最终状态；</li>
+<li>长会话中执行 <code>/usage</code>，判断是否需要 <code>/compact</code> 或 <code>/clear</code>；</li>
+<li>模型、目录或 MCP 状态可疑时执行 <code>/status</code>；</li>
+<li>环境确实异常时再使用 <code>/doctor</code>；</li>
+<li>确认无误后提交 Git，让长期历史脱离当前会话独立存在。</li>
+</ol>
+<p>这套顺序的核心不是多记几个命令，而是把三种控制分开：</p>
+<ul>
+<li><strong>改动控制</strong>：<code>/diff</code>、<code>/rewind</code>、Git；</li>
+<li><strong>成本控制</strong>：<code>/usage</code>、<code>/compact</code>、<code>/clear</code>；</li>
+<li><strong>环境控制</strong>：<code>/status</code>、<code>/mcp</code>、<code>/doctor</code>。</li>
+</ul>
+<h2 id="sec-15e2fb">五、避坑清单</h2>
+<ul>
+<li>[ ] <code>/diff</code> 的优势是逐回合视图；它不是对所有 Git diff 命令的简单替代。</li>
+<li>[ ] <code>git diff</code> 看未暂存改动，<code>git diff --cached</code> 看已暂存改动；提交前先运行 <code>git status</code>。</li>
+<li>[ ] <code>/rewind</code> 回到一个累积检查点，不能精准删除任意中间一轮。</li>
+<li>[ ] Bash、外部编辑器和大多数子代理产生的改动，不能依赖检查点恢复。</li>
+<li>[ ] <code>Session</code> 会话统计与套餐的滚动限额窗口不是一回事。</li>
+<li>[ ] <code>Total cost</code> 是估算值，订阅用户不要把它直接当成额外账单。</li>
+<li>[ ] <code>/clear</code> 会重置当前 Session 统计，并开始新的上下文。</li>
+<li>[ ] 活动统计中的多个百分比可能彼此独立，不能相加凑 100%。</li>
+<li>[ ] <code>/status</code> 只负责看现状，配置修改交给 <code>/config</code>。</li>
+<li>[ ] 新版 <code>/doctor</code> 会先报告问题并请求确认，不再沿用旧版按 <code>f</code> 的流程。</li>
+<li>[ ] 检查点是会话内撤销工具，Git 才是永久历史。</li>
+</ul>
+<h2 id="sec-8ea868">本课小结</h2>
+<p>当 Claude Code 真正进入日常开发流程，最重要的不只是“让它继续做”，而是随时知道：它改了什么、消耗了什么、运行在哪里。</p>
+<p>用 <code>/diff</code> 看清改动，用 <code>/usage</code> 看清消耗，用 <code>/status</code> 看清环境。需要撤回时记住检查点的边界，需要长期安全时始终回到 Git。</p>
+<p><strong>先看事实，再做动作。会检查的人，才能放心把更多工作交给 Claude。</strong></p>
+

@@ -19,6 +19,8 @@ export default function Nav() {
     { to: '/#flagship', label: t.nav.agent, hash: '#flagship' },
     { to: '/work', label: t.nav.work },
     { to: '/lab', label: t.nav.lab },
+    // Lesson pages live under /claude-code/<slug>; keep the nav item lit there.
+    { to: '/claude-code', label: t.nav.course, nested: true },
     { to: '/life', label: t.nav.life },
     { to: '/about', label: t.nav.about },
   ]
@@ -81,7 +83,7 @@ export default function Nav() {
       <NavLink
         key={link.to}
         to={link.to}
-        end
+        end={!link.nested}
         className={({ isActive }) => `${base} ${isActive ? 'is-active' : ''}`}
         onClick={() => setOpen(false)}
         tabIndex={sheet && !open ? -1 : undefined}

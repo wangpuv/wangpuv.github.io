@@ -1,0 +1,178 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答两个问题</strong>：忘了功能怎么找，去哪里看？Claude 正在干活，突然想问个旁题，怎样不打断主线？</p>
+<p>适合：已经会用 Claude Code 完成任务，但还不熟悉命令入口、技能列表和侧问机制的人。</p>
+<p class="lesson__stamp">📌 按 Claude Code 官方文档核对至 2026 年 9 月，制作时本机版本为 2.1.259。命令与界面可能随版本、平台和账户变化，具体以你当前可用的功能为准。</p>
+</blockquote>
+<h2 id="sec-7f3f59">一句话心智模型</h2>
+<p>这节课的四个命令，不负责直接写代码，而是帮助你更顺畅地使用 Claude Code：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>命令</th>
+<th>回答什么问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/help</code></td>
+<td>有哪些可用命令，可以从哪里入手？</td>
+</tr>
+<tr>
+<td><code>/skills</code></td>
+<td>有哪些技能，它们对 Claude 和我是否可见？</td>
+</tr>
+<tr>
+<td><code>/powerup</code></td>
+<td>这个功能实际用起来是什么样？</td>
+</tr>
+<tr>
+<td><code>/btw</code></td>
+<td>顺便问个基于已有信息的问题，能不能不写进主对话？</td>
+</tr>
+</tbody>
+</table></div><figure class="lesson__fig"><img src="/course/11-help-and-discovery-01-infographic-four-entries.webp" alt="四个入口各管一件事：查帮助、查技能、看演示和侧问已有信息" width="1200" height="675" loading="lazy" decoding="async"><figcaption>四个入口各管一件事：查帮助、查技能、看演示和侧问已有信息</figcaption></figure>
+<p>不必把它们按“哪个最有用”排出固定名次。<strong>忘了入口、排查技能、学习功能、临时侧问，是四种不同的需要。</strong></p>
+<h2 id="sec-6c43ef">一、<code>/help</code>：不必把命令都背下来</h2>
+<p>在 Claude Code 中输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/help</code></pre>
+<p>它会显示帮助信息和可用命令。适合刚上手时了解入口，也适合隔了一段时间回来，快速找回用法。</p>
+<p>如果你大概记得命令名称，直接在输入框开头输入 <code>/</code>，再接几个字母，通常更快：命令菜单会按输入内容过滤。</p>
+<p>两者可以这样分工：</p>
+<ul>
+<li><strong>想看帮助和命令概览</strong>：用 <code>/help</code>；</li>
+<li><strong>已经有目标，想快速选中命令</strong>：用 <code>/</code> 菜单。</li>
+</ul>
+<p>不要把任意一张命令截图当成所有人都相同的完整清单。部分命令是否出现，取决于平台、计划、环境或已安装的扩展。</p>
+<p>本课也不要求你逐个背诵所有命令。<strong>记住去哪里找，比记住每一个拼写更实用。</strong></p>
+<h2 id="sec-b3f10b">二、<code>/skills</code>：看见技能，不等于已经用上技能</h2>
+<p>输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/skills</code></pre>
+<p>它会列出可用技能，例如 Claude Code 自带的技能、自定义技能，以及插件提供的技能。当前菜单支持按名称、描述和来源过滤，也可以按 <code>t</code> 按 token 数排序。</p>
+<p>但这里有一个很容易混淆的地方：</p>
+<p><strong>技能出现在列表里，不等于它的完整内容已经进入上下文，更不等于它已经被调用成功。</strong></p>
+<h3 id="sec-960746">先分清“发现”和“使用”</h3>
+<p>你可以把技能的使用理解成两个阶段：</p>
+<ol>
+<li><strong>发现阶段</strong>：Claude 根据技能名称和描述，判断哪个技能可能有帮助；</li>
+<li><strong>使用阶段</strong>：需要调用时，再加载对应技能的完整指令。</li>
+</ol>
+<p>因此，安装一个很长的技能，不代表每轮对话都会自动塞入它的全文；但让模型发现技能所需的名称和描述，仍然会占用上下文。</p>
+<p>排查时，也要把问题拆开：</p>
+<ul>
+<li>列表里有没有这个技能？</li>
+<li>它是否对 Claude 可见，描述是否足够清楚？</li>
+<li>实际任务中，Claude 有没有调用它？</li>
+<li>调用后，结果是否符合预期？</li>
+</ul>
+<p><code>/skills</code> 能帮助检查前面的入口与可见性，后面的调用和效果仍需要用具体任务验证。</p>
+<h3 id="sec-4e77c0"><code>/skills</code> 不只是一个只读列表</h3>
+<p>在当前版本中，选中可调整的技能后，按 <code>Space</code> 或 <code>Enter</code> 可以轮换可见性状态，按 <code>Esc</code> 保存并关闭。</p>
+<p>主要有四种状态：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>状态</th>
+<th>Claude 能看到什么</th>
+<th>你能在 <code>/</code> 菜单中调用吗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>on</code></td>
+<td>名称和描述</td>
+<td>能</td>
+</tr>
+<tr>
+<td><code>name-only</code></td>
+<td>只有名称</td>
+<td>能</td>
+</tr>
+<tr>
+<td><code>user-only</code></td>
+<td>不自动提供给 Claude</td>
+<td>能，由你手动调用</td>
+</tr>
+<tr>
+<td><code>off</code></td>
+<td>隐藏</td>
+<td>不能</td>
+</tr>
+</tbody>
+</table></div><p>这里的 <code>user-only</code> 是界面显示名称，配置文件中的对应值是 <code>user-invocable-only</code>。</p>
+<p>这些调整会保存到项目的 <code>.claude/settings.local.json</code>。如果只是查看，不要随手切换状态。</p>
+<p>并非所有技能都能在这里调整：插件技能、显式禁用模型调用的技能，以及受管理配置等约束的条目存在限制。插件技能通常应到 <code>/plugin</code> 中管理。</p>
+<h3 id="sec-2b3334">技能太多时，先看预算，再做调整</h3>
+<p>技能列表的描述有预算限制。当前机制会根据上下文窗口大小分配预算；超出时，会优先缩减或省略较少调用的技能描述，而不是把所有技能正文一次性加载进来。</p>
+<p>如果怀疑技能描述占用过大，可以结合：</p>
+<ul>
+<li><code>/context</code>：看预算处理后实际进入上下文的 Skills 占用；</li>
+<li><code>/doctor</code>：检查技能列表的估算成本和占用较大的条目。</li>
+</ul>
+<p>不要把 <code>/doctor</code> 理解成一个保证逐项显示“哪条描述被截断”的专用面板。它是诊断入口；技能能否被正确匹配，还要结合描述、可见性和实际调用来判断。</p>
+<h2 id="sec-5ef64d">三、<code>/powerup</code>：从“看见名字”走到“知道怎么用”</h2>
+<p>输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/powerup</code></pre>
+<p>它提供带动画演示的简短交互式课程，用来发现和学习 Claude Code 的功能。</p>
+<p>与 <code>/help</code> 相比，区别不是“谁更高级”，而是解决的问题不同：</p>
+<ul>
+<li><code>/help</code> 帮你找到帮助与命令入口；</li>
+<li><code>/powerup</code> 通过交互和演示，让你看到功能怎样使用。</li>
+</ul>
+<p>初学时，可以用它把抽象说明变成直观操作。已经熟悉 Claude Code 后，也可以在升级版本后打开看看，检查有没有自己遗漏的功能。</p>
+<p>课程数量、菜单内容和具体交互可能随版本变化，以当前界面为准。</p>
+<p><strong>发现一个暂时用不上的功能，不必马上学完；知道它存在，等遇到对应问题再回来就够了。</strong></p>
+<h2 id="sec-13dad7">四、<code>/btw</code>：顺便问一句，不把旁题写进主线</h2>
+<p>假设 Claude 正在帮你修改登录逻辑。你看到它提到“幂等”，想确认这个词的意思，又不想让主任务停下来围绕术语展开。</p>
+<p>可以输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/btw 你刚才提到的“幂等”是什么意思？</code></pre>
+<p>Claude 会单独回答这个侧问。<strong>这轮问答不会加入主对话历史，也不会打断正在进行的主任务。</strong></p>
+<p>它适合解释、回顾和澄清，例如：</p>
+<pre class="lesson__code lesson__code--tight"><code>/btw 我们刚才为什么选择方案 B？</code></pre>
+<pre class="lesson__code lesson__code--tight"><code>/btw 你刚刚已经读过的配置文件叫什么？</code></pre>
+<p>这里的关键词是：<strong>已有信息。</strong></p>
+<figure class="lesson__fig"><img src="/course/11-help-and-discovery-02-flowchart-btw-boundary.webp" alt="主任务继续执行，已有上下文供 /btw 侧问使用；答案不自动写回主线，需要新信息或执行动作时使用主对话或子代理" width="1200" height="675" loading="lazy" decoding="async"><figcaption>主任务继续执行，已有上下文供 /btw 侧问使用；答案不自动写回主线，需要新信息或执行动作时使用主对话或子代理</figcaption></figure>
+<h3 id="sec-e4793c">边界一：<code>/btw</code> 没有工具访问能力</h3>
+<p>侧问可以参考已有的对话消息、回答和工具结果，但不能自己读取新文件、执行命令或搜索网页。</p>
+<p>还要注意：<strong>侧问看不到 Claude 正在生成、尚未完成的当前回复。</strong> 如果某个术语刚出现在正在输出的回复里，等这条回复完成后再侧问，才能让它参考完整内容。</p>
+<p>因此，下面这些需求不应直接交给 <code>/btw</code>：</p>
+<ul>
+<li>“查一下这个库最新版的 API”；</li>
+<li>“打开还没读过的配置文件，检查端口”；</li>
+<li>“顺便把刚才提到的错误修好”。</li>
+</ul>
+<p>它可能凭已有信息给出解释，但这不等于完成了实时查证或实际修改。</p>
+<p><strong>问已有信息，用 <code>/btw</code>；获取新信息或执行动作，用主对话或子代理。</strong></p>
+<p>当前本地终端还支持在侧问答案中按 <code>f</code>，把问题交给带工具能力的后台子代理继续处理。但那已经是一次新的委派，不是 <code>/btw</code> 本身突然获得了工具。</p>
+<h3 id="sec-ad64d6">边界二：侧问结论不会自动变成主任务指令</h3>
+<p>如果你在侧问中得知“方案 B 有一个风险”，主任务并不会因为这条侧问答案，就自动改变执行方向。</p>
+<p>需要主任务采用这个结论时，应在正常输入框明确补一句，例如：</p>
+<pre class="lesson__code lesson__code--tight"><code>补充一个约束：方案 B 需要处理重复请求。请把幂等检查纳入当前修改。</code></pre>
+<p>这样，原本属于你个人理解的旁题，才变成主任务明确可见的要求。</p>
+<h3 id="sec-646ef5">边界三：不进主历史，不等于完全没有上下文和成本</h3>
+<p>当前终端版会在内存中维护独立的侧问链。后续每次侧问，都会带入最近 20 轮侧问交流作为参考；这里的“20 轮”指每次带入的上下文范围，不应理解为整个侧问历史只保存 20 轮。</p>
+<p>在侧问界面按 <code>x</code>，可以清除此前的侧问交流，不是删除当前显示的答案。退出 Claude Code 后，这条保存在内存中的侧问链不会继续保留。</p>
+<p>所以，“不写进主对话”与“问完立即彻底消失”不是同一回事。</p>
+<p>侧问也仍然需要模型生成答案，并可能使用已有上下文。它不是免费问答，也不能替代 <code>/compact</code>：</p>
+<ul>
+<li><code>/btw</code>：让临时旁题不进入主对话历史；</li>
+<li><code>/compact</code>：处理已经过长的主对话。</li>
+</ul>
+<p>二者解决的是不同问题，可以配合使用。</p>
+<h2 id="sec-6e3320">五、练一次，比记四个名字更有用</h2>
+<p>找一个你正在使用的 Claude Code 项目，做一次小练习：</p>
+<ol>
+<li>输入 <code>/help</code>，找出一个之前没注意到的命令；</li>
+<li>打开 <code>/skills</code>，搜索一个熟悉的技能，查看来源和可见性，先不改设置；</li>
+<li>打开 <code>/powerup</code>，选一个不熟悉的功能看演示；</li>
+<li>在正常任务进行时，用 <code>/btw</code> 问一个基于已有上下文的解释性问题；</li>
+<li>判断这个答案是否应该影响主任务：如果应该，把真正需要执行的要求明确补回主对话。</li>
+</ol>
+<p>这套练习的重点不是“每次都走五步”，而是建立选择入口的习惯。</p>
+<h3 id="sec-f72d39">自测两题</h3>
+<p><strong>问题 1：</strong> Claude 正在改代码，你想查第三方库最新版的 API，又不想打断主任务，直接用 <code>/btw</code> 合适吗？</p>
+<p>不合适。查最新 API 需要新信息和工具。可以委派子代理去查；如果只是解释前面已经读到的 API 内容，才适合 <code>/btw</code>。</p>
+<p><strong>问题 2：</strong> <code>/skills</code> 里看到了某个技能，能否证明它已经被 Claude 调用？</p>
+<p>不能。列表说明技能入口存在；是否实际调用、完整指令是否加载、结果是否合格，要结合任务中的调用过程和输出验证。</p>
+<h2 id="sec-8ea868">本课小结</h2>
+<p>忘记入口时，用 <code>/help</code>；排查技能时，用 <code>/skills</code>；想看操作演示时，用 <code>/powerup</code>；临时解释已有信息时，用 <code>/btw</code>。</p>
+<p>尤其记住 <code>/btw</code> 的两条边界：<strong>它不能调用工具，答案也不会自动写回主线。</strong></p>
+<p>会用这些命令，不是为了多记几个快捷入口，而是让学习、排查、侧问和真正的任务执行各有位置。</p>
+

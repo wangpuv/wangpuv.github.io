@@ -1,0 +1,258 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答三个问题</strong>：哪些内容应该跨会话保留、<code>/memory</code> 到底管理什么、Claude 改错代码后怎样安全退回。</p>
+<p>适合：已经开始长期使用 Claude Code，希望减少重复解释，又敢于让它承担更大改动的人。</p>
+<p class="lesson__stamp">📌 基于 Claude Code 官方文档核对至 2026 年 7 月。产品更新较快，具体行为以官方文档与 <code>/release-notes</code> 为准。</p>
+</blockquote>
+<h2 id="sec-9e1362">一句话结论</h2>
+<p>这两个命令解决的是两种完全不同的状态问题：</p>
+<pre class="lesson__code"><code>/memory：管理“下次还要知道什么”
+/rewind：处理“刚才改坏了怎么办”</code></pre>
+<p>前者让有价值的经验跨会话留下，后者给当前会话里的试错加一张安全网。</p>
+<p>你可以把它们记成一句话：</p>
+<p><strong>记忆管下次，回滚管刚才。</strong></p>
+<h2 id="sec-be07f0">一、Claude Code 有两套记忆系统</h2>
+<p>Claude Code 的持久记忆不是一个文件，而是两套并行机制：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th></th>
+<th><code>CLAUDE.md</code></th>
+<th>自动记忆</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>谁写</td>
+<td>你或团队</td>
+<td>Claude</td>
+</tr>
+<tr>
+<td>主要内容</td>
+<td>指令、规则、工作约定</td>
+<td>工作中学到的经验和模式</td>
+</tr>
+<tr>
+<td>典型例子</td>
+<td>提交前跑测试、目录约定、编码规范</td>
+<td>构建命令、调试心得、个人偏好</td>
+</tr>
+<tr>
+<td>范围</td>
+<td>组织、用户、项目或本地</td>
+<td>按仓库隔离，同一仓库的 worktree 共享</td>
+</tr>
+<tr>
+<td>加载方式</td>
+<td>相关文件按层级加载</td>
+<td>启动时加载 <code>MEMORY.md</code> 前 200 行或 25KB，主题文件按需读取</td>
+</tr>
+</tbody>
+</table></div><figure class="lesson__fig"><img src="/course/05-memory-and-rewind-01-comparison-memory-systems.webp" alt="CLAUDE.md 与自动记忆的职责、范围和加载方式对比" width="1200" height="675" loading="lazy" decoding="async"><figcaption>CLAUDE.md 与自动记忆的职责、范围和加载方式对比</figcaption></figure>
+<p>两者最重要的区别，不是“手动”和“自动”，而是<strong>责任归属</strong>。</p>
+<p><code>CLAUDE.md</code> 是你明确交给 Claude 的长期说明；自动记忆是 Claude 在工作中自行沉淀的经验。</p>
+<p>因此：</p>
+<ul>
+<li>需要让整个团队共享的规则和工作约定，放进项目级 <code>CLAUDE.md</code>；</li>
+<li>只对你当前机器和工作习惯有用的经验，可以留在自动记忆；</li>
+<li>不能容忍偶尔失效的安全约束，不要只写成提示语，应使用权限、Hook 或其他强制机制。</li>
+</ul>
+<h2 id="sec-576be0">二、<code>/memory</code> 是记忆控制面板</h2>
+<p>直接运行：</p>
+<pre class="lesson__code lesson__code--tight"><code>/memory</code></pre>
+<p>它没有需要记忆的参数，打开的是一个交互式面板。你可以在里面：</p>
+<ul>
+<li>查看用户级和项目级的 <code>CLAUDE.md</code>、<code>CLAUDE.local.md</code> 等记忆位置；</li>
+<li>创建或编辑尚不存在的记忆文件；</li>
+<li>打开自动记忆文件夹；</li>
+<li>开启或关闭自动记忆。</li>
+</ul>
+<p>这里有一个容易混淆的细节：</p>
+<blockquote class="lesson__aside">
+<p><code>/memory</code> 展示的是可管理的记忆位置，其中可能包含尚未创建、也可能没有加载进当前会话的文件。</p>
+</blockquote>
+<p>如果你要排查“为什么 Claude 没有看到这条规则”，应该运行：</p>
+<pre class="lesson__code lesson__code--tight"><code>/context</code></pre>
+<p>然后查看其中的 <strong>Memory files</strong>。实际加载情况以 <code>/context</code> 为准，<code>/memory</code> 更像编辑与管理入口。</p>
+<h3 id="sec-aa7ce9">怎么让 Claude 记住一件事</h3>
+<p>不需要特殊语法，直接用自然语言：</p>
+<pre class="lesson__code lesson__code--tight"><code>记住：这个项目统一使用 pnpm，不要运行 npm install。</code></pre>
+<p>Claude 会判断这条经验是否值得放进自动记忆。</p>
+<p>如果你明确希望它成为项目规则，可以直接说：</p>
+<pre class="lesson__code lesson__code--tight"><code>把“提交前必须运行 npm test”加入项目的 CLAUDE.md。</code></pre>
+<p>一句实用判断是：</p>
+<pre class="lesson__code"><code>个人经验 → 自动记忆
+团队规则 → 项目级 CLAUDE.md</code></pre>
+<h2 id="sec-bf7e21">三、<code>CLAUDE.md</code> 的四种作用范围</h2>
+<p>从范围最广到最具体，常见位置有四类：</p>
+<ol>
+<li><strong>组织级</strong>：由企业或 IT 部署的 managed <code>CLAUDE.md</code>。</li>
+<li><strong>用户级</strong>：<code>~/.claude/CLAUDE.md</code>，适用于你所有项目。</li>
+<li><strong>项目级</strong>：<code>./CLAUDE.md</code> 或 <code>./.claude/CLAUDE.md</code>，适合随 Git 分享给团队。</li>
+<li><strong>本地级</strong>：<code>./CLAUDE.local.md</code>，只放个人的项目偏好，通常加入 <code>.gitignore</code>。</li>
+</ol>
+<p>Claude Code 会从较广的范围读到较具体的范围。同一目录中，<code>CLAUDE.local.md</code> 排在 <code>CLAUDE.md</code> 之后。</p>
+<p>但不要把这个顺序理解成严格的配置覆盖：</p>
+<p><strong>这些内容最终会一起进入上下文。规则互相矛盾时，Claude 仍可能选择不一致。</strong></p>
+<p>比起依赖“后加载的覆盖前面的”，更稳的做法是定期清理冲突，让每条规则明确、具体、可验证。</p>
+<p>还有一个细节：</p>
+<ul>
+<li>当前工作目录及其上层的相关文件，会在会话启动时加载；</li>
+<li>子目录里的 <code>CLAUDE.md</code>，通常等 Claude 读取该子目录文件时再按需加载。</li>
+</ul>
+<p>所以大型仓库不必把所有规则都塞进根目录，可以把局部约定放在对应目录，或者拆进 <code>.claude/rules/</code>。</p>
+<h2 id="sec-82e415">四、自动记忆怎样保存，又为什么会“忘”</h2>
+<p>自动记忆默认开启，需要 Claude Code 2.1.59 或更高版本。</p>
+<p>默认目录是：</p>
+<pre class="lesson__code lesson__code--tight"><code>~/.claude/projects/&lt;project&gt;/memory/</code></pre>
+<p>同一个 Git 仓库的不同子目录和 worktree 会共享这套自动记忆。它只保存在本机，不进入 Git，也不会自动同步到另一台机器或云环境。</p>
+<p>目录通常类似这样：</p>
+<pre class="lesson__code"><code>memory/
+├── MEMORY.md
+├── debugging.md
+├── api-conventions.md
+└── ...</code></pre>
+<p>其中：</p>
+<ul>
+<li><code>MEMORY.md</code> 是精简索引，每次会话都会加载；</li>
+<li><code>debugging.md</code> 等主题文件保存细节，需要时再读取；</li>
+<li>默认路径可以通过 <code>autoMemoryDirectory</code> 调整。</li>
+</ul>
+<h3 id="sec-995b30">200 行 / 25KB 上限</h3>
+<p>每次会话启动时，只加载 <code>MEMORY.md</code> 的前 200 行或前 25KB，以先达到的限制为准。</p>
+<p>当前版本会在文件接近上限时提醒 Claude 精简；如果写入后超限，写入仍会成功，但会返回提示要求重写索引。下一次加载时，超过上限的部分不会进入上下文。</p>
+<p>所以维护自动记忆时，重点不是“多记”，而是：</p>
+<ul>
+<li><code>MEMORY.md</code> 每条只保留一句索引；</li>
+<li>详细过程移进主题文件；</li>
+<li>合并重复内容；</li>
+<li>删除已经过时或被证明错误的经验。</li>
+</ul>
+<p>可以隔一段时间运行 <code>/memory</code>，打开自动记忆文件夹做一次审计。</p>
+<blockquote class="lesson__aside">
+<p><strong>注意：</strong> 主会话的自动记忆不会自动注入普通子代理。委派任务时真正不可缺少的规则，应放进 <code>CLAUDE.md</code>，或者在任务里明确写出来。</p>
+</blockquote>
+<h2 id="sec-e08dbd">五、<code>/rewind</code>：当前会话的存档与读档</h2>
+<p>打开方式有两个：</p>
+<pre class="lesson__code lesson__code--tight"><code>/rewind</code></pre>
+<p>或者在输入框为空时，连续按两次 <code>Esc</code>。</p>
+<p>如果输入框里已经有文字，双击 <code>Esc</code> 会先清空输入，而不是打开回滚菜单。文字仍保留在输入历史里，之后按 <code>Up</code> 可以找回。</p>
+<p><code>/checkpoint</code> 和 <code>/undo</code> 是 <code>/rewind</code> 的别名。</p>
+<h3 id="sec-0a30e0">检查点是怎样产生的</h3>
+<p>Claude Code 会在每一条用户提示词处创建检查点，并记录主会话中文件编辑工具产生的改动。</p>
+<p>当前版本会保留一个会话最近 100 个检查点的文件快照。检查点和会话一起保存，因此退出后重新 <code>/resume</code>，仍然可以回到之前的节点。</p>
+<p>会话和检查点默认约 30 天后清理，可以通过 <code>cleanupPeriodDays</code> 调整。</p>
+<h2 id="sec-591189">六、回滚菜单的六种动作</h2>
+<p>先选择一条历史提示词，再选择要执行的动作：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>动作</th>
+<th>会发生什么</th>
+<th>适合情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Restore code and conversation</code></td>
+<td>代码和对话一起退回</td>
+<td>实现方向整体错了</td>
+</tr>
+<tr>
+<td><code>Restore conversation</code></td>
+<td>只退对话，保留当前代码</td>
+<td>文件没问题，但对话已经跑偏</td>
+</tr>
+<tr>
+<td><code>Restore code</code></td>
+<td>只退代码，保留当前对话</td>
+<td>需要撤销文件改动，但还想保留讨论</td>
+</tr>
+<tr>
+<td><code>Summarize from here</code></td>
+<td>压缩选中节点及其后的对话</td>
+<td>丢掉一段岔路，保留前面上下文</td>
+</tr>
+<tr>
+<td><code>Summarize up to here</code></td>
+<td>压缩选中节点之前的对话</td>
+<td>保留最近讨论，压缩早期铺垫</td>
+</tr>
+<tr>
+<td><code>Never mind</code></td>
+<td>取消操作</td>
+<td>只是进来看看</td>
+</tr>
+</tbody>
+</table></div><p>两个代码恢复选项只会在该节点之后存在可恢复的文件改动时出现。</p>
+<p><code>Summarize from here</code> 和 <code>Summarize up to here</code> 不会修改文件。它们像“可以选择压缩哪一侧”的精准版 <code>/compact</code>，原始消息仍保留在会话记录里。</p>
+<p>如果你恢复了对话，或者选择了 <code>Summarize from here</code>，当时的原始提示词会重新回填到输入框，方便修改后再次发送。</p>
+<h2 id="sec-ba6cba">七、哪些改动不能被 <code>/rewind</code> 撤销</h2>
+<p>这是使用检查点时最重要的安全边界。</p>
+<p><code>/rewind</code> 主要追踪当前主会话里，由 Claude 文件编辑工具产生的改动。下面这些内容通常不在恢复范围内：</p>
+<ul>
+<li>Bash 命令改动的文件，例如 <code>rm</code>、<code>mv</code>、<code>cp</code> 或重定向写文件；</li>
+<li>后台子代理写入的改动，包括后台运行的 <code>/code-review --fix</code>；</li>
+<li>你手动修改的文件；</li>
+<li>其他并发会话修改的文件；</li>
+<li>软链接或硬链接指向的文件；</li>
+<li>已经产生的数据库、API、部署等外部副作用。</li>
+</ul>
+<p>所以运行 <code>--fix</code>、批量脚本或危险 Shell 命令之前，应该先看 <code>git status</code> 和 <code>git diff</code>；重要状态先 commit 或 stash，需要探索另一条路线时再创建分支。</p>
+<h3 id="sec-ecf5b8"><code>/rewind</code> 和 Git 的分工</h3>
+<div class="lesson__table"><table><thead>
+<tr>
+<th></th>
+<th><code>/rewind</code></th>
+<th>Git</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定位</td>
+<td>当前会话的快速撤销</td>
+<td>长期版本历史</td>
+</tr>
+<tr>
+<td>粒度</td>
+<td>每条提示词附近的检查点</td>
+<td>每次 commit</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>试错、跑偏、临时恢复</td>
+<td>跨会话、协作、分享与永久记录</td>
+</tr>
+</tbody>
+</table></div><p>它们不是替代关系：</p>
+<p><strong>检查点是本地撤销，Git 才是永久历史。</strong></p>
+<h2 id="sec-a1ff2c">八、回滚时怎么选</h2>
+<p>记住这张快速选择清单：</p>
+<pre class="lesson__code"><code>只有代码错了      → Restore code
+只有对话跑偏      → Restore conversation
+代码和对话都错了  → Restore code and conversation
+只想释放上下文    → Summarize
+想尝试另一条路线  → /branch</code></pre>
+<figure class="lesson__fig"><img src="/course/05-memory-and-rewind-02-framework-rewind-choices.webp" alt="根据代码、对话和上下文状态选择回滚、摘要或分支操作" width="1200" height="675" loading="lazy" decoding="async"><figcaption>根据代码、对话和上下文状态选择回滚、摘要或分支操作</figcaption></figure>
+<p>如果希望从命令行复制当前会话并另开路线，也可以使用：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude --continue --fork-session</code></pre>
+<p>分支会话适合探索平行方案；<code>/rewind</code> 更适合在原会话中恢复状态。</p>
+<h2 id="sec-fcd746">动手练习</h2>
+<h3 id="sec-d76779">练习一：审计记忆</h3>
+<ol>
+<li>运行 <code>claude --version</code>，确认版本不低于 2.1.59。</li>
+<li>运行 <code>/memory</code>，打开自动记忆文件夹。</li>
+<li>找出一条过时、重复或过于冗长的记录。</li>
+<li>删除它，或者把细节移动到一个主题文件。</li>
+<li>再运行 <code>/context</code>，观察当前会话实际加载了哪些记忆文件。</li>
+</ol>
+<h3 id="sec-7a3ef0">练习二：只回滚代码</h3>
+<ol>
+<li>让 Claude 修改一个测试文件里的一句话。</li>
+<li>输入框保持为空，连续按两次 <code>Esc</code>。</li>
+<li>选择改动之前的提示词。</li>
+<li>选择 <code>Restore code</code>。</li>
+<li>确认代码恢复了，但对话仍然保留。</li>
+</ol>
+<p>练习的重点不是学会“撤销”，而是建立两种习惯：</p>
+<p><strong>值得复用的经验及时沉淀，风险较大的改动先确认能不能安全退回。</strong></p>
+<h2 id="sec-5f0876">下一课</h2>
+<p><strong>第 6 课 · 会话续接</strong>——怎样继续昨天的工作、找到旧会话，并在不同任务之间切换。</p>
+

@@ -276,6 +276,9 @@ export const home = {
         'Focus areas: AI agent engineering, AI application architecture, AI platforms. Available full-time, Hangzhou preferred, open to other cities.',
       contact: 'Contact me',
       resume: 'Résumé PDF (Chinese)',
+      writing:
+        'Alongside that I am serialising a Claude Code course in Chinese, {n} of {total} lessons out so far.',
+      writingCta: 'Read the course',
     },
   },
 
@@ -526,6 +529,8 @@ export const home = {
       body: '目标方向：AI Agent 工程、AI 应用架构、AI 平台。可全职到岗，工作地点优先杭州，其他城市可以商议。',
       contact: '联系我',
       resume: '下载简历 PDF',
+      writing: '工作之外，我在连载一套 Claude Code 中文教程，目前已发布 {n} / {total} 课。',
+      writingCta: '读教程',
     },
   },
 }

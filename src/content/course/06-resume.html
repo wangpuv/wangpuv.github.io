@@ -1,0 +1,371 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答三个问题</strong>：<code>/resume</code> 恢复的到底是什么、怎样找到“消失”的旧会话、什么时候恢复旧会话反而不划算。</p>
+<p>适合：经常把一个任务分成几天完成，或者同时维护多个分支、多个 Claude Code 会话的人。</p>
+<p class="lesson__stamp">📌 基于 Claude Code 官方文档与本机 Claude Code 2.1.220 核对至 2026 年 7 月。产品更新较快，具体行为以官方文档与 <code>/release-notes</code> 为准。</p>
+</blockquote>
+<h2 id="sec-9e1362">一句话结论</h2>
+<p><code>/resume</code> 恢复的是<strong>一段可以继续追加的会话</strong>，不是把项目恢复到过去。</p>
+<pre class="lesson__code"><code>恢复：对话历史、工具调用与结果，以及部分会话状态
+不恢复：过去的文件系统快照</code></pre>
+<p>所以续接旧会话后：</p>
+<ul>
+<li>Claude 记得之前讨论过什么、读过什么、做过什么；</li>
+<li>磁盘上的代码仍然是当前状态；</li>
+<li>如果代码在这段时间被你、Git 或其他会话改过，Claude 需要重新读取才能看到最新版。</li>
+</ul>
+<p>可以把它记成一句话：</p>
+<p><strong><code>resume</code> 接着聊，<code>rewind</code> 才是往回退。</strong></p>
+<h2 id="sec-4abd73">一、什么是 Claude Code 会话</h2>
+<p>一个会话，就是 Claude Code 持续保存的一段对话记录。</p>
+<p>里面不只有你和 Claude 的文字，还包括：</p>
+<ul>
+<li>用户提示词；</li>
+<li>Claude 的回答；</li>
+<li>工具调用；</li>
+<li>文件读取结果；</li>
+<li>命令输出；</li>
+<li>其他会话元数据。</li>
+</ul>
+<p>这些内容会持续写入本机的 JSONL 文件：</p>
+<pre class="lesson__code lesson__code--tight"><code>~/.claude/projects/&lt;project&gt;/&lt;session-id&gt;.jsonl</code></pre>
+<p>默认保存约 30 天，可以通过 <code>cleanupPeriodDays</code> 调整。</p>
+<p>不过不要直接依赖 JSONL 内部结构编写长期脚本，因为它可能随版本变化。如果想阅读或导出会话，优先使用：</p>
+<pre class="lesson__code lesson__code--tight"><code>/export</code></pre>
+<h3 id="sec-d05ba8">会话不是代码快照</h3>
+<p>会话记录里可能保存着“Claude 当时读到的文件内容”，但这不等于保存了一份可恢复的项目副本。</p>
+<p>例如：</p>
+<ol>
+<li>昨天 Claude 修改了 <code>auth.ts</code>；</li>
+<li>今天你手动又改了这个文件；</li>
+<li>然后恢复昨天的会话。</li>
+</ol>
+<p>这时 Claude 能看到昨天的讨论和工具结果，但磁盘上仍然是今天的 <code>auth.ts</code>。</p>
+<p>因此恢复重要会话后，最好先告诉 Claude：</p>
+<pre class="lesson__code lesson__code--tight"><code>先重新读取相关文件，并检查 git status 和 git diff，再继续修改。</code></pre>
+<h2 id="sec-068cf2">二、<code>resume</code> 会恢复什么</h2>
+<p>当前版本恢复的不只是聊天文字，还包括一部分会话状态：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>状态</th>
+<th>恢复情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>对话历史、工具调用和结果</td>
+<td>恢复</td>
+</tr>
+<tr>
+<td>会话使用的模型</td>
+<td>通常恢复，但显式 <code>--model</code>、环境变量、模型下线等情况会覆盖</td>
+</tr>
+<tr>
+<td>自定义 agent</td>
+<td>能找到原 agent 配置时恢复；找不到会警告并退回默认配置</td>
+</tr>
+<tr>
+<td>权限模式</td>
+<td>部分恢复；<code>plan</code> 和 <code>bypassPermissions</code> 不会自动恢复</td>
+</tr>
+<tr>
+<td>活动 goal（目标）</td>
+<td>恢复，但计时、轮次和 token 基线会重置</td>
+</tr>
+<tr>
+<td>未过期的 scheduled tasks（定时任务）</td>
+<td>恢复</td>
+</tr>
+<tr>
+<td>后台 Bash 与 monitor 任务</td>
+<td>不恢复</td>
+</tr>
+<tr>
+<td>磁盘文件</td>
+<td>保持当前状态，不回滚、不重放</td>
+</tr>
+</tbody>
+</table></div><p>如果会话此前已经执行过 <code>/compact</code>，或者恢复时选择了 <code>Resume from summary</code>，继续使用的是摘要状态，不保证早期内容逐字重新进入上下文。</p>
+<p>还有一类内容需要重新提供。</p>
+<p>如果原会话依赖这些启动参数：</p>
+<ul>
+<li><code>--mcp-config</code></li>
+<li><code>--settings</code></li>
+<li><code>--plugin-dir</code></li>
+<li><code>--fallback-model</code></li>
+<li><code>--add-dir</code></li>
+</ul>
+<p>恢复时通常需要再次传入。标准的 <code>settings.json</code> 和 <code>settings.local.json</code> 会在重新启动时从磁盘读取。</p>
+<p>恢复会话不会恢复一份旧配置快照。通过 CLI 重新启动时，标准 settings 会从磁盘重新读取；特殊启动参数仍需重新传入。恢复后可以用 <code>/context</code> 和 <code>/memory</code> 检查实际加载状态。</p>
+<figure class="lesson__fig"><img src="/course/06-resume-01-comparison-resume-boundary.webp" alt="恢复的是会话，不是文件：会话记录会恢复，磁盘文件保持当前状态" width="1200" height="675" loading="lazy" decoding="async"><figcaption>恢复的是会话，不是文件：会话记录会恢复，磁盘文件保持当前状态</figcaption></figure>
+<h2 id="sec-07a1f1">三、五个常用入口怎么选</h2>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>写法</th>
+<th>适合情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>claude --continue</code> 或 <code>claude -c</code></td>
+<td>直接继续当前目录最近一次会话</td>
+</tr>
+<tr>
+<td><code>claude --resume</code> 或 <code>claude -r</code></td>
+<td>打开会话选择器</td>
+</tr>
+<tr>
+<td><code>claude --resume &lt;名称或 ID&gt;</code></td>
+<td>直接恢复指定会话</td>
+</tr>
+<tr>
+<td><code>claude --from-pr &lt;PR号或 URL&gt;</code></td>
+<td>打开选择器，并按相关 PR 筛选</td>
+</tr>
+<tr>
+<td><code>/resume</code></td>
+<td>已经在 Claude Code 里，切换到另一段会话</td>
+</tr>
+</tbody>
+</table></div><p>最常用的是两个：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude -c</code></pre>
+<p>适合“我只想继续刚才那件事”。</p>
+<pre class="lesson__code lesson__code--tight"><code>/resume</code></pre>
+<p>适合“我想从历史记录里找一件事”。</p>
+<h3 id="sec-152e56"><code>/continue</code> 与 <code>--continue</code> 不完全是一回事</h3>
+<p>在当前版本中：</p>
+<ul>
+<li><code>/continue</code> 是 <code>/resume</code> 的斜杠命令别名；</li>
+<li><code>claude --continue</code> 是启动时使用的 CLI 参数。</li>
+</ul>
+<p>也就是说：</p>
+<pre class="lesson__code"><code>/continue         → 在会话内打开恢复功能
+claude --continue → 从 shell 继续当前目录最近一次会话</code></pre>
+<p>名字很像，但使用位置和默认行为不同。</p>
+<p>如果当前目录没有可继续的会话，<code>claude --continue</code> 会提示：</p>
+<pre class="lesson__code lesson__code--tight"><code>No conversation found to continue</code></pre>
+<p>然后退出，不会偷偷创建一个空会话。</p>
+<h3 id="sec-c02881">名称匹配有歧义时</h3>
+<pre class="lesson__code lesson__code--tight"><code>claude --resume &lt;名称&gt;</code></pre>
+<p>遇到重名，会打开选择器，并把名称作为搜索条件。</p>
+<p>而：</p>
+<pre class="lesson__code lesson__code--tight"><code>/resume &lt;名称&gt;</code></pre>
+<p>遇到重名会直接报错，需要改用不带参数的 <code>/resume</code> 手动选择。</p>
+<h2 id="sec-6c9859">四、会话选择器怎么用</h2>
+<p>运行：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude --resume</code></pre>
+<p>或者在会话内运行：</p>
+<pre class="lesson__code lesson__code--tight"><code>/resume</code></pre>
+<p>就会打开会话选择器。</p>
+<p>每一行通常会显示：</p>
+<ul>
+<li>会话名称或自动生成的标题；</li>
+<li>距离上次活动的时间；</li>
+<li>Git 分支；</li>
+<li>会话文件大小；</li>
+<li>扩大范围后还会显示项目路径。</li>
+</ul>
+<h3 id="sec-947fff">常用快捷键</h3>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>按键</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>↑</code> / <code>↓</code></td>
+<td>上下选择</td>
+</tr>
+<tr>
+<td><code>Enter</code></td>
+<td>恢复选中的会话</td>
+</tr>
+<tr>
+<td><code>Space</code></td>
+<td>预览会话内容；部分终端可用 <code>Ctrl+V</code></td>
+</tr>
+<tr>
+<td><code>Ctrl+R</code></td>
+<td>重命名选中的会话</td>
+</tr>
+<tr>
+<td><code>/</code> 或可打印字符</td>
+<td>搜索会话，也可以粘贴 PR / MR 链接</td>
+</tr>
+<tr>
+<td><code>Ctrl+W</code></td>
+<td>显示当前仓库的所有 worktree</td>
+</tr>
+<tr>
+<td><code>Ctrl+A</code></td>
+<td>显示本机所有项目</td>
+</tr>
+<tr>
+<td><code>Ctrl+B</code></td>
+<td>只看当前 Git 分支</td>
+</tr>
+<tr>
+<td><code>→</code> / <code>←</code></td>
+<td>展开或折叠分组</td>
+</tr>
+<tr>
+<td><code>Esc</code></td>
+<td>退出搜索或选择器</td>
+</tr>
+</tbody>
+</table></div><p>如果从 <code>claude --resume</code> 选择器恢复失败，命令会退出并给出重试方式。</p>
+<p>如果是在当前会话里的 <code>/resume</code> 选择器恢复失败，原会话仍然继续运行，不会被破坏。</p>
+<h2 id="sec-c1de3e">五、会话没丢，可能只是作用域挡住了</h2>
+<p>Claude Code 会按项目目录保存会话。选择器默认主要显示：</p>
+<pre class="lesson__code lesson__code--tight"><code>当前 worktree</code></pre>
+<p>默认列表还可能包含从其他位置启动、但通过 <code>/add-dir</code> 加入了当前目录的会话。</p>
+<p>如果没找到，再逐步扩大范围：</p>
+<pre class="lesson__code"><code>当前 worktree
+      ↓ Ctrl+W
+当前仓库的所有 worktree
+      ↓ Ctrl+A
+本机所有项目</code></pre>
+<figure class="lesson__fig"><img src="/course/06-resume-02-flowchart-session-scope.webp" alt="会话选择器的作用域：从当前 worktree 扩展到仓库全部 worktree，再扩展到本机所有项目" width="1200" height="675" loading="lazy" decoding="async"><figcaption>会话选择器的作用域：从当前 worktree 扩展到仓库全部 worktree，再扩展到本机所有项目</figcaption></figure>
+<h3 id="sec-6baa23">为什么 worktree 里的会话看不见</h3>
+<p>同一个仓库的不同 worktree，是不同的绝对路径：</p>
+<pre class="lesson__code"><code>~/project          → main 分支会话
+~/project-feature  → feature 分支会话</code></pre>
+<p>所以默认列表会分开显示。</p>
+<p>在多 worktree 仓库里按 <code>Ctrl+W</code>，就能把同一仓库的会话一起列出来。</p>
+<p>如果选择的是另一个 worktree 中的会话，Claude Code 可以直接恢复。</p>
+<p>如果选择的是完全无关项目中的会话，它不会在错误目录里强行打开，而是把一条 <code>cd</code> 加恢复命令复制到剪贴板，让你切到正确目录再运行。</p>
+<h3 id="sec-f48de1">ID 恢复也有目录范围</h3>
+<p>通过 <code>claude -p</code> 或 Agent SDK 创建的会话不会出现在选择器里，但可以用 session ID 恢复：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude --resume &lt;session-id&gt;</code></pre>
+<p>这条命令也应该从原会话所在项目目录，或同一仓库的 worktree 中运行。目录不匹配时，会提示找不到对应 session ID。</p>
+<h2 id="sec-856d2e">六、给重要会话起名字</h2>
+<p>会话一多，只看自动标题很难快速找到。</p>
+<p>推荐在任务一开始就命名：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude -n auth-refactor</code></pre>
+<p>会话进行中也可以改名：</p>
+<pre class="lesson__code lesson__code--tight"><code>/rename auth-refactor</code></pre>
+<p>不带参数时，<code>/rename</code> 会根据当前对话自动生成名称。</p>
+<p>还可以在选择器中高亮会话，按 <code>Ctrl+R</code> 重命名。</p>
+<h3 id="sec-c636a0">自动标题不等于可恢复名称</h3>
+<p>新版 Claude Code 会为未命名的交互会话生成显示名称和 AI 标题，方便在列表中辨认。</p>
+<p>但直接运行：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude --resume &lt;名称&gt;</code></pre>
+<p>匹配的是你通过 <code>--name</code>、<code>/rename</code> 或选择器明确设置的名称，不要把自动显示标题当成稳定的恢复句柄。</p>
+<h3 id="sec-1bd0a3">推荐命名方式</h3>
+<pre class="lesson__code"><code>feature-user-auth
+bugfix-payment-webhook
+refactor-api-routes
+review-pr-142
+docs-session-guide</code></pre>
+<p>名称最好满足三个条件：</p>
+<ul>
+<li>看得出任务类型；</li>
+<li>看得出具体对象；</li>
+<li>几周以后仍然能认出来。</li>
+</ul>
+<p>避免使用 <code>work</code>、<code>test</code>、<code>misc</code> 或纯日期。</p>
+<h2 id="sec-a7badd">七、<code>/resume</code>、<code>/clear</code>、<code>/compact</code> 怎么选</h2>
+<p>这三个命令处理的是不同问题：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>命令</th>
+<th>做什么</th>
+<th>适合情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/resume</code></td>
+<td>切换或恢复另一段已保存会话</td>
+<td>回到之前的任务</td>
+</tr>
+<tr>
+<td><code>/clear</code></td>
+<td>保存当前对话，然后开启空上下文的新会话</td>
+<td>开始一件不相关的新任务</td>
+</tr>
+<tr>
+<td><code>/compact [说明]</code></td>
+<td>把当前会话历史压缩成摘要</td>
+<td>继续同一任务，但上下文太长</td>
+</tr>
+</tbody>
+</table></div><p>快速判断：</p>
+<pre class="lesson__code"><code>还是同一件事，只是对话太长  → /compact
+准备开始完全不同的任务      → /clear
+想回到昨天或之前的任务      → /resume</code></pre>
+<p>例如：</p>
+<pre class="lesson__code lesson__code--tight"><code>/compact 重点保留认证模块的决策、未完成事项和测试结果</code></pre>
+<p>比直接 <code>/compact</code> 更容易保住真正重要的信息。</p>
+<h3 id="sec-78e788">超大会话恢复时的新选择</h3>
+<p>对于 Pro 或 Max 用户，如果一个会话：</p>
+<ul>
+<li>已经超过大约 100,000 tokens；</li>
+<li>并且闲置超过约一小时；</li>
+</ul>
+<p>恢复时可能会先出现选择：</p>
+<ul>
+<li><code>Resume from summary</code>：先压缩，再继续；</li>
+<li><code>Resume full session as-is</code>：完整恢复；</li>
+<li><code>Don't ask me again</code>：以后默认完整恢复。</li>
+</ul>
+<p>完整恢复保留细节更多，但后续每次请求携带的上下文也更大。</p>
+<p>恢复摘要更省上下文，但摘要没保住的细节不会继续出现在模型的当前上下文里。</p>
+<h2 id="sec-60f348">八、几个容易踩的坑</h2>
+<h3 id="sec-2fedfa">1. 恢复会话不等于恢复代码</h3>
+<p>想撤销文件改动，用第 5 课的 <code>/rewind</code> 或 Git。</p>
+<p>想继续过去的讨论，才用 <code>/resume</code>。</p>
+<h3 id="sec-ce8279">2. 恢复后不要盲信旧文件内容</h3>
+<p>旧会话里的工具结果记录的是“当时看到的内容”。</p>
+<p>如果文件已经变化，先让 Claude 重新读取关键文件，并查看：</p>
+<pre class="lesson__code"><code>git status
+git diff</code></pre>
+<h3 id="sec-f60779">3. 同一个会话不要同时在两个终端继续</h3>
+<p>如果两个终端恢复同一个 session ID，消息可能交错写进同一份记录。</p>
+<p>需要探索另一条路线时，用：</p>
+<pre class="lesson__code lesson__code--tight"><code>/branch</code></pre>
+<p>或者：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude --continue --fork-session</code></pre>
+<h3 id="sec-d69fd3">4. 启动时的特殊参数不会全部自动回来</h3>
+<p>旧会话使用过 <code>--mcp-config</code>、<code>--plugin-dir</code>、<code>--settings</code> 或 <code>--add-dir</code>，恢复时记得重新提供。</p>
+<h3 id="sec-e4cc3d">5. 旧会话不一定值得恢复</h3>
+<p>如果任务已经改变、代码差异很大，或者旧会话充满无关岔路，重新开一个会话并写一句交接说明，往往更清晰：</p>
+<pre class="lesson__code lesson__code--tight"><code>上次已完成认证接口，当前请重新读取 auth/ 目录，从补充集成测试开始。</code></pre>
+<p>会话越长，携带的旧信息越多。真正应该恢复的是<strong>仍然有用的上下文</strong>，而不是所有历史。</p>
+<h2 id="sec-fcd746">动手练习</h2>
+<h3 id="sec-1d542a">练习一：命名并恢复</h3>
+<ol>
+<li>
+<p>在一个测试项目里运行：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude -n lesson-6-practice</code></pre>
+</li>
+<li>
+<p>让 Claude 读取一个文件并总结。</p>
+</li>
+<li>
+<p>退出 Claude Code。</p>
+</li>
+<li>
+<p>在同一目录运行：</p>
+<pre class="lesson__code lesson__code--tight"><code>claude --resume lesson-6-practice</code></pre>
+</li>
+<li>
+<p>让它说明刚才读过什么。</p>
+</li>
+<li>
+<p>再让它重新读取该文件，比较历史记录和当前磁盘内容。</p>
+</li>
+</ol>
+<h3 id="sec-2db37e">练习二：扩大选择器范围</h3>
+<ol>
+<li>运行 <code>/resume</code>。</li>
+<li>观察默认显示的会话。</li>
+<li>如果项目有多个 worktree，按 <code>Ctrl+W</code>。</li>
+<li>再按 <code>Ctrl+A</code> 查看本机所有项目。</li>
+<li>用 <code>Ctrl+B</code> 只看当前分支。</li>
+</ol>
+<p>练习的重点不是记住快捷键，而是建立一个判断：</p>
+<p><strong>先确认要恢复哪段对话，再确认当前磁盘是否仍然匹配那段对话。</strong></p>
+<h2 id="sec-5f0876">下一课</h2>
+<p><strong>第 7 课 · 子代理与外部工具</strong>——怎样把任务拆出去，并让 Claude Code 连接更多能力。</p>
+

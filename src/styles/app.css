@@ -1958,3 +1958,668 @@
   .shotbox__title { padding-bottom: 0.55rem; }
   .shotbox__media img { max-height: calc(94dvh - 4.5rem); }
 }
+
+/* ============================================================
+   Course — Claude Code 中文教程
+   A serial set in the site's paper stock: a printed contents page
+   and numbered lesson plates. Hairlines do all the dividing; the
+   only filled shapes are the progress ticks and the accent rail.
+   ============================================================ */
+
+/* ---------------- Contents page ---------------- */
+/* The base .page-head caps at 24ch, which sets this four-word English title
+   as five lines and strands "in" on its own. The masthead needs the width. */
+.course .page-head { max-width: min(100%, 58rem); margin-bottom: var(--space-l); }
+.course .page-title { max-width: 20ch; font-size: var(--step-4); }
+.course .page-head .lead { max-width: 50rem; }
+:lang(zh) .course .page-title { max-width: 16ch; }
+
+/* Status band: how far along the serial is, stated the way a
+   masthead would state it. Hairline above and below, nothing filled. */
+.course__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-m) var(--space-l);
+  padding: var(--space-m) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--space-xl);
+}
+.course__tally {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+.course__tally-num {
+  font-size: var(--step-3);
+  color: var(--accent-ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+/* Seventeen ticks, twelve inked. A filled bar would round the count
+   off; the ticks let you read "12 of 17" without the label. */
+.course__gauge {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.34rem;
+  margin-inline-start: auto;
+  height: 1.4rem;
+}
+.course__tick {
+  display: block;
+  width: 2px;
+  height: 0.75rem;
+  background: var(--line);
+  transition: background var(--dur-med) var(--ease-out), height var(--dur-med) var(--ease-out);
+}
+.course__tick.is-done { height: 1.4rem; background: var(--accent); }
+.course__cadence { white-space: nowrap; }
+
+/* Stage headers. The range sits right, set as a caption, so the eye
+   can jump between stages without reading the prose. */
+.course__group + .course__group { margin-top: var(--space-2xl); }
+.course__group--opener { margin-bottom: var(--space-xl); }
+.course__stage {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: var(--space-m);
+  padding-bottom: var(--space-s);
+  margin-bottom: var(--space-2xs);
+}
+.course__stage-label { grid-column: 1; }
+.course__stage-range {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+.course__stage-title {
+  grid-column: 1;
+  font-size: var(--step-2);
+  margin-top: 0.4rem;
+}
+.course__stage-note {
+  grid-column: 1;
+  margin-top: 0.5rem;
+  max-width: 56ch;
+  line-height: 1.65;
+  font-size: var(--step--1);
+}
+
+/* ---------------- Lesson rows ---------------- */
+.course__rows { border-top: 1px solid var(--line); }
+
+.lesson-row {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr auto;
+  gap: var(--space-m);
+  align-items: baseline;
+  padding: var(--space-m) 0;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  transition: padding-left var(--dur-med) var(--ease-out);
+}
+/* Same accent rail the project rows use, so a lesson reads as one more
+   row in this site's vocabulary rather than a link from somewhere else. */
+.lesson-row::before {
+  content: '';
+  position: absolute;
+  left: -1.25rem; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+.lesson-row__num {
+  font-size: var(--step-2);
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: color var(--dur-fast);
+}
+.lesson-row__main { min-width: 0; }
+.lesson-row__topic {
+  display: block;
+  font-size: var(--step-2);
+  transition: color var(--dur-fast);
+}
+.lesson-row__kicker {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: var(--step--1);
+  line-height: 1.6;
+  max-width: 52ch;
+}
+.lesson-row__aside {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (hover: hover) {
+  a.lesson-row:hover { padding-left: 1.25rem; }
+  a.lesson-row:hover::before { transform: scaleY(1); }
+  a.lesson-row:hover .lesson-row__topic,
+  a.lesson-row:hover .lesson-row__num { color: var(--accent-ink); }
+}
+a.lesson-row:focus-visible { outline-offset: -2px; }
+
+/* Announced but unwritten. Kept in the list because the arc is part of
+   what the course is; greyed and inert so it never reads as a dead link. */
+.lesson-row--planned { color: var(--muted); }
+.lesson-row--planned .lesson-row__num { color: var(--line); }
+.lesson-row--planned .lesson-row__topic { color: var(--muted); font-weight: 400; }
+.lesson-row__pending {
+  color: var(--faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+/* ---------------- Colophon ---------------- */
+.course__colophon {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2xl);
+  align-items: start;
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-l);
+  border-top: 1px solid var(--line);
+}
+.course__why { max-width: var(--measure); }
+/* Scoped past `.course__why p`, which would otherwise win on specificity
+   and repaint the label as body copy. */
+.course__why .course__why-label { margin-bottom: 0.6rem; color: var(--accent-ink); }
+.course__why p { line-height: 1.8; color: var(--ink-soft); }
+.course__channel { display: grid; gap: 0.75rem; justify-items: center; width: 11rem; }
+.course__qr {
+  width: 8.5rem; height: 8.5rem;
+  border-radius: var(--radius);
+  outline: 1px solid oklch(0% 0 0 / 0.1);
+  outline-offset: -1px;
+}
+[data-theme='dark'] .course__qr { outline-color: oklch(100% 0 0 / 0.12); }
+.course__channel .meta { text-align: center; line-height: 1.6; }
+
+/* ---------------- Lesson page ---------------- */
+.lesson__head {
+  max-width: 46rem;
+  padding-bottom: var(--space-l);
+  margin-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--line);
+}
+.lesson__title { font-size: var(--step-4); margin-top: var(--space-xs); }
+.lesson__kicker {
+  font-size: var(--step-2);
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: 0.5rem;
+}
+.lesson__head .lead { margin-top: var(--space-m); font-size: var(--step-0); }
+.lesson__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: var(--space-m);
+  font-variant-numeric: tabular-nums;
+}
+.lesson__facts span + span::before {
+  content: '·';
+  margin-right: 0.9rem;
+  color: var(--line);
+}
+.lesson__notice {
+  margin-top: var(--space-m);
+  padding: 0.7rem 0.9rem;
+  background: var(--raise);
+  border-radius: var(--radius);
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+/* Text column left, section rail in the right margin. The header above
+   spans wider than both, the way a printed article carries its title. */
+.lesson__grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.lesson__rail { display: none; }
+
+@media (min-width: 1120px) {
+  .lesson__grid {
+    grid-template-columns: minmax(0, 46rem) minmax(0, 1fr);
+    column-gap: var(--space-2xl);
+    align-items: start;
+  }
+  .lesson__rail { display: block; position: sticky; top: 6.5rem; }
+}
+
+/* ---------------- Article body ---------------- */
+.lesson__body {
+  max-width: 46rem;
+  color: var(--ink-soft);
+  /* Hanzi needs more vertical room than the 1.6 that suits Latin body copy. */
+  line-height: 1.85;
+  text-wrap: pretty;
+  /* Roughly 33 Hanzi to the line. The global 68ch measure is sized for Latin
+     and lands within a hair of the column width here, which would collapse
+     the difference between a paragraph and a plate. */
+  --lesson-measure: 36rem;
+}
+.lesson__body > * { max-width: var(--lesson-measure); }
+/* Figures, tables and listings run the full column, wider than the text —
+   the diagrams are the argument, not decoration beside it. */
+.lesson__body > .lesson__fig,
+.lesson__body > .lesson__table,
+.lesson__body > .lesson__code { max-width: none; }
+/* …except the compact one-line plate, which hugs its command. It still needs
+   a cap, or fit-content has nothing to shrink against and a long command
+   walks out of the column. */
+.lesson__body > .lesson__code--tight { max-width: 100%; }
+
+.lesson__body > * + * { margin-top: var(--space-m); }
+
+.lesson__body h2,
+.lesson__body h3 { scroll-margin-top: 6rem; color: var(--ink); }
+/* The section rule spans the whole column, not the text measure: it marks
+   structure, so stopping it short of the plates below reads as a mistake. */
+.lesson__body h2 {
+  max-width: none;
+  font-size: var(--step-2);
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-s);
+  border-top: 1px solid var(--line);
+  line-height: 1.35;
+}
+/* The abstract already sits apart on its own board; a full section gap after
+   it leaves the first heading stranded. */
+.lesson__body > .lesson__abstract + h2 { margin-top: var(--space-l); }
+.lesson__body h3 {
+  font-size: var(--step-1);
+  margin-top: var(--space-l);
+  line-height: 1.45;
+}
+.lesson__body > h2 + *, .lesson__body > h3 + * { margin-top: var(--space-s); }
+.lesson__body strong { color: var(--ink); font-weight: 600; }
+.lesson__body a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 0.2em; }
+.lesson__body hr {
+  max-width: none;
+  height: 1px;
+  border: 0;
+  background: var(--line-soft);
+  margin-block: var(--space-l);
+}
+
+/* Lists: a short accent rule as the marker, matching the project bullets. */
+.lesson__body ul, .lesson__body ol { display: grid; gap: 0.6rem; }
+.lesson__body li { position: relative; padding-left: 1.6rem; }
+/* 2px, not the 1.5px used elsewhere: at this line-height the markers land on
+   fractional offsets, and a 1.5px rule rasterises crisp on some rows and
+   washed out on others, which reads as inconsistent ink. */
+.lesson__body ul > li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.82em;
+  width: 0.55rem; height: 2px;
+  background: var(--accent);
+}
+.lesson__body ol { counter-reset: step; }
+.lesson__body ol > li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 0;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--step--1);
+}
+.lesson__body li > ul, .lesson__body li > ol { margin-top: 0.6rem; }
+
+/* Inline code: a tint, not a box, so it does not chop up a Chinese line. */
+.lesson__body code {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  font-size: 0.86em;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  background: var(--tint);
+  color: var(--ink);
+  /* Break a long token only when it cannot fit a line on its own; `break-word`
+     alone was splitting `medium` across two lines inside a table cell. */
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+/* A command in a table cell must never break: the column widens and the
+   table scrolls instead. */
+.lesson__table code { white-space: nowrap; }
+
+/* ---------------- Code plates ---------------- */
+.lesson__code {
+  position: relative;
+  background: var(--raise);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  padding: var(--space-s) var(--space-m);
+  overflow-x: auto;
+  line-height: 1.7;
+  -webkit-overflow-scrolling: touch;
+}
+.lesson__code code {
+  background: none;
+  padding: 0;
+  font-size: var(--step--1);
+  color: var(--ink);
+  white-space: pre;
+}
+/* A one-line fence is a command, not a listing. Sized down so `/effort high`
+   does not sit on the page with the weight of a program. */
+.lesson__code--tight {
+  /* `display: inline-block` sizes to content rather than capping at the
+     column, so a long command escaped the scroller and widened the page.
+     A block with fit-content hugs short commands and still hard-caps. */
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  min-width: min(100%, 22rem);
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius);
+}
+.lesson__code[data-lang]::after {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0.5rem; right: 0.75rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.lesson__code[data-lang] { padding-top: var(--space-m); }
+
+/* ---------------- Figures ---------------- */
+/* The diagrams came from the WeChat edition: dark, saturated, drawn for a
+   phone feed. Mounting each one on the raised board turns that clash into
+   a reproduced plate, which is what it is. */
+.lesson__fig {
+  margin-block: var(--space-l);
+  padding: var(--space-s);
+  background: var(--raise);
+  border-radius: var(--radius-lg);
+}
+.lesson__fig img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  outline: 1px solid oklch(0% 0 0 / 0.1);
+  outline-offset: -1px;
+}
+[data-theme='dark'] .lesson__fig img { outline-color: oklch(100% 0 0 / 0.1); }
+.lesson__fig figcaption {
+  margin-top: 0.7rem;
+  padding-inline: 0.25rem;
+  font-size: var(--step--1);
+  line-height: 1.6;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* ---------------- Tables ---------------- */
+.lesson__table {
+  overflow-x: auto;
+  margin-block: var(--space-l);
+  -webkit-overflow-scrolling: touch;
+}
+.lesson__table table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+}
+.lesson__table th, .lesson__table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.7rem 1rem 0.7rem 0;
+  border-bottom: 1px solid var(--line-soft);
+  line-height: 1.65;
+}
+.lesson__table th {
+  color: var(--ink);
+  font-weight: 500;
+  white-space: nowrap;
+  border-bottom-color: var(--line);
+}
+.lesson__table tr:last-child td { border-bottom: 0; }
+
+/* ---------------- Abstract & asides ---------------- */
+/* The opening quote of every lesson states what it answers, who it is for,
+   and the version it was checked against. That is a masthead, not a pull
+   quote, so it gets the board treatment and sits above the first rule. */
+.lesson__abstract {
+  max-width: none;
+  background: var(--raise);
+  border-radius: var(--radius-lg);
+  padding: var(--space-m);
+  margin-bottom: var(--space-l);
+}
+.lesson__abstract > * + * { margin-top: 0.7rem; }
+.lesson__abstract p { line-height: 1.8; }
+/* The 📌 line dates the lesson against a specific build. Small print, but
+   the honest kind, so it is set as such rather than dropped. */
+.lesson__abstract .lesson__stamp {
+  margin-top: var(--space-s);
+  padding-top: var(--space-s);
+  border-top: 1px solid var(--line);
+  font-size: var(--step--1);
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* Asides in the flow of the argument: a hanging accent rule, indented,
+   so they read as marginalia the author added, not as a callout widget. */
+.lesson__aside {
+  position: relative;
+  padding-left: var(--space-m);
+  color: var(--muted);
+}
+.lesson__aside::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.55em; bottom: 0.55em;
+  width: 1px;
+  background: var(--accent);
+}
+.lesson__aside > * + * { margin-top: 0.7rem; }
+
+/* ---------------- Section rail ---------------- */
+.lesson-toc { max-height: calc(100vh - 9rem); overflow-y: auto; }
+.lesson-toc .lesson-toc__label {
+  margin-bottom: 0.85rem;
+  /* A rail beside running prose should stay quieter than the prose. */
+  color: var(--muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.lesson-toc__list { border-left: 1px solid var(--line); }
+.lesson-toc__item { position: relative; }
+.lesson-toc__item a {
+  display: block;
+  padding: 0.4rem 0 0.4rem 0.9rem;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--muted);
+  transition: color var(--dur-fast);
+}
+/* Active state as a short rail on the hairline, not a filled block. */
+.lesson-toc__item::before {
+  content: '';
+  position: absolute;
+  left: -1px; top: 0.35rem; bottom: 0.35rem;
+  width: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+.lesson-toc__item.is-active::before { transform: scaleX(1); }
+.lesson-toc__item.is-active a { color: var(--ink); }
+@media (hover: hover) {
+  .lesson-toc__item a:hover { color: var(--accent-ink); }
+}
+
+/* ---------------- Pager & foot ---------------- */
+.lesson__pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-m);
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-l);
+  border-top: 1px solid var(--line);
+}
+.lesson__pager-link { display: grid; gap: 0.35rem; min-width: 0; }
+.lesson__pager-link .display {
+  font-size: var(--step-1);
+  transition: color var(--dur-fast);
+}
+.lesson__pager-link--next { text-align: right; }
+@media (hover: hover) {
+  .lesson__pager-link:hover .display { color: var(--accent-ink); }
+}
+.lesson__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-s) var(--space-l);
+  margin-top: var(--space-l);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--line-soft);
+}
+.lesson__back { font-weight: 500; }
+.lesson__back .arrow { display: inline-block; transition: transform var(--dur-med) var(--ease-out); }
+.lesson__back:hover .arrow { transform: translateX(4px); }
+
+/* ---------------- Narrow screens ---------------- */
+@media (max-width: 820px) {
+  .course__colophon { grid-template-columns: minmax(0, 1fr); gap: var(--space-l); }
+  .course__channel { width: auto; justify-items: start; }
+  .course__channel .meta { text-align: left; }
+}
+
+@media (max-width: 640px) {
+  .course__status {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-s);
+  }
+  .course__gauge { margin-inline-start: 0; }
+  .course__stage { grid-template-columns: minmax(0, 1fr); }
+  .course__stage-range { grid-column: 1; grid-row: auto; margin-top: 0.5rem; }
+
+  /* The date is the first thing to go: on a phone the row needs its width
+     for the title, and the reading time is what decides whether to open it. */
+  /* Two rows now, so the 1.5rem grid gap would also open up between the
+     title and its reading time. Columns keep the gap, rows do not. */
+  .lesson-row { grid-template-columns: 2.5rem minmax(0, 1fr); row-gap: 0; }
+  .lesson-row__num { font-size: var(--step-1); }
+  .lesson-row__topic { font-size: var(--step-1); }
+  .lesson-row__aside { grid-column: 2; margin-top: 0.5rem; }
+  .lesson-row__date { display: none; }
+
+  .lesson__title { font-size: var(--step-3); }
+  .lesson__kicker { font-size: var(--step-1); }
+  .lesson__body { line-height: 1.8; }
+  .lesson__code { padding: 0.8rem 0.9rem; border-radius: var(--radius); }
+  .lesson__fig { padding: 0.5rem; margin-inline: 0; }
+  .lesson__abstract { padding: var(--space-s); }
+  .lesson__pager { grid-template-columns: minmax(0, 1fr); gap: var(--space-l); }
+  .lesson__pager-link--next { text-align: left; }
+}
+
+/* A quiet line under the closing actions: the course is something I am doing
+   now, so it belongs with "open to opportunities" rather than in the two
+   products the year section is already counting. */
+.home-writing {
+  max-width: 60ch;
+  margin-top: 2rem;
+  padding-top: 1.35rem;
+  /* --line-soft disappears against the raised closing panel. */
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+.home-writing__cta { color: var(--ink); font-weight: 500; }
+.home-writing__cta .arrow { display: inline-block; transition: transform var(--dur-med) var(--ease-out); }
+@media (hover: hover) {
+  .home-writing__cta:hover .arrow { transform: translateX(4px); }
+}
+
+/* ---------------- Authorship ---------------- */
+/* The course is the strongest credential on this site, so it has to be
+   legible as *authored*: a byline on every lesson, and a block at the end
+   putting whoever just finished one click from the rest of the work. */
+
+.course__byline {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: var(--space-m);
+  font-size: var(--step--1);
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+.course__byline-mark,
+.lesson__author-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  border-radius: var(--radius);
+  letter-spacing: 0.02em;
+}
+.course__byline-mark { width: 1.6rem; height: 1.6rem; font-size: 0.68rem; }
+
+/* The writer's name leads the meta line; the dot separators follow it. */
+.lesson__byline { color: var(--ink-soft); }
+
+.lesson__author {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: var(--space-m);
+  align-items: start;
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-l);
+  /* Full content width, so this rule lines up with the pager and foot rules
+     stacked below it rather than stopping short of them. */
+  border-top: 1px solid var(--line);
+}
+.lesson__author-mark { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+.lesson__author-name { font-size: var(--step-1); }
+.lesson__author-bio {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: var(--step--1);
+  line-height: 1.75;
+  max-width: 52ch;
+}
+.lesson__author-cta { display: inline-block; margin-top: var(--space-s); font-weight: 500; }
+.lesson__author-cta .arrow { display: inline-block; transition: transform var(--dur-med) var(--ease-out); }
+@media (hover: hover) {
+  .lesson__author-cta:hover .arrow { transform: translateX(4px); }
+}
+
+/* The author block already carries a rule, so the foot below it steps down
+   to the softer one rather than stacking two of equal weight. */
+.lesson__author + .lesson__foot {
+  margin-top: var(--space-l);
+  border-top-color: var(--line-soft);
+}
+
+@media (max-width: 640px) {
+  .lesson__author { grid-template-columns: 2rem minmax(0, 1fr); gap: var(--space-s); }
+  .lesson__author-mark { width: 2rem; height: 2rem; font-size: 0.8rem; }
+}

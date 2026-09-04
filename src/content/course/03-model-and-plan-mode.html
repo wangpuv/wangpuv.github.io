@@ -1,0 +1,155 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答三个问题</strong>：什么任务值得切模型、为什么大改动要先进入计划模式、怎样把“强模型规划、快模型执行”变成一套稳定工作流。</p>
+<p>适合：已经能用 Claude Code 完成日常修改，想进一步提升复杂任务质量、速度和额度利用率的人。</p>
+<p class="lesson__stamp">📌 基于 Claude Code 官方文档核对至 2026 年 7 月。产品更新较快，个别细节以官方文档与 <code>/release-notes</code> 为准。</p>
+</blockquote>
+<h2 id="sec-9e1362">一句话结论</h2>
+<p><code>/model</code> 决定<strong>让谁来思考和执行</strong>，<code>/plan</code> 决定<strong>当前阶段能不能动手修改</strong>。</p>
+<p>复杂任务最稳的做法不是从头到尾都用最强模型，而是把工作拆成两个阶段：<strong>先让强模型在只读状态下把方案想清楚，再让更快的模型按方案执行。</strong></p>
+<p>这不只是省额度，也是在减少返工。规划阶段多想一步，往往比实现阶段反复推倒重来便宜得多。</p>
+<h2 id="sec-7e19c9">一、<code>/model [模型]</code>：切换模型</h2>
+<h3 id="sec-9fa0fd">基本用法</h3>
+<ul>
+<li>输入 <code>/model</code> 可以打开模型选择器。</li>
+<li>输入 <code>/model fable</code>、<code>/model opus</code>、<code>/model sonnet</code> 或 <code>/model haiku</code>，可以直接切换到对应档位。</li>
+<li>直接选择模型，会把它保存为以后新会话的默认模型。</li>
+<li>如果只想在<strong>当前会话临时切换</strong>，可以在选择器对应行按 <code>s</code>，这样不会修改默认设置。</li>
+<li>启动 Claude Code 时也可以指定模型，例如：<code>claude --model opus</code>。</li>
+</ul>
+<h3 id="sec-3aa575">四种模型怎么分工</h3>
+<p>与其记具体版本号，不如先记住四种定位：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>档位</th>
+<th>特点</th>
+<th>典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fable</strong></td>
+<td>能力最强，擅长长时间自主推进，额度消耗也更快</td>
+<td>跨阶段的大型任务、根因调查、系统级架构决策</td>
+</tr>
+<tr>
+<td><strong>Opus</strong></td>
+<td>复杂推理能力强，速度较慢，成本较高</td>
+<td>复杂架构、棘手 bug、大型重构的方案制定</td>
+</tr>
+<tr>
+<td><strong>Sonnet</strong></td>
+<td>能力与速度均衡，通常适合默认使用</td>
+<td>日常写代码、改功能、读代码、常规调试</td>
+</tr>
+<tr>
+<td><strong>Haiku</strong></td>
+<td>最快、最省</td>
+<td>改文案、加简单字段、格式化、批量小修改</td>
+</tr>
+</tbody>
+</table></div><blockquote class="lesson__aside">
+<p><strong>关于 Fable 5 的使用资格：</strong> Fable 5 不是默认模型，需要 Claude Code 2.1.170 或更高版本。它不向 Free 计划开放；Max 计划以及 Team、Enterprise 的高级席位可以在订阅额度内使用，Pro 计划和标准席位则需要使用按量付费额度。如果 <code>/model</code> 中没有显示 Fable，可能是版本较旧，或者当前账号、组织尚未开放。</p>
+</blockquote>
+<blockquote class="lesson__aside">
+<p>Anthropic 更新具体模型版本很快，<code>/model</code> 里实际显示的版本以当前环境为准。记住“按能力和任务选择合适的模型”，比记住某个版本号更耐用。</p>
+</blockquote>
+<figure class="lesson__fig"><img src="/course/03-model-and-plan-mode-01-comparison-model-tiers.webp" alt="Fable、Opus、Sonnet、Haiku 四种模型按照能力、速度与任务复杂度进行分工" width="1200" height="675" loading="lazy" decoding="async"><figcaption>Fable、Opus、Sonnet、Haiku 四种模型按照能力、速度与任务复杂度进行分工</figcaption></figure>
+<h3 id="sec-991de9">四个容易忽略的细节</h3>
+<ol>
+<li><strong>中途切模型并不是免费的。</strong> 对话已经产生内容后再切模型，下一次回复需要重新读取整段历史，而且无法沿用原模型的提示缓存，所以会更慢、也更费 token。</li>
+<li><strong>模型选择器还能调整推理强度。</strong> 对支持的模型，可以在 <code>/model</code> 选择器里用左右方向键调整 effort，相当于把模型和推理强度一起设好。<code>/effort</code> 会在第 9 课详细讲。</li>
+<li><strong>不要无意中修改默认模型。</strong> 只是临时换个模型继续当前任务时，记得使用 <code>s</code> 的 session-only 切换。</li>
+<li><strong>切换会对后续回复立即生效。</strong> 不需要退出 Claude Code 再重新进入。</li>
+</ol>
+<h2 id="sec-f2b69e">二、<code>/plan [描述]</code>：先进入只读计划模式</h2>
+<h3 id="sec-9fa0fd">基本用法</h3>
+<p><code>/plan</code> 会让 Claude 进入<strong>只读的计划模式</strong>：它可以查看代码、调研问题、分析影响范围并提出方案，但要等你批准后，才能进入实际修改阶段。</p>
+<p>你也可以把任务直接写在命令后面：</p>
+<pre class="lesson__code lesson__code--tight"><code>/plan 把支付模块从 REST 迁移到 gRPC，并让集成测试通过</code></pre>
+<p>还可以在启动时直接进入计划模式：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="bash"><code>claude --permission-mode plan</code></pre>
+<h3 id="sec-7bf510">为什么“只读”很重要</h3>
+<p>计划模式的只读不是一句口头约定，也不是 Claude “答应暂时不改”。约束发生在<strong>工具层</strong>：规划阶段不会把普通写文件工具交给它。</p>
+<p>这意味着，你可以让强模型放心探索陌生代码库、梳理依赖关系、评估重构范围，而不用担心它在方案还没对齐时顺手修改实现。</p>
+<h3 id="sec-3b0537">适用场景</h3>
+<ul>
+<li><strong>大改动或高风险改动</strong>：迁移、重构、修改核心模块之前，先看完整方案。</li>
+<li><strong>陌生代码库导航</strong>：接手 legacy 项目时，先零风险理解结构和改动路径。</li>
+<li><strong>需要先对齐思路</strong>：先检查 Claude 会怎样拆解问题，再决定哪些建议值得执行。</li>
+<li><strong>方案有多个分支</strong>：先比较取舍、明确边界，避免做到一半才发现方向错了。</li>
+</ul>
+<blockquote class="lesson__aside">
+<p><code>/plan</code> 还有一个云端版兄弟 <code>/ultraplan</code>：云端起草计划，在浏览器里审阅，再远程执行或传回终端。第 16 课会详细讲。</p>
+</blockquote>
+<h2 id="sec-adb685">三、为什么 <code>auto</code> 和 <code>plan</code> 是并列模式</h2>
+<p><code>auto</code> 和 <code>plan</code> 不是两个可以同时打开的独立开关，而是<strong>同一个权限模式旋钮的不同档位</strong>。</p>
+<p>如果按照“管得最严 → 管得最松”排列，可以这样理解：</p>
+<pre class="lesson__code lesson__code--tight"><code>plan（禁止写） → 普通（每次改动都问） → 自动接受编辑 → auto（基本都不问）</code></pre>
+<ul>
+<li><strong>plan</strong> 位于最严格的一端：工具层面禁止普通写操作。</li>
+<li><strong>auto</strong> 位于最宽松的一端：符合模式范围的写操作会自动放行。</li>
+</ul>
+<p>二者在逻辑上互斥。一边要求“什么都不许写”，另一边要求“写的时候不要再问”，这两种状态无法同时成立。</p>
+<p>所以，“在 auto 的同时开启 plan”并不会得到一个更智能的组合。plan 模式里根本没有普通写操作需要自动审批，auto 自然也没有发挥空间。权限模式会在第 8 课展开。</p>
+<h2 id="sec-841203">四、推荐工作流：规划与执行分离</h2>
+<p>核心思路只有一句：<strong>强模型规划，快模型执行。</strong></p>
+<p>实际使用时，有两种常见做法。</p>
+<h3 id="sec-33db3b">方式 A：使用 plan 模式</h3>
+<pre class="lesson__code"><code>1. /model
+   切到 Opus
+
+2. /plan 重构用户认证模块，拆出独立的 token 服务
+   只读调研并输出方案
+
+3. 审阅方案，继续追问和修改，直到满意
+
+4. 批准方案，退出计划模式
+
+5. /model
+   按 s 临时切到 Sonnet
+
+6. 按方案实现并验证</code></pre>
+<p><strong>优点：</strong> 只读由工具层强制，规划阶段风险最低。</p>
+<p><strong>缺点：</strong> Plan 模式会把计划写入 Claude Code 的本地计划目录，但它不是项目内可跟随 Git 管理的设计文档。需要长期保存、团队协作或版本管理时，仍建议写入项目的 <code>docs/</code> 目录。</p>
+<h3 id="sec-c51b98">方式 B：把设计方案写成文件</h3>
+<pre class="lesson__code"><code>1. 让 Opus 产出详细设计文档并落盘
+2. 审阅、修改设计文档
+3. /clear 开一段干净的新会话
+4. 让 Sonnet 读取设计文档并实现</code></pre>
+<p><strong>优点：</strong> 设计文档是真实文件，可以跨会话复用、进入 Git，也可以作为明确上下文交给执行模型。</p>
+<p><strong>需要注意：</strong> 如果在允许写入的模式下让 Claude“只写文档”，这个限制主要依赖指令，工具层并不会阻止它顺手改实现代码。高风险改动可以先在 <code>/plan</code> 中只读地把方案讲清楚、审一遍，再退出计划模式把方案落成文档。</p>
+<figure class="lesson__fig"><img src="/course/03-model-and-plan-mode-02-flowchart-plan-execute-workflows.webp" alt="强模型规划、人工审阅、快模型执行的两种工作流：plan 模式与设计文档落盘" width="1200" height="675" loading="lazy" decoding="async"><figcaption>强模型规划、人工审阅、快模型执行的两种工作流：plan 模式与设计文档落盘</figcaption></figure>
+<h3 id="sec-aa7095">为什么方式 B 常常更省</h3>
+<p>设计已经落成文件后，如果继续在同一段长对话里切模型，新的模型需要无缓存地重新读取前面整段规划历史。</p>
+<p>更干净的做法是：</p>
+<ol>
+<li>把最终方案写进设计文档。</li>
+<li>用 <code>/clear</code> 开一段全新会话。</li>
+<li>直接让执行模型读取“设计文档 + 必要代码”。</li>
+</ol>
+<p>这样，新会话里只有真正需要的上下文，不必背着 Opus 的整段探索过程继续工作。</p>
+<blockquote class="lesson__aside">
+<p>经验法则：<strong>临时换个脑子继续聊，可以在会话中途切模型；阶段已经明确分开，就用文件交接，再 <code>/clear</code> 重开。</strong></p>
+</blockquote>
+<h2 id="sec-04b5c1">五、相关命令</h2>
+<ul>
+<li><code>/advisor [opus|sonnet|off]</code>：让第二个模型在关键时刻给主模型提供建议，适合用强模型把关；也可以使用完整的模型 ID。</li>
+<li><code>/effort [档位|auto]</code>：单独设置推理强度，第 9 课详讲。</li>
+<li><code>/permissions</code>、Shift+Tab：切换和管理权限模式，第 8 课详讲。</li>
+</ul>
+<h2 id="sec-fcd746">动手练习</h2>
+<p>找一个你近期准备做、但还没有开始的大改动，按下面的顺序走一遍：</p>
+<ol>
+<li>用 <code>/model</code> 临时切到更强的模型。</li>
+<li>用 <code>/plan</code> 描述任务，让它只读调研并给出完整方案。</li>
+<li>要求方案明确列出：目标、影响文件、风险、实施步骤和验证方式。</li>
+<li>审阅方案，至少追问一次“最可能遗漏什么”和“有没有更小的改法”。</li>
+<li>方案稳定后，把它落成设计文档。</li>
+<li><code>/clear</code> 开新会话，让更快的模型按文档实现并验证。</li>
+</ol>
+<p>你要练习的不是“频繁切模型”，而是<strong>把不同强度的思考用在最有价值的阶段</strong>。</p>
+<h2 id="sec-5f0876">下一课</h2>
+<p><strong>第 4 课 · 代码审查</strong>——怎样让 Claude 不只检查语法，而是真正发现逻辑、边界条件和回归风险。</p>
+<hr>
+<p>参考：<a href="https://code.claude.com/docs">Claude Code 官方文档</a>中的 model configuration、plan mode、permissions 和 interactive mode 等页面。</p>
+
