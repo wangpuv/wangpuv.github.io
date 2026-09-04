@@ -50,14 +50,14 @@ export const lifeCards = [
     en: {
       label: 'WeChat',
       title: '阿诚的代码',
-      body: 'My WeChat public account. Its daily column “Last Night in Tech” (《昨夜科技圈二三事》) is compiled and published automatically every day by my little assistant Wilher (Hermes-Agent). Scan to follow.',
+      body: 'My WeChat public account. I am currently publishing a course on Claude Code commands. Scan to follow.',
       qrAlt: 'WeChat QR code for 阿诚的代码',
       qrCaption: 'Scan to follow',
     },
     zh: {
       label: '公众号',
       title: '阿诚的代码',
-      body: '我的微信公众号。每天的栏目《昨夜科技圈二三事》由我的小助理 Wilher（Hermes-Agent）自动整理信息并发布。扫码即可关注。',
+      body: '我的微信公众号。目前在连载《Claude Code 命令教程》。扫码即可关注。',
       qrAlt: '阿诚的代码 微信公众号二维码',
       qrCaption: '扫码关注',
     },

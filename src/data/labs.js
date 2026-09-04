@@ -70,7 +70,7 @@ export const labs = [
     year: '2026',
     accent: 'oklch(62% 0.14 160)',
     kind: 'app',
-    link: 'https://apps.apple.com/us/app/%E5%B0%8F%E6%AD%A5%E6%89%93%E5%8D%A1-%E4%B8%AD%E5%B0%8F%E5%AD%A6%E7%94%9F%E4%B9%A0%E6%83%AF%E5%85%BB%E6%88%90/id6761506709',
+    link: 'https://apps.apple.com/cn/app/%E5%B0%8F%E6%AD%A5%E6%89%93%E5%8D%A1-%E4%B8%AD%E5%B0%8F%E5%AD%A6%E7%94%9F%E4%B9%A0%E6%83%AF%E5%85%BB%E6%88%90/id6761506709',
     icon: '/littlesteps/icon.webp',
     // Unretouched App Store screenshots, one pair per screen. The app ships
     // its own light and dark themes, so each plate follows the site theme.

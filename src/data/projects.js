@@ -104,6 +104,8 @@ export const projects = [
     slug: 'vds-directory-service',
     year: '2020',
     accent: 'oklch(60% 0.14 70)',
+    // 证书扫描件：同事姓名与地址行已做实心遮盖；专利本身是公开记录 (CN 113726639 B)
+    shots: [{ key: 'patent', light: '/patent-vds-directory.webp', width: 932, height: 1322 }],
     en: {
       title: 'VDS Directory Service',
       role: 'Distributed Systems Architecture',
@@ -118,6 +120,7 @@ export const projects = [
         'Implemented large-organization address book visibility control, later granted as a national patent.',
       ],
       outcome: 'Improved node operation latency from 1200ms to 80ms and supported smooth operation at provincial government scale.',
+      shots: { patent: 'Invention patent certificate · Communication method and apparatus · ZL 2020 1 0394748.X' },
     },
     zh: {
       title: 'VDS 组织级目录服务',
@@ -133,6 +136,7 @@ export const projects = [
         '实现大型组织通讯录可见性控制能力，并获得国家级专利授权。',
       ],
       outcome: '节点操作耗时从 1200ms 优化至 80ms，支撑省级政务场景平稳运行。',
+      shots: { patent: '发明专利证书 · 通讯方法及装置 · ZL 2020 1 0394748.X' },
     },
   },
   {

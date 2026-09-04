@@ -1,12 +1,13 @@
 // ───────────────────────────────────────────────────────────
 // Finished books — a static snapshot pulled from WeChat Reading
-// (微信读书) on 2026-06-18, most-recent-first. The site is a static
+// (微信读书) on 2026-09-04, most-recent-first. The site is a static
 // SPA, so this is a generated snapshot, not a live fetch. Covers are
 // downloaded into public/covers/ as WebP. Refresh by re-running the weread
 // skill and regenerating both this file and the cover images.
 // ───────────────────────────────────────────────────────────
 
 export const books = [
+  { title: '五代十国全史：《太平年》的混乱前传', author: '麦老师', year: 2026, cover: '/covers/36.webp' },
   { title: '走近费曼丛书·费曼讲物理：入门', author: '理查德·费曼', year: 2026, cover: '/covers/01.webp' },
   { title: '理性乐观派（典藏版）', author: '马特·里德利', year: 2026, cover: '/covers/02.webp' },
   { title: '技术与文明：我们的时代和未来', author: '张笑宇', year: 2026, cover: '/covers/03.webp' },

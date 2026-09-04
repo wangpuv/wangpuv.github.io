@@ -5,7 +5,7 @@ export const thisyear = {
     sections: [
       {
         paragraphs: [
-          '2025 年，在阿里巴巴工作了十一年之后，我主动离职了。孩子从小学升入初中，遇到了严重的心理困难。我判断那是一个需要父亲在场的时刻，于是选择了停下来，用一整年的时间陪他度过那段最艰难的时期。',
+          '2025 年，在阿里巴巴工作了十一年之后，我离职了。孩子从小学升入初中，有一段时间状态很不好。我判断那是一个需要父亲在场的时刻，于是选择了停下来，用一整年的时间陪他度过那段最艰难的时期。',
           '他现在已经走出来了。',
         ],
       },
@@ -19,7 +19,7 @@ export const thisyear = {
           '但这一年我也没有停下来。',
           '陪孩子学习的过程中，我碰到了一个真实的问题：AI 可以讲解一道错题，但它做不到持续跟进。什么时候该复习、掌握到了什么程度、下一步该教什么——这些需要跨天、跨会话的记忆、证据和判断。对话式 AI 能给答案，但不对这个过程负责。',
           '这个问题让我开始认真思考：AI Agent 在一个真实的产品里、面对真实的用户时，到底该怎么做？怎么把不确定的模型能力变成可靠的产品行为？',
-          '我先独立设计并上架了离线优先的习惯产品「小步打卡」，完成了从产品定义到 App Store 上架的完整闭环。然后从错题复习问题出发，主导构建了 Little Step Learning Agent——一个完整的学习 Agent 系统：工具调用、跨会话可信记忆、有界副作用，由宿主系统保证模型行为可验证、可恢复。整个系统有 1392 项单元与集成测试。',
+          '我先独立设计并上架了离线优先的习惯产品「小步打卡」，完成了从产品定义到 App Store 上架的完整闭环。然后从错题复习问题出发，主导构建了 Little Step Learning Agent——一个完整的学习 Agent 系统：工具调用、跨会话可信记忆，由宿主系统保证模型行为可验证、可恢复。整个系统有 1392 项单元与集成测试。',
           '我在这个项目中做的核心判断是：模型可以自由选择教学动作，但什么可以成为持久事实、什么时候状态可以转换、失败后如何恢复——这些必须由系统控制，不能交给模型。这和我过去二十年做分布式系统、高并发交易和权限体系时的工程直觉是一致的：事务、幂等、状态管理、容灾降级、安全边界。',
           '这不是一个 demo。它是一个从真实问题出发、经过完整工程验证的产品，也是我把二十年系统工程经验带进 AI Agent 领域的证明。',
         ],
@@ -42,7 +42,7 @@ export const thisyear = {
     sections: [
       {
         paragraphs: [
-          "In 2025, after eleven years at Alibaba, I resigned. My child was moving from primary school to middle school and hit a serious psychological wall. I judged it was a moment that needed a father present, so I stepped away and spent a full year helping him through the hardest stretch.",
+          "In 2025, after eleven years at Alibaba, I resigned. My child was moving from primary school to middle school and was struggling. I judged it was a moment that needed a father present, so I stepped away and spent a full year helping him through the hardest stretch.",
           "He came through it. He's back on track now.",
         ],
       },

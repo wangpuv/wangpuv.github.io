@@ -32,6 +32,7 @@ export const ui = {
       whatIDid: 'What I did',
       stack: 'Tech stack',
       outcome: 'Outcome',
+      credential: 'Patent',
     },
     lab: {
       eyebrow: 'Independent products',
@@ -124,6 +125,7 @@ export const ui = {
       whatIDid: '我做了什么',
       stack: '技术栈',
       outcome: '成果',
+      credential: '专利',
     },
     lab: {
       eyebrow: '独立产品',

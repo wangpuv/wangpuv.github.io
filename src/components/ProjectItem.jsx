@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLanguage } from '../i18n/LanguageContext'
 import { ui } from '../i18n/strings'
+import AppShots from './AppShots'
 
 /**
  * Editorial work row that expands in place to reveal the full case study.
@@ -59,6 +60,18 @@ export default function ProjectItem({ project, index }) {
                 ))}
               </ul>
             </div>
+
+            {project.shots && (
+              <div className="proj__block">
+                <p className="meta proj__label">{t.project.credential}</p>
+                <AppShots
+                  shots={project.shots}
+                  labels={c.shots}
+                  appName={c.title}
+                  label={`${c.title} — ${t.project.credential}`}
+                />
+              </div>
+            )}
 
             <div className="proj__meta-row">
               <div className="proj__block">
