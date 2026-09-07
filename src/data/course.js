@@ -101,15 +101,11 @@ export const stages = [
   },
 ]
 
-// Lessons 12–17, announced in the 发刊词 but not yet written. They appear
+// Lessons 13–17, announced in the 发刊词 but not yet written. They appear
 // on the contents page as plain, unlinked rows: the arc is part of what
-// the course is, and pretending the list stops at 11 would undersell it.
+// the course is, and pretending the list stops at the last published
+// lesson would undersell it.
 export const upcomingLessons = [
-  {
-    number: 12,
-    en: { topic: 'Large parallel changes', kicker: 'Which big edits are worth splitting up' },
-    zh: { topic: '大规模并行改动', kicker: '什么样的大改动适合拆成并行任务' },
-  },
   {
     number: 13,
     en: { topic: 'Background, forks, branches, tasks', kicker: 'Four ways to run more than one thing' },
@@ -221,6 +217,12 @@ const english = {
     kicker: 'Find the entry point without derailing the task',
     description:
       '/help for reference, /skills for what is visible, /powerup for demos, /btw for the side question that needs no tools.',
+  },
+  '12-batch-parallel-changes': {
+    topic: 'Large parallel changes',
+    kicker: '/batch is not a “big change” button',
+    description:
+      'What actually suits /batch: rules already settled, units that are independent, results you can sign off. Then the split, the plan you approve, and the merge nobody else can do for you.',
   },
 }
 

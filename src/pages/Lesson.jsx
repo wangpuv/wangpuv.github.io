@@ -7,7 +7,7 @@ import LessonToc from '../components/LessonToc'
 import NotFound from './NotFound'
 
 // Article bodies are generated into src/content/course/ by `npm run course`.
-// Loading them lazily keeps twelve long-form lessons out of the main bundle;
+// Loading them lazily keeps every long-form lesson out of the main bundle;
 // only the one being read is fetched.
 const bodies = import.meta.glob('../content/course/*.html', {
   query: '?raw',

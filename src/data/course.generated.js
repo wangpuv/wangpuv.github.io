@@ -630,5 +630,51 @@ export const publishedLessons = [
       "kicker": "找到功能入口，侧问不打断主线",
       "description": "用 /help 查帮助，用 /skills 查技能与可见性，用 /powerup 看交互演示，用 /btw 处理不需要调用工具的侧问。四个入口各有分工，先分清边界，再用得顺手。"
     }
+  },
+  {
+    "slug": "12-batch-parallel-changes",
+    "number": 12,
+    "date": "2026-09-07",
+    "minutes": 9,
+    "toc": [
+      {
+        "id": "sec-1fa186",
+        "text": "一、/batch 会做什么"
+      },
+      {
+        "id": "sec-325ed6",
+        "text": "二、并行之前，先问三个问题"
+      },
+      {
+        "id": "sec-573f50",
+        "text": "三、四类任务，怎样判断"
+      },
+      {
+        "id": "sec-452a70",
+        "text": "四、给 /batch 一份可以执行的要求"
+      },
+      {
+        "id": "sec-2f39b8",
+        "text": "五、worktree 隔离之后，仍然需要合并验收"
+      },
+      {
+        "id": "sec-4f463b",
+        "text": "六、并行度由审查能力决定"
+      },
+      {
+        "id": "sec-f72d39",
+        "text": "自测两题"
+      },
+      {
+        "id": "sec-8ea868",
+        "text": "本课小结"
+      }
+    ],
+    "zh": {
+      "title": "第 12 课：大规模并行改动 —— /batch 不是“大改动按钮”",
+      "topic": "大规模并行改动",
+      "kicker": "/batch 不是“大改动按钮”",
+      "description": "什么任务适合 /batch？先确认规则明确、单元独立、结果可验收，再让子代理在各自的 worktree 中并行实现。本课讲清任务拆分、方案确认和 PR 合并的边界。"
+    }
   }
 ]

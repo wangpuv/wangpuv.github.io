@@ -52,7 +52,7 @@ course` reads the Obsidian source (outside this repo, at
 source automatically. Never hand-edit those three outputs.
 
 `src/data/course.js` is the hand-written half: English titles for each lesson,
-the three stage groupings, lessons 12–17 that are announced but unwritten, and
+the three stage groupings, the lessons announced but not yet written, and
 the appendix. It merges the generated data and is what the pages import.
 
 Lesson bodies stay Chinese in both languages — English mode translates the
