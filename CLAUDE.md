@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A personal portfolio site (React + Vite SPA) for Wang Pu. Editorial design, bilingual (Chinese default / English), light & dark themes. Deployed as the GitHub user site at https://wangpuv.github.io/.
+A personal portfolio site (React + Vite SPA) for Wang Pu. Editorial design, bilingual (Chinese default / English), light & dark themes. Deployed as the GitHub user site, served at https://wangpuv.com/.
 
 ## Commands
 
@@ -113,4 +113,9 @@ Chinese display headings must not break mid-word. `global.css` applies `word-bre
 
 Pushing to `master` triggers `.github/workflows/deploy.yml`, which builds and deploys to GitHub Pages (Pages `build_type` is `workflow`, not Jekyll). The workflow copies `dist/index.html` → `dist/404.html` so SPA deep links like `/work/<slug>` resolve on refresh (they return HTTP 404 status but render correctly — expected, not a bug). Base path is root (`/`); `BrowserRouter` uses no basename.
 
-**Do not touch** the separate `wangpuv/littlesteps-privacy` repo — it independently serves https://wangpuv.github.io/littlesteps-privacy/.
+**The live site is https://wangpuv.com/**, set by `public/CNAME`. `wangpuv.github.io`
+still resolves but 301s to the custom domain, and so does every project site under it.
+When verifying a deploy with curl, follow redirects (`curl -L`) — a bare 301 is the
+domain hop, not a failed deploy.
+
+**Do not touch** the separate `wangpuv/littlesteps-privacy` repo — it independently serves https://wangpuv.com/littlesteps-privacy/.
