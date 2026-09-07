@@ -19,7 +19,7 @@
 <li><code>default / acceptEdits / plan / auto / dontAsk / bypassPermissions</code> 是会话的默认处置方式。</li>
 </ul>
 <p>规则和模式不是二选一，而是叠加工作的。</p>
-<figure class="lesson__fig"><img src="/course/08-permissions-and-auto-mode-01-flowchart-permission-gate.webp" alt="先查规则，再由模式兜底：工具调用先经过 deny、ask、allow，未命中时再由当前权限模式处理" width="1200" height="675" loading="lazy" decoding="async"><figcaption>先查规则，再由模式兜底：工具调用先经过 deny、ask、allow，未命中时再由当前权限模式处理</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/08-permissions-and-auto-mode-01-flowchart-permission-gate.webp" alt="先查规则，再由模式兜底：工具调用先经过 deny、ask、allow，未命中时再由当前权限模式处理" width="1200" height="675" loading="lazy" decoding="async"><figcaption>先查规则，再由模式兜底：工具调用先经过 deny、ask、allow，未命中时再由当前权限模式处理</figcaption></figure>
 <h2 id="sec-cd8375">一、系统 A：权限规则</h2>
 <p>权限规则通常写在 <code>settings.json</code> 的 <code>permissions</code> 字段里，也可以在 <code>/permissions</code> 中查看和管理。</p>
 <p>它适合表达这些确定性要求：</p>
@@ -267,7 +267,7 @@ claude --permission-mode dontAsk</code></pre>
 <p>Bypass 会跳过常规权限提示和安全检查，保护路径也可能直接写入。</p>
 <p>Bypass 会跳过常规权限层，因此不要指望普通 <code>ask</code> / <code>deny</code> 继续充当可靠边界。当前版本只明确保留删除文件系统根目录或用户主目录时的熔断提示；管理员也可以在会话启动前禁用这个模式。</p>
 <p>这些都不等于完整保护。<strong>在日常开发机上，不要把 Bypass 当成省弹窗的快捷方式。</strong></p>
-<figure class="lesson__fig"><img src="/course/08-permissions-and-auto-mode-02-comparison-automation-modes.webp" alt="三种自动化不是同一种放行：Accept edits 按类别放行，Auto 由分类器判断，Bypass 跳过常规安全检查" width="1200" height="675" loading="lazy" decoding="async"><figcaption>三种自动化不是同一种放行：Accept edits 按类别放行，Auto 由分类器判断，Bypass 跳过常规安全检查</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/08-permissions-and-auto-mode-02-comparison-automation-modes.webp" alt="三种自动化不是同一种放行：Accept edits 按类别放行，Auto 由分类器判断，Bypass 跳过常规安全检查" width="1200" height="675" loading="lazy" decoding="async"><figcaption>三种自动化不是同一种放行：Accept edits 按类别放行，Auto 由分类器判断，Bypass 跳过常规安全检查</figcaption></figure>
 <h2 id="sec-780b85">六、Auto 模式怎样做决定</h2>
 <p>日常可以把 Auto 的判定过程理解为四步：</p>
 <ol>

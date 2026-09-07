@@ -53,7 +53,7 @@
 <blockquote class="lesson__aside">
 <p>Anthropic 更新具体模型版本很快，<code>/model</code> 里实际显示的版本以当前环境为准。记住“按能力和任务选择合适的模型”，比记住某个版本号更耐用。</p>
 </blockquote>
-<figure class="lesson__fig"><img src="/course/03-model-and-plan-mode-01-comparison-model-tiers.webp" alt="Fable、Opus、Sonnet、Haiku 四种模型按照能力、速度与任务复杂度进行分工" width="1200" height="675" loading="lazy" decoding="async"><figcaption>Fable、Opus、Sonnet、Haiku 四种模型按照能力、速度与任务复杂度进行分工</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/03-model-and-plan-mode-01-comparison-model-tiers.webp" alt="Fable、Opus、Sonnet、Haiku 四种模型按照能力、速度与任务复杂度进行分工" width="1200" height="675" loading="lazy" decoding="async"><figcaption>Fable、Opus、Sonnet、Haiku 四种模型按照能力、速度与任务复杂度进行分工</figcaption></figure>
 <h3 id="sec-991de9">四个容易忽略的细节</h3>
 <ol>
 <li><strong>中途切模型并不是免费的。</strong> 对话已经产生内容后再切模型，下一次回复需要重新读取整段历史，而且无法沿用原模型的提示缓存，所以会更慢、也更费 token。</li>
@@ -118,7 +118,7 @@
 4. 让 Sonnet 读取设计文档并实现</code></pre>
 <p><strong>优点：</strong> 设计文档是真实文件，可以跨会话复用、进入 Git，也可以作为明确上下文交给执行模型。</p>
 <p><strong>需要注意：</strong> 如果在允许写入的模式下让 Claude“只写文档”，这个限制主要依赖指令，工具层并不会阻止它顺手改实现代码。高风险改动可以先在 <code>/plan</code> 中只读地把方案讲清楚、审一遍，再退出计划模式把方案落成文档。</p>
-<figure class="lesson__fig"><img src="/course/03-model-and-plan-mode-02-flowchart-plan-execute-workflows.webp" alt="强模型规划、人工审阅、快模型执行的两种工作流：plan 模式与设计文档落盘" width="1200" height="675" loading="lazy" decoding="async"><figcaption>强模型规划、人工审阅、快模型执行的两种工作流：plan 模式与设计文档落盘</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/03-model-and-plan-mode-02-flowchart-plan-execute-workflows.webp" alt="强模型规划、人工审阅、快模型执行的两种工作流：plan 模式与设计文档落盘" width="1200" height="675" loading="lazy" decoding="async"><figcaption>强模型规划、人工审阅、快模型执行的两种工作流：plan 模式与设计文档落盘</figcaption></figure>
 <h3 id="sec-aa7095">为什么方式 B 常常更省</h3>
 <p>设计已经落成文件后，如果继续在同一段长对话里切模型，新的模型需要无缓存地重新读取前面整段规划历史。</p>
 <p>更干净的做法是：</p>

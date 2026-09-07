@@ -52,7 +52,7 @@
 <li><code>git diff HEAD</code>：查看已跟踪文件相对 <code>HEAD</code> 的全部改动。</li>
 </ul>
 <p>未跟踪文件不会出现在这些 diff 中，所以提交前不能省略 <code>git status</code>。</p>
-<figure class="lesson__fig"><img src="/course/10-diff-and-usage-01-comparison-git-check-v2.webp" alt="Claude Code 的逐回合 diff、Git 提交前检查和检查点恢复各有不同边界" width="1200" height="675" loading="lazy" decoding="async"><figcaption>Claude Code 的逐回合 diff、Git 提交前检查和检查点恢复各有不同边界</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/10-diff-and-usage-01-comparison-git-check-v2.webp" alt="Claude Code 的逐回合 diff、Git 提交前检查和检查点恢复各有不同边界" width="1200" height="675" loading="lazy" decoding="async"><figcaption>Claude Code 的逐回合 diff、Git 提交前检查和检查点恢复各有不同边界</figcaption></figure>
 <h3 id="sec-0121a3"><code>/rewind</code> 只能回到累积检查点</h3>
 <p>第 5 课已经详细讲过 <code>/rewind</code> 的恢复选项和安全边界。放在本课，只需要记住它与逐回合 diff 的一个关键区别：</p>
 <p><strong><code>/diff</code> 能单独查看某一轮，<code>/rewind</code> 却不能从历史中精准摘掉中间的一轮。</strong></p>
@@ -62,7 +62,7 @@
 <p>输入：</p>
 <pre class="lesson__code lesson__code--tight"><code>/usage</code></pre>
 <p>会打开用量仪表盘。最容易误读的地方，是把面板中的所有数字都理解成“这次对话用了多少”。实际上，它把三类尺度不同的数据放在了一起。</p>
-<figure class="lesson__fig"><img src="/course/10-diff-and-usage-02-framework-usage-dashboard.webp" alt="一个 /usage 面板包含当前会话、套餐限额和活动统计三类不同数据" width="1200" height="675" loading="lazy" decoding="async"><figcaption>一个 /usage 面板包含当前会话、套餐限额和活动统计三类不同数据</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/10-diff-and-usage-02-framework-usage-dashboard.webp" alt="一个 /usage 面板包含当前会话、套餐限额和活动统计三类不同数据" width="1200" height="675" loading="lazy" decoding="async"><figcaption>一个 /usage 面板包含当前会话、套餐限额和活动统计三类不同数据</figcaption></figure>
 <h3 id="sec-671818">1. <code>Session</code>：当前 Claude Code 会话的消耗</h3>
 <p>顶部的 <code>Session</code> 区域用于描述当前 CLI 会话，包括：</p>
 <ul>

@@ -10,7 +10,7 @@ MCP：增加连接，让 Claude 够到外部工具和数据</code></pre>
 <p>可以把它们记成一句话：</p>
 <p><strong>子代理管“谁来做”，MCP 管“能用什么做”。</strong></p>
 <p>两者还可以组合：让一个权限受限的子代理，只连接完成任务必需的 MCP server。</p>
-<figure class="lesson__fig"><img src="/course/07-agents-and-mcp-01-comparison-subagent-vs-mcp.webp" alt="一个管分工，一个管连接：子代理负责分工，MCP 负责连接外部工具和数据" width="1200" height="675" loading="lazy" decoding="async"><figcaption>一个管分工，一个管连接：子代理负责分工，MCP 负责连接外部工具和数据</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/07-agents-and-mcp-01-comparison-subagent-vs-mcp.webp" alt="一个管分工，一个管连接：子代理负责分工，MCP 负责连接外部工具和数据" width="1200" height="675" loading="lazy" decoding="async"><figcaption>一个管分工，一个管连接：子代理负责分工，MCP 负责连接外部工具和数据</figcaption></figure>
 <h2 id="sec-9ca8f6">一、先分清几种容易混淆的 agent</h2>
 <p>Claude Code 里的“agent”现在不只一种。如果不先分清，后面很容易把命令和能力混在一起。</p>
 <div class="lesson__table"><table><thead>
@@ -340,7 +340,7 @@ model: sonnet
 <p>如果希望 MCP server 只在这个子代理运行期间连接，需要在 <code>mcpServers</code> 中写入包含 <code>type</code>、<code>url</code> 或 <code>command</code> 等字段的完整 server 定义。这样的内联 server 会在子代理启动时连接、结束时断开，主会话不必拥有那组 MCP 工具。</p>
 <p>这正是最小权限原则：</p>
 <p><strong>只给完成这项任务所需的工具、数据和持续时间。</strong></p>
-<figure class="lesson__fig"><img src="/course/07-agents-and-mcp-02-flowchart-least-privilege.webp" alt="最小权限组合：从主会话到专用子代理、MCP server 和外部系统的三道边界" width="1200" height="675" loading="lazy" decoding="async"><figcaption>最小权限组合：从主会话到专用子代理、MCP server 和外部系统的三道边界</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/07-agents-and-mcp-02-flowchart-least-privilege.webp" alt="最小权限组合：从主会话到专用子代理、MCP server 和外部系统的三道边界" width="1200" height="675" loading="lazy" decoding="async"><figcaption>最小权限组合：从主会话到专用子代理、MCP server 和外部系统的三道边界</figcaption></figure>
 <h2 id="sec-5e009c">十一、几个容易踩的坑</h2>
 <h3 id="sec-334661">1. 把 <code>/agents</code> 当成当前版本的管理向导</h3>
 <p>2.1.198 以后，创建 agent 应让 Claude 写文件或手动编辑 <code>.claude/agents/</code>。</p>

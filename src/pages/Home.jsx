@@ -4,7 +4,7 @@ import Reveal from '../components/Reveal'
 import AppShots from '../components/AppShots'
 import { home } from '../data/home'
 import { littlesteps } from '../data/labs'
-import { courseMeta, publishedCount } from '../data/course'
+import { courses, totalLessons, totalPublished } from '../data/course'
 import { useLanguage } from '../i18n/LanguageContext'
 
 // Keep the character before Chinese closing punctuation in the same inline
@@ -588,9 +588,10 @@ export default function Home() {
             </div>
             <p className="home-writing">
               {content.closing.writing
-                .replace('{n}', publishedCount)
-                .replace('{total}', courseMeta.total)}{' '}
-              <Link className="link home-writing__cta" to="/claude-code">
+                .replace('{n}', totalPublished)
+                .replace('{total}', totalLessons)
+                .replace('{courses}', courses.length)}{' '}
+              <Link className="link home-writing__cta" to="/writing">
                 {content.closing.writingCta}
                 <span className="arrow" aria-hidden="true"> →</span>
               </Link>

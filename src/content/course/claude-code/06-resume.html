@@ -96,7 +96,7 @@
 </ul>
 <p>恢复时通常需要再次传入。标准的 <code>settings.json</code> 和 <code>settings.local.json</code> 会在重新启动时从磁盘读取。</p>
 <p>恢复会话不会恢复一份旧配置快照。通过 CLI 重新启动时，标准 settings 会从磁盘重新读取；特殊启动参数仍需重新传入。恢复后可以用 <code>/context</code> 和 <code>/memory</code> 检查实际加载状态。</p>
-<figure class="lesson__fig"><img src="/course/06-resume-01-comparison-resume-boundary.webp" alt="恢复的是会话，不是文件：会话记录会恢复，磁盘文件保持当前状态" width="1200" height="675" loading="lazy" decoding="async"><figcaption>恢复的是会话，不是文件：会话记录会恢复，磁盘文件保持当前状态</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/06-resume-01-comparison-resume-boundary.webp" alt="恢复的是会话，不是文件：会话记录会恢复，磁盘文件保持当前状态" width="1200" height="675" loading="lazy" decoding="async"><figcaption>恢复的是会话，不是文件：会话记录会恢复，磁盘文件保持当前状态</figcaption></figure>
 <h2 id="sec-07a1f1">三、五个常用入口怎么选</h2>
 <div class="lesson__table"><table><thead>
 <tr>
@@ -225,7 +225,7 @@ claude --continue → 从 shell 继续当前目录最近一次会话</code></pre
 当前仓库的所有 worktree
       ↓ Ctrl+A
 本机所有项目</code></pre>
-<figure class="lesson__fig"><img src="/course/06-resume-02-flowchart-session-scope.webp" alt="会话选择器的作用域：从当前 worktree 扩展到仓库全部 worktree，再扩展到本机所有项目" width="1200" height="675" loading="lazy" decoding="async"><figcaption>会话选择器的作用域：从当前 worktree 扩展到仓库全部 worktree，再扩展到本机所有项目</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/06-resume-02-flowchart-session-scope.webp" alt="会话选择器的作用域：从当前 worktree 扩展到仓库全部 worktree，再扩展到本机所有项目" width="1200" height="675" loading="lazy" decoding="async"><figcaption>会话选择器的作用域：从当前 worktree 扩展到仓库全部 worktree，再扩展到本机所有项目</figcaption></figure>
 <h3 id="sec-6baa23">为什么 worktree 里的会话看不见</h3>
 <p>同一个仓库的不同 worktree，是不同的绝对路径：</p>
 <pre class="lesson__code"><code>~/project          → main 分支会话

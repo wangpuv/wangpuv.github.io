@@ -1,25 +1,26 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { courseMeta, lessons } from '../data/course'
+import { courseUi } from '../data/course'
 import { profile } from '../data/profile'
 import { useLanguage } from '../i18n/LanguageContext'
 import LessonToc from '../components/LessonToc'
 import NotFound from './NotFound'
 
-// Article bodies are generated into src/content/course/ by `npm run course`.
-// Loading them lazily keeps every long-form lesson out of the main bundle;
-// only the one being read is fetched.
-const bodies = import.meta.glob('../content/course/*.html', {
+// Article bodies are generated into src/content/course/<course>/ by
+// `npm run course`. Loading them lazily keeps every long-form lesson out of
+// the main bundle; only the one being read is fetched.
+const bodies = import.meta.glob('../content/course/*/*.html', {
   query: '?raw',
   import: 'default',
 })
 
 const pad = (n) => String(n).padStart(2, '0')
 
-export default function Lesson() {
+export default function Lesson({ course }) {
   const { slug } = useParams()
   const { lang, setLang } = useLanguage()
-  const t = courseMeta[lang]
+  const t = courseUi[lang]
+  const { lessons } = course
 
   const index = lessons.findIndex((lesson) => lesson.slug === slug)
   const lesson = index === -1 ? null : lessons[index]
@@ -32,17 +33,17 @@ export default function Lesson() {
     if (!lesson) return undefined
     let cancelled = false
     setHtml('')
-    bodies[`../content/course/${lesson.slug}.html`]().then((body) => {
+    bodies[`../content/course/${course.slug}/${lesson.slug}.html`]().then((body) => {
       if (!cancelled) setHtml(body)
     })
     return () => { cancelled = true }
-  }, [lesson])
+  }, [course.slug, lesson])
 
   // Owned here rather than in App: see the note on the title effect there.
   useEffect(() => {
     if (!lesson) return
-    document.title = `${lesson[lang].topic} — ${t.title} · ${profile[lang].name}`
-  }, [lesson, lang, t.title])
+    document.title = `${lesson[lang].topic} — ${course[lang].title} · ${profile[lang].name}`
+  }, [lesson, lang, course])
 
   if (!lesson) return <NotFound />
 
@@ -50,13 +51,27 @@ export default function Lesson() {
   const isPreface = lesson.number === 0
 
   return (
-    <article className="section page-top lesson">
+    <article
+      className="section page-top lesson"
+      style={{
+        '--course-ink': `var(--${course.ink})`,
+        '--course-ink-text': `var(--${course.ink}-ink)`,
+      }}
+    >
       <div className="wrap">
         <header className="lesson__head">
-          <p className="eyebrow">
-            {isPreface
-              ? c.topic
-              : lang === 'zh' ? `第 ${lesson.number} 课` : `Lesson ${pad(lesson.number)}`}
+          {/* Which serial this lesson belongs to matters more now that there
+              are two; the eyebrow names it and links back to its contents. */}
+          <p className="lesson__crumb">
+            <Link className="lesson__crumb-link" to={`/${course.slug}`}>
+              {course[lang].title}
+            </Link>
+            <span className="lesson__crumb-sep meta" aria-hidden="true">/</span>
+            <span className="meta">
+              {isPreface
+                ? c.topic
+                : lang === 'zh' ? `第 ${lesson.number} 课` : `Lesson ${pad(lesson.number)}`}
+            </span>
           </p>
           <h1 className="display lesson__title">{isPreface ? c.kicker : c.topic}</h1>
           {!isPreface && <p className="lesson__kicker display">{c.kicker}</p>}
@@ -93,13 +108,13 @@ export default function Lesson() {
 
         <nav className="lesson__pager" aria-label={t.onThisPage}>
           {prev ? (
-            <Link className="lesson__pager-link lesson__pager-link--prev" to={`/claude-code/${prev.slug}`}>
+            <Link className="lesson__pager-link lesson__pager-link--prev" to={`/${course.slug}/${prev.slug}`}>
               <span className="meta">← {t.prev}</span>
               <span className="display">{prev[lang].topic}</span>
             </Link>
           ) : <span />}
           {next ? (
-            <Link className="lesson__pager-link lesson__pager-link--next" to={`/claude-code/${next.slug}`}>
+            <Link className="lesson__pager-link lesson__pager-link--next" to={`/${course.slug}/${next.slug}`}>
               <span className="meta">{t.next} →</span>
               <span className="display">{next[lang].topic}</span>
             </Link>
@@ -118,10 +133,10 @@ export default function Lesson() {
         </aside>
 
         <div className="lesson__foot">
-          <Link className="link lesson__back" to="/claude-code">
+          <Link className="link lesson__back" to={`/${course.slug}`}>
             {t.backToContents} <span className="arrow" aria-hidden="true">→</span>
           </Link>
-          <p className="meta">{t.follow}</p>
+          <p className="meta">{course[lang].follow}</p>
         </div>
       </div>
     </article>

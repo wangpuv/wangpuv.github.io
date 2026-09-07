@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router'
-import { courseMeta, lessons, publishedCount, stages, upcomingLessons, appendix } from '../data/course'
+import { channel, courses, courseUi } from '../data/course'
 import { useLanguage } from '../i18n/LanguageContext'
 import { profile } from '../data/profile'
 import Reveal from '../components/Reveal'
@@ -8,10 +8,10 @@ import Reveal from '../components/Reveal'
 const pad = (n) => String(n).padStart(2, '0')
 
 /** Row for a lesson that exists: a link into the article. */
-function LessonRow({ lesson, lang, t }) {
+function LessonRow({ course, lesson, lang, t }) {
   const c = lesson[lang]
   return (
-    <Link className="lesson-row" to={`/claude-code/${lesson.slug}`}>
+    <Link className="lesson-row" to={`/${course.slug}/${lesson.slug}`}>
       <span className="lesson-row__num display">{pad(lesson.number)}</span>
       <span className="lesson-row__main">
         <span className="lesson-row__topic display">{c.topic}</span>
@@ -42,28 +42,49 @@ function PlannedRow({ item, lang, t }) {
   )
 }
 
-export default function Course() {
+export default function Course({ course }) {
   const { lang } = useLanguage()
-  const t = courseMeta[lang]
+  const t = courseUi[lang]
+  const c = course[lang]
+  const { lessons, publishedCount, total } = course
 
   // Owned here rather than in App: see the note on the title effect there.
   useEffect(() => {
-    document.title = `${t.title} — ${profile[lang].name}`
-  }, [lang, t.title])
+    document.title = `${c.title} — ${profile[lang].name}`
+  }, [lang, c.title])
 
-  const opener = lessons.find((lesson) => lesson.number === 0)
   const inStage = (stage) =>
     lessons.filter((l) => l.number >= stage.from && l.number <= stage.to)
   const plannedInStage = (stage) =>
-    upcomingLessons.filter((l) => l.number >= stage.from && l.number <= stage.to)
+    course.upcoming.filter((l) => l.number >= stage.from && l.number <= stage.to)
+
+  // A serial whose 发刊词 is out but whose numbered run has not started
+  // would lead this band with a large 0, which reads as "nothing here".
+  // Set the length of the series instead and let the label say where it is.
+  const started = publishedCount > 0
+  const opener = lessons.find((lesson) => lesson.number === 0)
+
+  const other = courses.find((item) => item.slug !== course.slug)
+  const lastStage = course.stages[course.stages.length - 1]
 
   return (
-    <section className="section page-top course">
+    <section
+      className="section page-top course"
+      style={{
+        '--course-ink': `var(--${course.ink})`,
+        '--course-ink-text': `var(--${course.ink}-ink)`,
+      }}
+    >
       <div className="wrap">
         <Reveal className="page-head course__head">
-          <p className="eyebrow">{t.eyebrow}</p>
-          <h1 className="display page-title">{t.title}</h1>
-          <p className="lead">{t.lead}</p>
+          {/* The spread is the parent now, so the eyebrow slot carries the
+              way back to it rather than repeating the section name. */}
+          <Link className="course__up eyebrow" to="/writing">
+            <span aria-hidden="true">←</span> {t.allCourses}
+          </Link>
+          <h1 className="display page-title">{c.title}</h1>
+          <p className="course__tagline display">{c.tagline}</p>
+          <p className="lead">{c.lead}</p>
           <p className="course__byline">
             <span className="course__byline-mark" aria-hidden="true">{profile.initials}</span>
             {t.masthead.replace('{name}', profile[lang].name)}
@@ -74,15 +95,20 @@ export default function Course() {
             serial with a known length, and the ticks say so at a glance. */}
         <Reveal className="course__status">
           <p className="course__tally">
-            <span className="course__tally-num display">{publishedCount}</span>
-            <span className="meta">{t.tally.replace('{total}', courseMeta.total)}</span>
+            <span className="course__tally-num display">{started ? publishedCount : total}</span>
+            <span className="meta">
+              {started ? t.tally.replace('{total}', total) : t.startedTally}
+            </span>
           </p>
           <p
             className="course__gauge"
             role="img"
-            aria-label={`${publishedCount} / ${courseMeta.total}`}
+            aria-label={`${publishedCount} / ${total}`}
           >
-            {Array.from({ length: courseMeta.total }, (_, i) => (
+            {/* The 发刊词 sits outside the numbered run but is published all
+                the same; a half-strength tick in front says so. */}
+            {opener && <span className="course__tick course__tick--opener" aria-hidden="true" />}
+            {Array.from({ length: total }, (_, i) => (
               <span
                 key={i}
                 className={`course__tick${i < publishedCount ? ' is-done' : ''}`}
@@ -90,17 +116,17 @@ export default function Course() {
               />
             ))}
           </p>
-          <p className="meta course__cadence">{t.cadenceLabel}</p>
+          <p className="meta course__cadence">{c.cadence}</p>
         </Reveal>
 
         <div className="course__contents">
           {opener && (
             <Reveal className="course__group course__group--opener">
-              <LessonRow lesson={opener} lang={lang} t={t} />
+              <LessonRow course={course} lesson={opener} lang={lang} t={t} />
             </Reveal>
           )}
 
-          {stages.map((stage, i) => {
+          {course.stages.map((stage, i) => {
             const s = stage[lang]
             const rows = inStage(stage)
             const planned = plannedInStage(stage)
@@ -116,13 +142,13 @@ export default function Course() {
                 </div>
                 <div className="course__rows">
                   {rows.map((lesson) => (
-                    <LessonRow key={lesson.slug} lesson={lesson} lang={lang} t={t} />
+                    <LessonRow key={lesson.slug} course={course} lesson={lesson} lang={lang} t={t} />
                   ))}
                   {planned.map((item) => (
                     <PlannedRow key={item.number} item={item} lang={lang} t={t} />
                   ))}
-                  {stage.key === 'automation' && (
-                    <PlannedRow item={appendix} lang={lang} t={t} />
+                  {course.appendix && stage.key === lastStage.key && (
+                    <PlannedRow item={course.appendix} lang={lang} t={t} />
                   )}
                 </div>
               </Reveal>
@@ -130,23 +156,53 @@ export default function Course() {
           })}
         </div>
 
-        <Reveal className="course__colophon">
+        {/* Only the course that actually runs on the WeChat account carries
+            the QR. The other one states where it is published instead, under
+            the colophon copy, so the column does not sit there empty. */}
+        <Reveal className={`course__colophon${course.wechat ? '' : ' course__colophon--solo'}`}>
           <div className="course__why">
             <p className="meta course__why-label">{t.whyLabel}</p>
-            <p>{t.why}</p>
+            <p>{c.why}</p>
+            {!course.wechat && <p className="meta course__venue">{c.follow}</p>}
           </div>
-          <div className="course__channel">
-            <img
-              className="course__qr"
-              src={courseMeta.channel.qr}
-              alt={courseMeta.qrAlt[lang]}
-              width="240"
-              height="240"
-              loading="lazy"
-            />
-            <p className="meta">{t.follow}</p>
-          </div>
+          {course.wechat && (
+            <div className="course__channel">
+              <img
+                className="course__qr"
+                src={channel.qr}
+                alt={channel.alt[lang]}
+                width="240"
+                height="240"
+                loading="lazy"
+              />
+              <p className="meta">{c.follow}</p>
+            </div>
+          )}
         </Reveal>
+
+        {/* The two serials are one publication; a reader who finished this
+            contents page should not have to go back up to find the other. */}
+        {other && (
+          <Reveal>
+            <Link
+              className="course__sibling"
+              to={`/${other.slug}`}
+              style={{
+                '--course-ink': `var(--${other.ink})`,
+                '--course-ink-text': `var(--${other.ink}-ink)`,
+              }}
+            >
+              <span className="course__sibling-label meta">{t.otherCourseLabel}</span>
+              <span className="course__sibling-main">
+                <span className="course__sibling-title display">{other[lang].title}</span>
+                <span className="course__sibling-note muted">
+                  {other[lang].tagline} · {other.total} {t.lessonsLabel}
+                </span>
+              </span>
+              <span className="arrow" aria-hidden="true">→</span>
+            </Link>
+          </Reveal>
+        )}
       </div>
     </section>
   )

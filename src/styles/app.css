@@ -1960,18 +1960,268 @@
 }
 
 /* ============================================================
-   Course — Claude Code 中文教程
-   A serial set in the site's paper stock: a printed contents page
-   and numbered lesson plates. Hairlines do all the dividing; the
-   only filled shapes are the progress ticks and the accent rail.
+   Writing — the spread above the serials
+   A publisher's list rather than a set of cards: each serial is a
+   full-width band divided by hairlines, inked in its own accent, with
+   the size of the series set large and a run of ticks carrying the
+   progress. The only filled shapes are the ticks and the accent rail.
+   ============================================================ */
+
+.writing .page-head { max-width: min(100%, 58rem); margin-bottom: var(--space-l); }
+.writing .page-title { max-width: 24ch; font-size: var(--step-4); }
+.writing .page-head .lead { max-width: 50rem; }
+:lang(zh) .writing .page-title { max-width: 16ch; }
+
+.writing__tally {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: var(--space-m) 0;
+  border-top: 1px solid var(--line);
+  margin-bottom: 0;
+}
+.writing .writing__tally-num {
+  font-size: var(--step-3);
+  color: var(--accent-ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* ---------------- One serial ---------------- */
+.serial {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) 17rem;
+  gap: var(--space-l);
+  align-items: start;
+  padding: var(--space-l) 0;
+  border-top: 1px solid var(--line);
+  position: relative;
+  transition: padding-left var(--dur-med) var(--ease-out);
+}
+/* The same accent rail the lesson and project rows use, at serial scale,
+   so a course reads as one more row in this site's vocabulary. */
+.serial::before {
+  content: '';
+  position: absolute;
+  left: -1.25rem; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--serial-ink);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+.serial__index {
+  font-size: var(--step-3);
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: color var(--dur-fast);
+}
+
+.serial__main { min-width: 0; }
+.serial__title {
+  display: block;
+  font-size: var(--step-3);
+  transition: color var(--dur-fast);
+}
+/* The subtitle carries the serial's colour: with two courses on one page,
+   colour is what tells them apart before any of the words are read. */
+.serial .serial__tagline {
+  display: block;
+  margin-top: 0.55rem;
+  font-size: var(--step-1);
+  color: var(--serial-ink-text);
+}
+.serial__lead {
+  display: block;
+  margin-top: var(--space-s);
+  max-width: 54ch;
+  font-size: var(--step--1);
+  line-height: 1.75;
+  color: var(--ink-soft);
+}
+
+/* The arc of the series as a spine of stage ranges. It is the one place the
+   two serials differ structurally — three stages against four — so it is
+   worth showing rather than summarising. */
+.serial__stages {
+  display: grid;
+  margin-top: var(--space-m);
+  max-width: 46ch;
+  border-top: 1px solid var(--line-soft);
+}
+.serial__stage {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: var(--space-s);
+  align-items: baseline;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.serial__stage-range {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+.serial__stage-title {
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ---------------- Serial status ---------------- */
+.serial__aside {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: 0.7rem;
+}
+/* The figure worth setting large is the size of the series, not the count
+   published: a serial that has just opened with its 发刊词 would otherwise
+   lead with a zero, which reads as "nothing here yet". */
+.serial__count { display: flex; align-items: baseline; gap: 0.45rem; }
+.serial .serial__count-num {
+  font-size: var(--step-4);
+  line-height: 1;
+  color: var(--serial-ink-text);
+  font-variant-numeric: tabular-nums;
+}
+.serial__gauge {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.3rem;
+  height: 1.4rem;
+}
+.serial__tick {
+  display: block;
+  width: 2px;
+  height: 0.7rem;
+  background: var(--line);
+  transition: background var(--dur-med) var(--ease-out), height var(--dur-med) var(--ease-out);
+}
+.serial__tick.is-done { height: 1.4rem; background: var(--serial-ink); }
+/* The 发刊词 sits outside the numbered run but is published all the same; a
+   half-strength tick in front of the run says the serial has opened. */
+.serial__tick--opener {
+  height: 1.4rem;
+  background: var(--serial-ink);
+  opacity: 0.42;
+  margin-right: 0.3rem;
+}
+.serial__status,
+.serial__cadence { line-height: 1.55; }
+
+.serial__latest {
+  display: grid;
+  gap: 0.3rem;
+  width: 100%;
+  margin-top: 0.2rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+}
+.serial .serial__latest-label {
+  color: var(--serial-ink-text);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+.serial__latest-topic { font-size: var(--step-0); line-height: 1.35; }
+
+.serial .serial__cta {
+  margin-top: 0.3rem;
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--serial-ink-text);
+}
+.serial__cta .arrow {
+  display: inline-block;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .serial:hover { padding-left: 1.25rem; }
+  .serial:hover::before { transform: scaleY(1); }
+  .serial:hover .serial__index,
+  .serial:hover .serial__title { color: var(--serial-ink-text); }
+  .serial:hover .serial__cta .arrow { transform: translateX(4px); }
+}
+.serial:focus-visible { outline-offset: -2px; }
+
+/* Closing rule under the last serial, so the run reads as a finished list. */
+.writing__serials { border-bottom: 1px solid var(--line); }
+
+.writing__channel {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  margin-top: var(--space-xl);
+}
+.writing__qr {
+  width: 8.5rem; height: 8.5rem;
+  border-radius: var(--radius);
+  outline: 1px solid oklch(0% 0 0 / 0.1);
+  outline-offset: -1px;
+}
+[data-theme='dark'] .writing__qr { outline-color: oklch(100% 0 0 / 0.12); }
+.writing__channel .meta { max-width: 32ch; text-align: center; line-height: 1.6; }
+
+/* The status column drops under the copy before the copy gets cramped; the
+   gauge and the stage spine both need their width to stay readable. */
+@media (max-width: 1000px) {
+  .serial {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: var(--space-m);
+  }
+  .serial__aside {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    padding-top: var(--space-xs);
+  }
+}
+@media (max-width: 620px) {
+  .serial { grid-template-columns: minmax(0, 1fr); gap: var(--space-s); }
+  .serial__index { font-size: var(--step-1); }
+  .serial__aside { grid-column: 1; grid-row: auto; }
+  .serial__stage { grid-template-columns: 3.5rem minmax(0, 1fr); gap: 0.75rem; }
+  .serial__count-num { font-size: var(--step-3); }
+}
+
+/* ============================================================
+   Course — one serial's contents page and its lessons
+   Set in the site's paper stock: a printed contents page and numbered
+   lesson plates. Hairlines do all the dividing; the only filled shapes
+   are the progress ticks and the accent rail. Which accent is up to the
+   course — `--course-ink` is set per serial on the page root, so the
+   whole section re-inks itself without a second copy of these rules.
    ============================================================ */
 
 /* ---------------- Contents page ---------------- */
 /* The base .page-head caps at 24ch, which sets this four-word English title
    as five lines and strands "in" on its own. The masthead needs the width. */
+/* Every eyebrow inside a contents page takes that serial's ink, so the
+   stage labels and the way back match the ticks and the hover rail. */
+.course .eyebrow { color: var(--course-ink-text, var(--accent-ink)); }
+
+/* The spread is the parent now; the eyebrow slot carries the way back to
+   it rather than repeating the section name. */
+.course__up {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  transition: gap var(--dur-med) var(--ease-out);
+}
+@media (hover: hover) {
+  .course__up:hover { gap: 0.8rem; }
+}
+
 .course .page-head { max-width: min(100%, 58rem); margin-bottom: var(--space-l); }
 .course .page-title { max-width: 20ch; font-size: var(--step-4); }
-.course .page-head .lead { max-width: 50rem; }
+.course .course__tagline {
+  margin-top: var(--space-xs);
+  font-size: var(--step-2);
+  color: var(--course-ink-text, var(--accent-ink));
+}
+.course .page-head .lead { max-width: 50rem; margin-top: var(--space-m); }
 :lang(zh) .course .page-title { max-width: 16ch; }
 
 /* Status band: how far along the serial is, stated the way a
@@ -1992,9 +2242,9 @@
   gap: 0.6rem;
   white-space: nowrap;
 }
-.course__tally-num {
+.course .course__tally-num {
   font-size: var(--step-3);
-  color: var(--accent-ink);
+  color: var(--course-ink-text, var(--accent-ink));
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -2014,7 +2264,13 @@
   background: var(--line);
   transition: background var(--dur-med) var(--ease-out), height var(--dur-med) var(--ease-out);
 }
-.course__tick.is-done { height: 1.4rem; background: var(--accent); }
+.course__tick.is-done { height: 1.4rem; background: var(--course-ink, var(--accent)); }
+.course__tick--opener {
+  height: 1.4rem;
+  background: var(--course-ink, var(--accent));
+  opacity: 0.42;
+  margin-right: 0.34rem;
+}
 .course__cadence { white-space: nowrap; }
 
 /* Stage headers. The range sits right, set as a caption, so the eye
@@ -2069,7 +2325,7 @@
   position: absolute;
   left: -1.25rem; top: 0; bottom: 0;
   width: 3px;
-  background: var(--accent);
+  background: var(--course-ink, var(--accent));
   transform: scaleY(0);
   transform-origin: top;
   transition: transform var(--dur-med) var(--ease-out);
@@ -2106,7 +2362,7 @@
   a.lesson-row:hover { padding-left: 1.25rem; }
   a.lesson-row:hover::before { transform: scaleY(1); }
   a.lesson-row:hover .lesson-row__topic,
-  a.lesson-row:hover .lesson-row__num { color: var(--accent-ink); }
+  a.lesson-row:hover .lesson-row__num { color: var(--course-ink-text, var(--accent-ink)); }
 }
 a.lesson-row:focus-visible { outline-offset: -2px; }
 
@@ -2132,10 +2388,13 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   padding-top: var(--space-l);
   border-top: 1px solid var(--line);
 }
+/* No QR to sit beside, so the copy takes the full measure. */
+.course__colophon--solo { grid-template-columns: minmax(0, 1fr); }
 .course__why { max-width: var(--measure); }
+.course__venue { margin-top: var(--space-m); }
 /* Scoped past `.course__why p`, which would otherwise win on specificity
    and repaint the label as body copy. */
-.course__why .course__why-label { margin-bottom: 0.6rem; color: var(--accent-ink); }
+.course__why .course__why-label { margin-bottom: 0.6rem; color: var(--course-ink-text, var(--accent-ink)); }
 .course__why p { line-height: 1.8; color: var(--ink-soft); }
 .course__channel { display: grid; gap: 0.75rem; justify-items: center; width: 11rem; }
 .course__qr {
@@ -2147,6 +2406,68 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
 [data-theme='dark'] .course__qr { outline-color: oklch(100% 0 0 / 0.12); }
 .course__channel .meta { text-align: center; line-height: 1.6; }
 
+/* ---------------- The other serial ---------------- */
+/* The two courses are one publication. A reader who has just read a
+   contents page to the end should not have to go back up a level to
+   discover the other one, so it closes the page in its own ink. */
+.course__sibling {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-m);
+  margin-top: var(--space-xl);
+  padding: var(--space-m) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  transition: padding-left var(--dur-med) var(--ease-out);
+}
+.course__sibling::before {
+  content: '';
+  position: absolute;
+  left: -1.25rem; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--course-ink);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+.course__sibling .course__sibling-label {
+  grid-column: 1;
+  color: var(--course-ink-text);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+.course__sibling-main { grid-column: 1; min-width: 0; }
+.course__sibling .course__sibling-title {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: var(--step-2);
+  transition: color var(--dur-fast);
+}
+.course__sibling-note {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: var(--step--1);
+  line-height: 1.6;
+}
+.course__sibling .arrow {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: inline-block;
+  color: var(--course-ink-text);
+  font-size: var(--step-1);
+  transition: transform var(--dur-med) var(--ease-out);
+}
+@media (hover: hover) {
+  .course__sibling:hover { padding-left: 1.25rem; }
+  .course__sibling:hover::before { transform: scaleY(1); }
+  .course__sibling:hover .course__sibling-title { color: var(--course-ink-text); }
+  .course__sibling:hover .arrow { transform: translateX(4px); }
+}
+.course__sibling:focus-visible { outline-offset: -2px; }
+
 /* ---------------- Lesson page ---------------- */
 .lesson__head {
   max-width: 46rem;
@@ -2154,6 +2475,30 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   margin-bottom: var(--space-xl);
   border-bottom: 1px solid var(--line);
 }
+/* Which serial an article belongs to matters now that there are two, so
+   the eyebrow slot names it and links back to its contents. */
+.lesson__crumb {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+/* Not `.eyebrow`: its uppercase transform would set a serial called
+   "…构建 Agent" as "…构建 AGENT", and 0.14em tracking is too loose for a
+   title this long. Same weight and size, without either. */
+.lesson__crumb .lesson__crumb-link {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--course-ink-text, var(--accent-ink));
+  transition: opacity var(--dur-fast);
+}
+@media (hover: hover) {
+  .lesson__crumb-link:hover { opacity: 0.68; }
+}
+.lesson__crumb .lesson__crumb-sep { color: var(--line); }
+
 .lesson__title { font-size: var(--step-4); margin-top: var(--space-xs); }
 .lesson__kicker {
   font-size: var(--step-2);
@@ -2244,7 +2589,7 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
 }
 .lesson__body > h2 + *, .lesson__body > h3 + * { margin-top: var(--space-s); }
 .lesson__body strong { color: var(--ink); font-weight: 600; }
-.lesson__body a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 0.2em; }
+.lesson__body a { color: var(--course-ink-text, var(--accent-ink)); text-decoration: underline; text-underline-offset: 0.2em; }
 .lesson__body hr {
   max-width: none;
   height: 1px;
@@ -2264,7 +2609,7 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   position: absolute;
   left: 0; top: 0.82em;
   width: 0.55rem; height: 2px;
-  background: var(--accent);
+  background: var(--course-ink, var(--accent));
 }
 .lesson__body ol { counter-reset: step; }
 .lesson__body ol > li::before {
@@ -2427,7 +2772,7 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   position: absolute;
   left: 0; top: 0.55em; bottom: 0.55em;
   width: 1px;
-  background: var(--accent);
+  background: var(--course-ink, var(--accent));
 }
 .lesson__aside > * + * { margin-top: 0.7rem; }
 
@@ -2456,7 +2801,7 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   position: absolute;
   left: -1px; top: 0.35rem; bottom: 0.35rem;
   width: 2px;
-  background: var(--accent);
+  background: var(--course-ink, var(--accent));
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--dur-med) var(--ease-out);
@@ -2464,7 +2809,7 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
 .lesson-toc__item.is-active::before { transform: scaleX(1); }
 .lesson-toc__item.is-active a { color: var(--ink); }
 @media (hover: hover) {
-  .lesson-toc__item a:hover { color: var(--accent-ink); }
+  .lesson-toc__item a:hover { color: var(--course-ink-text, var(--accent-ink)); }
 }
 
 /* ---------------- Pager & foot ---------------- */
@@ -2483,7 +2828,7 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
 }
 .lesson__pager-link--next { text-align: right; }
 @media (hover: hover) {
-  .lesson__pager-link:hover .display { color: var(--accent-ink); }
+  .lesson__pager-link:hover .display { color: var(--course-ink-text, var(--accent-ink)); }
 }
 .lesson__foot {
   display: flex;
@@ -2560,7 +2905,8 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
    legible as *authored*: a byline on every lesson, and a block at the end
    putting whoever just finished one click from the rest of the work. */
 
-.course__byline {
+.course__byline,
+.writing__byline {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -2570,6 +2916,7 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   letter-spacing: 0.01em;
 }
 .course__byline-mark,
+.writing__byline-mark,
 .lesson__author-mark {
   display: grid;
   place-items: center;
@@ -2581,7 +2928,8 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   border-radius: var(--radius);
   letter-spacing: 0.02em;
 }
-.course__byline-mark { width: 1.6rem; height: 1.6rem; font-size: 0.68rem; }
+.course__byline-mark,
+.writing__byline-mark { width: 1.6rem; height: 1.6rem; font-size: 0.68rem; }
 
 /* The writer's name leads the meta line; the dot separators follow it. */
 .lesson__byline { color: var(--ink-soft); }

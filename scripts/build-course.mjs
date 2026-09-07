@@ -1,13 +1,13 @@
 // ───────────────────────────────────────────────────────────
-// Course build step — turns the Obsidian source of the Claude Code
-// tutorial into site content. Run it after publishing a new lesson:
+// Course build step — turns the Obsidian sources of the serialised
+// tutorials into site content. Run it after publishing a lesson:
 //
 //   npm run course
 //
-// Reads   : $COURSE_SRC (default: the Obsidian 公众号版 folder)
-// Writes  : src/content/course/<slug>.html   article markup
-//           src/data/course.generated.js     lesson metadata + TOC
-//           public/course/*.webp             figures, PNG → WebP
+// Reads   : one Obsidian folder per course (see COURSES below)
+// Writes  : src/content/course/<course>/<slug>.html   article markup
+//           src/data/course.generated.js              metadata + TOC
+//           public/course/<course>/*.webp             figures, PNG → WebP
 //
 // Nothing here runs in the browser: markdown-it and sharp are
 // devDependencies, and the site only ever imports the output.
@@ -25,11 +25,30 @@ import MarkdownIt from 'markdown-it'
 import sharp from 'sharp'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+const VAULT = join(process.env.HOME, 'Documents/Obsidian/will-falcon-doc')
 
-const SRC = process.env.COURSE_SRC || join(
-  process.env.HOME,
-  'Documents/Obsidian/will-falcon-doc/Learn Claude Code/发布预览/公众号版',
-)
+// One entry per serialised course. `slug` is the URL segment and the
+// output folder; it must match the slug in src/data/courses/<slug>.js.
+//
+// `include` limits the build to specific source stems. The LLM course
+// keeps unfinished lessons in the same folder as the published ones, so
+// without it a half-written 第 8 课 would appear on the site with 3–7
+// still missing. Omit it to publish every .md in the folder.
+const COURSES = [
+  {
+    slug: 'claude-code',
+    src: process.env.COURSE_SRC
+      || join(VAULT, 'Learn Claude Code/发布预览/公众号版'),
+    preface: { topic: '发刊词', kicker: '17 课，从能用到自动化' },
+  },
+  {
+    slug: 'llm-engineer',
+    src: process.env.LLM_COURSE_SRC
+      || join(VAULT, 'Learn LLM Engineer/发布预览/公众号版'),
+    preface: { topic: '发刊词', kicker: '22 课，从调用模型到构建 Agent' },
+    include: ['00-发刊词'],
+  },
+]
 
 const OUT_HTML = join(ROOT, 'src/content/course')
 const OUT_IMG = join(ROOT, 'public/course')
@@ -151,47 +170,59 @@ function cleanBody(body) {
 // Lesson 0 is the 发刊词; its filename is Chinese, so it gets an explicit slug.
 const slugFor = (stem) => (stem.startsWith('00-') ? '00-preface' : stem)
 
-// Source titles read "第 N 课：<主题> —— <副题>". The contents page sets the
-// subject large and the subtitle small, so split them once here rather than
-// re-parsing the same string in three components.
-function splitTitle(title, number) {
-  if (number === 0) return { topic: '发刊词', kicker: '17 课，从能用到自动化' }
+// Source titles read "第 N 课：<主题> —— <副题>" in the Claude Code course and
+// "第 N 课：<问题>" in the LLM one. The contents page sets the subject large and
+// the subtitle small, so split them once here rather than re-parsing the same
+// string in three components.
+function splitTitle(title, number, course) {
+  if (number === 0) return { ...course.preface }
   const parts = title.match(/^第\s*\d+\s*课[：:]\s*(.+?)\s*——\s*(.+)$/)
-  return parts ? { topic: parts[1], kicker: parts[2] } : { topic: title, kicker: '' }
+  if (parts) return { topic: parts[1], kicker: parts[2] }
+  // No subtitle: strip the lesson number, which the row already prints.
+  const bare = title.match(/^第\s*\d+\s*课[：:]\s*(.+)$/)
+  return { topic: bare ? bare[1] : title, kicker: '' }
 }
 
 // ── figures ────────────────────────────────────────────────
 
-async function convertFigure(srcPath, outName) {
-  const outPath = join(OUT_IMG, `${outName}.webp`)
+async function convertFigure(srcPath, outDir, outName) {
+  const outPath = join(outDir, `${outName}.webp`)
   const image = sharp(srcPath)
   const { width, height } = await image.metadata()
   await image.webp({ quality: 80, effort: 6 }).toFile(outPath)
-  return { url: `/course/${outName}.webp`, width, height }
+  return { path: outPath, width, height }
 }
 
-// ── main ───────────────────────────────────────────────────
+// ── per-course build ───────────────────────────────────────
 
-async function main() {
-  await rm(OUT_HTML, { recursive: true, force: true })
-  await rm(OUT_IMG, { recursive: true, force: true })
-  await mkdir(OUT_HTML, { recursive: true })
-  await mkdir(OUT_IMG, { recursive: true })
+async function buildCourse(course) {
+  const htmlDir = join(OUT_HTML, course.slug)
+  const imgDir = join(OUT_IMG, course.slug)
+  await mkdir(htmlDir, { recursive: true })
+  await mkdir(imgDir, { recursive: true })
 
-  const files = (await readdir(SRC))
+  const files = (await readdir(course.src))
     .filter((f) => f.endsWith('.md'))
+    .filter((f) => !course.include || course.include.includes(f.replace(/\.md$/, '')))
     .sort()
+
+  if (course.include) {
+    const missing = course.include.filter((stem) => !files.includes(`${stem}.md`))
+    if (missing.length) throw new Error(`${course.slug}: no source for ${missing.join(', ')}`)
+  }
 
   const lessons = []
   let bytesIn = 0
   let bytesOut = 0
+
+  console.log(`\n${course.slug}  ←  ${course.src.replace(process.env.HOME, '~')}`)
 
   for (const file of files) {
     const stem = file.replace(/\.md$/, '')
     const number = Number(stem.slice(0, 2))
     const slug = slugFor(stem)
 
-    const raw = await readFile(join(SRC, file), 'utf8')
+    const raw = await readFile(join(course.src, file), 'utf8')
     const { data, body: rawBody } = parseFrontmatter(raw)
     const body = cleanBody(rawBody)
 
@@ -201,12 +232,12 @@ async function main() {
     figures = new Map()
     for (const [, ref] of body.matchAll(/!\[[^\]]*\]\(([^)]+)\)/g)) {
       if (figures.has(ref)) continue
-      const srcPath = join(SRC, ref)
+      const srcPath = join(course.src, ref)
       const name = `${slug}-${ref.split('/').pop().replace(/\.png$/, '')}`
       bytesIn += (await stat(srcPath)).size
-      const fig = await convertFigure(srcPath, name)
-      bytesOut += (await stat(join(OUT_IMG, `${name}.webp`))).size
-      figures.set(ref, fig)
+      const fig = await convertFigure(srcPath, imgDir, name)
+      bytesOut += (await stat(fig.path)).size
+      figures.set(ref, { url: `/course/${course.slug}/${name}.webp`, width: fig.width, height: fig.height })
     }
 
     const html = md.render(body)
@@ -214,9 +245,9 @@ async function main() {
       .replace(/<p>(<figure[\s\S]*?<\/figure>)<\/p>/g, '$1')
 
     const chars = body.replace(/```[\s\S]*?```/g, '').replace(/\s/g, '').length
-    const { mtime } = await stat(join(SRC, file))
+    const { mtime } = await stat(join(course.src, file))
 
-    await writeFile(join(OUT_HTML, `${slug}.html`), `${html}\n`)
+    await writeFile(join(htmlDir, `${slug}.html`), `${html}\n`)
 
     lessons.push({
       slug,
@@ -226,7 +257,7 @@ async function main() {
       toc,
       zh: {
         title: data.title ?? stem,
-        ...splitTitle(data.title ?? stem, number),
+        ...splitTitle(data.title ?? stem, number, course),
         description: data.description ?? '',
       },
     })
@@ -234,14 +265,39 @@ async function main() {
     console.log(`  ${String(number).padStart(2, '0')}  ${slug}  ${lessons.at(-1).minutes} min  ${toc.length} sections  ${figures.size} figures`)
   }
 
+  return { lessons, bytesIn, bytesOut }
+}
+
+// ── main ───────────────────────────────────────────────────
+
+async function main() {
+  await rm(OUT_HTML, { recursive: true, force: true })
+  await rm(OUT_IMG, { recursive: true, force: true })
+
+  const published = {}
+  let bytesIn = 0
+  let bytesOut = 0
+
+  for (const course of COURSES) {
+    const result = await buildCourse(course)
+    published[course.slug] = result.lessons
+    bytesIn += result.bytesIn
+    bytesOut += result.bytesOut
+  }
+
   const banner = `// Generated by scripts/build-course.mjs — do not edit.\n` +
-    `// Source: ${SRC.replace(process.env.HOME, '~')}\n` +
+    `// Sources:\n` +
+    COURSES.map((c) => `//   ${c.slug}: ${c.src.replace(process.env.HOME, '~')}\n`).join('') +
     `// Run \`npm run course\` after publishing a lesson.\n\n`
 
-  await writeFile(OUT_DATA, `${banner}export const publishedLessons = ${JSON.stringify(lessons, null, 2)}\n`)
+  await writeFile(
+    OUT_DATA,
+    `${banner}export const publishedLessons = ${JSON.stringify(published, null, 2)}\n`,
+  )
 
   const mb = (n) => `${(n / 1024 / 1024).toFixed(1)} MB`
-  console.log(`\n${lessons.length} lessons → src/content/course/`)
+  const total = Object.values(published).reduce((n, l) => n + l.length, 0)
+  console.log(`\n${total} lessons across ${COURSES.length} courses → src/content/course/`)
   console.log(`figures: ${mb(bytesIn)} PNG → ${mb(bytesOut)} WebP`)
 }
 

@@ -46,7 +46,7 @@
 <td>启动时加载 <code>MEMORY.md</code> 前 200 行或 25KB，主题文件按需读取</td>
 </tr>
 </tbody>
-</table></div><figure class="lesson__fig"><img src="/course/05-memory-and-rewind-01-comparison-memory-systems.webp" alt="CLAUDE.md 与自动记忆的职责、范围和加载方式对比" width="1200" height="675" loading="lazy" decoding="async"><figcaption>CLAUDE.md 与自动记忆的职责、范围和加载方式对比</figcaption></figure>
+</table></div><figure class="lesson__fig"><img src="/course/claude-code/05-memory-and-rewind-01-comparison-memory-systems.webp" alt="CLAUDE.md 与自动记忆的职责、范围和加载方式对比" width="1200" height="675" loading="lazy" decoding="async"><figcaption>CLAUDE.md 与自动记忆的职责、范围和加载方式对比</figcaption></figure>
 <p>两者最重要的区别，不是“手动”和“自动”，而是<strong>责任归属</strong>。</p>
 <p><code>CLAUDE.md</code> 是你明确交给 Claude 的长期说明；自动记忆是 Claude 在工作中自行沉淀的经验。</p>
 <p>因此：</p>
@@ -230,7 +230,7 @@
 代码和对话都错了  → Restore code and conversation
 只想释放上下文    → Summarize
 想尝试另一条路线  → /branch</code></pre>
-<figure class="lesson__fig"><img src="/course/05-memory-and-rewind-02-framework-rewind-choices.webp" alt="根据代码、对话和上下文状态选择回滚、摘要或分支操作" width="1200" height="675" loading="lazy" decoding="async"><figcaption>根据代码、对话和上下文状态选择回滚、摘要或分支操作</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/05-memory-and-rewind-02-framework-rewind-choices.webp" alt="根据代码、对话和上下文状态选择回滚、摘要或分支操作" width="1200" height="675" loading="lazy" decoding="async"><figcaption>根据代码、对话和上下文状态选择回滚、摘要或分支操作</figcaption></figure>
 <p>如果希望从命令行复制当前会话并另开路线，也可以使用：</p>
 <pre class="lesson__code lesson__code--tight"><code>claude --continue --fork-session</code></pre>
 <p>分支会话适合探索平行方案；<code>/rewind</code> 更适合在原会话中恢复状态。</p>

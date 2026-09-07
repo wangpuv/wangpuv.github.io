@@ -12,7 +12,7 @@
 <li><code>/model</code> 负责选择模型，和前两个设置可以组合使用。</li>
 </ul>
 <p>所以，快速模式不会让 Claude “少想一点”；降低 effort 才可能用更少的推理换速度和成本。</p>
-<figure class="lesson__fig"><img src="/course/09-effort-and-fast-01-comparison-two-controls.webp" alt="两个正交旋钮：effort 控制推理强度，fast 控制响应延迟与单价" width="1200" height="675" loading="lazy" decoding="async"><figcaption>两个正交旋钮：effort 控制推理强度，fast 控制响应延迟与单价</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/09-effort-and-fast-01-comparison-two-controls.webp" alt="两个正交旋钮：effort 控制推理强度，fast 控制响应延迟与单价" width="1200" height="675" loading="lazy" decoding="async"><figcaption>两个正交旋钮：effort 控制推理强度，fast 控制响应延迟与单价</figcaption></figure>
 <h2 id="sec-72290e">一、<code>/effort</code>：调节推理强度</h2>
 <p>effort 不是固定的 thinking token 数字，而是控制自适应推理投入程度的偏好。</p>
 <p>Claude 会根据每一步的难度决定要不要展开思考，而 effort 决定它可以有多积极：</p>
@@ -247,7 +247,7 @@ effort: high
 <td>机器等待通常不值得支付速度溢价</td>
 </tr>
 </tbody>
-</table></div><figure class="lesson__fig"><img src="/course/09-effort-and-fast-02-framework-effort-fast-matrix.webp" alt="先看任务难度，再看等待敏感度：四种 effort 与 fast 组合的选择矩阵" width="1200" height="675" loading="lazy" decoding="async"><figcaption>先看任务难度，再看等待敏感度：四种 effort 与 fast 组合的选择矩阵</figcaption></figure>
+</table></div><figure class="lesson__fig"><img src="/course/claude-code/09-effort-and-fast-02-framework-effort-fast-matrix.webp" alt="先看任务难度，再看等待敏感度：四种 effort 与 fast 组合的选择矩阵" width="1200" height="675" loading="lazy" decoding="async"><figcaption>先看任务难度，再看等待敏感度：四种 effort 与 fast 组合的选择矩阵</figcaption></figure>
 <h3 id="sec-8734c4"><code>low + fast</code> 会发生什么</h3>
 <p>这是“简单任务追求最低延迟”的组合。</p>
 <p>较低的 effort 减少复杂推理，fast 再降低输出延迟。适合你正在实时盯着终端、需要快速完成大量明确小步骤的场景。</p>

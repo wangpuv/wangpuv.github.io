@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, Link, useLocation } from 'react-router'
 import { profile } from '../data/profile'
+import { coursePaths } from '../data/course'
 import { ui } from '../i18n/strings'
 import { useLanguage } from '../i18n/LanguageContext'
 import ThemeToggle from './ThemeToggle'
@@ -19,8 +20,9 @@ export default function Nav() {
     { to: '/#flagship', label: t.nav.agent, hash: '#flagship' },
     { to: '/work', label: t.nav.work },
     { to: '/lab', label: t.nav.lab },
-    // Lesson pages live under /claude-code/<slug>; keep the nav item lit there.
-    { to: '/claude-code', label: t.nav.course, nested: true },
+    // The spread is the destination, but each serial has its own contents
+    // page and lesson pages off the root; keep the nav item lit on all of them.
+    { to: '/writing', label: t.nav.course, nested: true, alsoOn: coursePaths },
     { to: '/life', label: t.nav.life },
     { to: '/about', label: t.nav.about },
   ]
@@ -79,12 +81,15 @@ export default function Nav() {
         </Link>
       )
     }
+    const alsoActive = (link.alsoOn ?? []).some(
+      (path) => pathname === path || pathname.startsWith(`${path}/`),
+    )
     return (
       <NavLink
         key={link.to}
         to={link.to}
         end={!link.nested}
-        className={({ isActive }) => `${base} ${isActive ? 'is-active' : ''}`}
+        className={({ isActive }) => `${base} ${isActive || alsoActive ? 'is-active' : ''}`}
         onClick={() => setOpen(false)}
         tabIndex={sheet && !open ? -1 : undefined}
       >

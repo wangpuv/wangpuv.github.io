@@ -18,7 +18,7 @@
 <p>“5–30 个单元”描述的是当前工作流的拆分范围，<strong>不代表每个项目都应该同时运行 30 个任务</strong>。如果只有两三个小修改，直接在主会话完成，或明确委派少量子代理，往往更合适。</p>
 <h2 id="sec-325ed6">二、并行之前，先问三个问题</h2>
 <p>决定能不能用 <code>/batch</code> 的关键，是这些工作能否独立推进。</p>
-<figure class="lesson__fig"><img src="/course/12-batch-parallel-changes-01-framework-three-checks.webp" alt="规则是否明确、单元是否独立、结果是否可验收，是并行前的三个判断" width="1200" height="675" loading="lazy" decoding="async"><figcaption>规则是否明确、单元是否独立、结果是否可验收，是并行前的三个判断</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/12-batch-parallel-changes-01-framework-three-checks.webp" alt="规则是否明确、单元是否独立、结果是否可验收，是并行前的三个判断" width="1200" height="675" loading="lazy" decoding="async"><figcaption>规则是否明确、单元是否独立、结果是否可验收，是并行前的三个判断</figcaption></figure>
 <h3 id="sec-ed1cae">1. 规则明确了吗？</h3>
 <p>不同代理读到要求后，应该能做出一致的决定。</p>
 <p>例如，“按已经确定的新日志接口替换各模块中的旧调用”，通常比“把日志系统设计得更好”明确得多。</p>
@@ -76,7 +76,7 @@
 <p><code>/batch</code> 自带方案确认步骤，但你仍要认真检查方案。可以重点看：有没有两个单元改同一份公共文件、是否存在隐含的合并顺序、是否把尚未确定的设计问题分发给了执行代理。</p>
 <p>发现问题时，先让它调整方案，再批准执行。</p>
 <h2 id="sec-2f39b8">五、worktree 隔离之后，仍然需要合并验收</h2>
-<figure class="lesson__fig"><img src="/course/12-batch-parallel-changes-02-flowchart-batch-workflow.webp" alt="调查与方案确认后，各单元在独立 worktree 中实现、测试并提交 PR，最后进行审查与集成验证" width="1200" height="675" loading="lazy" decoding="async"><figcaption>调查与方案确认后，各单元在独立 worktree 中实现、测试并提交 PR，最后进行审查与集成验证</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/12-batch-parallel-changes-02-flowchart-batch-workflow.webp" alt="调查与方案确认后，各单元在独立 worktree 中实现、测试并提交 PR，最后进行审查与集成验证" width="1200" height="675" loading="lazy" decoding="async"><figcaption>调查与方案确认后，各单元在独立 worktree 中实现、测试并提交 PR，最后进行审查与集成验证</figcaption></figure>
 <p>worktree 能让不同代理在各自的工作目录里编辑代码，减少直接覆盖彼此文件的问题。</p>
 <p>它不会自动解决语义冲突。例如，一个 PR 调整函数的返回格式，另一个 PR 仍按旧格式读取；Git 可能顺利合并，程序却不能正常工作。</p>
 <p>worktree 也不是完整的运行环境隔离。不同任务仍可能争用同一个端口、数据库或外部测试账号，测试环境要按项目情况安排。</p>

@@ -15,7 +15,7 @@
 <blockquote class="lesson__aside">
 <p>真正的高手靠<strong>预防</strong>：别让它读整个大文件；一个任务用一段对话；处理完的日志别一直留着。做到这三点，三件套的使用频率会大大下降。</p>
 </blockquote>
-<figure class="lesson__fig"><img src="/course/02-context-management-01-framework-context-window-budget.webp" alt="固定开销与对话、文件、工具输出共同占用有限的上下文窗口，随着占用增加会依次出现变笨、变慢和撞墙" width="1200" height="675" loading="lazy" decoding="async"><figcaption>固定开销与对话、文件、工具输出共同占用有限的上下文窗口，随着占用增加会依次出现变笨、变慢和撞墙</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/02-context-management-01-framework-context-window-budget.webp" alt="固定开销与对话、文件、工具输出共同占用有限的上下文窗口，随着占用增加会依次出现变笨、变慢和撞墙" width="1200" height="675" loading="lazy" decoding="async"><figcaption>固定开销与对话、文件、工具输出共同占用有限的上下文窗口，随着占用增加会依次出现变笨、变慢和撞墙</figcaption></figure>
 <h2 id="sec-62542c">1. <code>/context [all]</code> —— 看</h2>
 <p>这个命令会把当前上下文占用画成彩色网格，并在右侧给出分类明细。它<strong>只看不改</strong>。</p>
 <p><strong>怎么读最有效？</strong> 先看顶部的大局百分比，再把右侧明细分成两类：</p>
@@ -100,7 +100,7 @@
 <blockquote class="lesson__aside">
 <p><code>/clear</code> 与「退出重开」不同：重进后如果提示压缩并继续上次的内容，那是<strong>续旧</strong>（continue）；<code>/clear</code> 是<strong>主动开一段全新的、什么都不带的对话</strong>。换题时敲 <code>/clear</code>，比退出重启省事。</p>
 </blockquote>
-<figure class="lesson__fig"><img src="/course/02-context-management-02-flowchart-context-compact-clear.webp" alt="上下文管理决策：先用 context 看占用，同一任务上下文不足时用 compact 压缩后继续，切换到无关任务时用 clear 开新会话" width="1200" height="675" loading="lazy" decoding="async"><figcaption>上下文管理决策：先用 context 看占用，同一任务上下文不足时用 compact 压缩后继续，切换到无关任务时用 clear 开新会话</figcaption></figure>
+<figure class="lesson__fig"><img src="/course/claude-code/02-context-management-02-flowchart-context-compact-clear.webp" alt="上下文管理决策：先用 context 看占用，同一任务上下文不足时用 compact 压缩后继续，切换到无关任务时用 clear 开新会话" width="1200" height="675" loading="lazy" decoding="async"><figcaption>上下文管理决策：先用 context 看占用，同一任务上下文不足时用 compact 压缩后继续，切换到无关任务时用 clear 开新会话</figcaption></figure>
 <h2 id="sec-e7f487">参数速查</h2>
 <p>三个命令<strong>都能</strong>跟参数，而且参数<strong>都可以省略</strong>：</p>
 <div class="lesson__table"><table><thead>

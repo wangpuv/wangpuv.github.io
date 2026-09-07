@@ -62,6 +62,7 @@
   --accent-ink: oklch(48% 0.18 36);      /* accent text on paper */
   --on-accent: oklch(98% 0.01 80);
   --highlight: oklch(56% 0.10 200);      /* teal — secondary accent */
+  --highlight-ink: oklch(46% 0.12 205);  /* teal text on paper */
   --agent:     oklch(50% 0.19 285);      /* flagship agent only */
   --agent-ink: oklch(46% 0.2 285);
   --agent-soft: oklch(50% 0.19 285 / 0.09);
@@ -85,6 +86,7 @@
   --accent-ink: oklch(76% 0.15 42);
   --on-accent: oklch(18% 0.012 60);
   --highlight: oklch(74% 0.11 200);      /* brighter teal */
+  --highlight-ink: oklch(80% 0.10 202);
   --agent:     oklch(73% 0.15 285);
   --agent-ink: oklch(79% 0.13 286);
   --agent-soft: oklch(73% 0.15 285 / 0.14);

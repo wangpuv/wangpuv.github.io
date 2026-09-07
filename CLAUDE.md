@@ -37,23 +37,49 @@ All text is data-driven and bilingual. When editing copy, edit data — not JSX:
 
 Components consume these with `const { lang } = useLanguage()` then index by `lang`. There is no `t()` helper — indexing is direct.
 
-### Course content (`/claude-code`)
+### Courses (`/writing`, `/claude-code`, `/llm-engineer`)
 
-The Claude Code tutorial section is **generated**, not hand-written. `npm run
-course` reads the Obsidian source (outside this repo, at
-`~/Documents/Obsidian/will-falcon-doc/Learn Claude Code/发布预览/公众号版`, or
-`$COURSE_SRC`) and writes three things, all committed:
+Two serialised tutorials. `/writing` is the spread listing both; each course
+keeps its own contents page at `/<slug>` and its lessons at `/<slug>/<lesson>`.
+`/claude-code` URLs predate the spread and must keep working.
 
-- `src/content/course/<slug>.html` — article markup, lazily imported per lesson
-- `src/data/course.generated.js` — lesson metadata, TOC, dates, reading time
-- `public/course/*.webp` — figures, converted from PNG (24 MB → 1.2 MB)
+**They are not published the same way.** The Claude Code course goes out on the
+WeChat account 阿诚的代码 first and is mirrored here; the LLM course is published
+on this site first and is not on WeChat at all. So venue is per-course copy
+(`wechat` and the `follow` string in `src/data/courses/<slug>.js`), never a
+sentence about "both courses". Only a course with `wechat: true` shows the QR.
+
+Routes, nav highlighting and the spread are all derived from the `courses`
+array in `src/data/course.js`, so nothing needs a new route added by hand.
+
+Each course is split into a generated half and a hand-written half.
+
+`npm run course` reads the Obsidian sources (one folder per course, listed in
+`COURSES` at the top of `scripts/build-course.mjs`; `$COURSE_SRC` and
+`$LLM_COURSE_SRC` override the paths) and writes three things, all committed:
+
+- `src/content/course/<course>/<slug>.html` — article markup, lazily imported
+- `src/data/course.generated.js` — lesson metadata, TOC, dates, reading time,
+  keyed by course slug
+- `public/course/<course>/*.webp` — figures, converted from PNG
 
 **Re-run `npm run course` after publishing a lesson**; nothing picks up new
 source automatically. Never hand-edit those three outputs.
 
-`src/data/course.js` is the hand-written half: English titles for each lesson,
-the three stage groupings, the lessons announced but not yet written, and
-the appendix. It merges the generated data and is what the pages import.
+A course entry may carry an `include` list naming the source stems that ship.
+The LLM course keeps unfinished lessons in the same Obsidian folder as the
+published ones, so without it a half-written 第 8 课 would appear on the site
+with 3–7 still missing. Omit `include` to publish every `.md` in the folder.
+
+The hand-written half is one module per course under `src/data/courses/`:
+English titles for each published lesson, the stage groupings, the lessons
+announced but not yet written, an optional appendix, and which accent the
+serial is inked in (`ink: 'accent' | 'highlight'`). `src/data/course.js` joins
+the two halves and owns what the courses share: the chrome strings, the WeChat
+channel, and the spread's copy.
+
+Adding a third course: write `src/data/courses/<slug>.js`, add it to `COURSES`
+in the build script, and register it in `src/data/course.js`.
 
 Lesson bodies stay Chinese in both languages — English mode translates the
 chrome and contents page and shows a note on the article. The 公众号 cover
@@ -66,6 +92,16 @@ build script; neither reaches the browser.
 - `tokens.css` — design tokens in **OKLCH**: fluid type scale (`--step-*`), spacing, motion, and the light/dark color blocks. Font stacks pair Latin (Fraunces display / Geist body, loaded from Google Fonts in `index.html`) with CJK fallbacks (Songti SC / PingFang SC).
 - `global.css` — reset, base typography, layout primitives (`.wrap`, `.section`, `.stack`), and shared component classes (`.btn`, `.link`, `.eyebrow`, `.reveal`).
 - `app.css` — page- and component-specific styles, imported in `App.jsx`.
+
+Each serial re-inks the whole course section through `--course-ink` /
+`--course-ink-text`, set as inline custom properties on the page root from the
+course's `ink` field (terracotta `--accent` for Claude Code, teal
+`--highlight` for the LLM course). The spread uses `--serial-ink` the same way.
+
+Note that `main.jsx` imports `App.jsx` (which pulls `app.css`) *before*
+`global.css`, so `app.css` loses the cascade at equal specificity. A colour in
+`app.css` that has to beat `.display`, `.meta` or `.eyebrow` must be scoped one
+level up (`.serial .serial__tagline`, not `.serial__tagline`).
 
 Plain CSS with hand-written class names (BEM-ish), no modules/Tailwind. Scroll-reveal animations use the `.reveal` class driven by the `Reveal` component (IntersectionObserver), and all motion respects `prefers-reduced-motion`.
 
