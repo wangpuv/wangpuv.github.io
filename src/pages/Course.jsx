@@ -12,7 +12,9 @@ function LessonRow({ course, lesson, lang, t }) {
   const c = lesson[lang]
   return (
     <Link className="lesson-row" to={`/${course.slug}/${lesson.slug}`}>
-      <span className="lesson-row__num display">{pad(lesson.number)}</span>
+      <span className="lesson-row__num display">
+        {lesson.slug === '00-preface' || lesson.number >= 1 ? pad(lesson.number) : '—'}
+      </span>
       <span className="lesson-row__main">
         <span className="lesson-row__topic display">{c.topic}</span>
         <span className="lesson-row__kicker muted">{c.kicker}</span>
@@ -62,7 +64,7 @@ export default function Course({ course }) {
   // would lead this band with a large 0, which reads as "nothing here".
   // Set the length of the series instead and let the label say where it is.
   const started = publishedCount > 0
-  const opener = lessons.find((lesson) => lesson.number === 0)
+  const openers = lessons.filter((lesson) => lesson.number === 0)
 
   const other = courses.find((item) => item.slug !== course.slug)
   const lastStage = course.stages[course.stages.length - 1]
@@ -107,7 +109,7 @@ export default function Course({ course }) {
           >
             {/* The 发刊词 sits outside the numbered run but is published all
                 the same; a half-strength tick in front says so. */}
-            {opener && <span className="course__tick course__tick--opener" aria-hidden="true" />}
+            {openers.map((l) => <span key={l.slug} className="course__tick course__tick--opener" aria-hidden="true" />)}
             {Array.from({ length: total }, (_, i) => (
               <span
                 key={i}
@@ -120,9 +122,11 @@ export default function Course({ course }) {
         </Reveal>
 
         <div className="course__contents">
-          {opener && (
+          {openers.length > 0 && (
             <Reveal className="course__group course__group--opener">
-              <LessonRow course={course} lesson={opener} lang={lang} t={t} />
+              {openers.map((lesson) => (
+                <LessonRow key={lesson.slug} course={course} lesson={lesson} lang={lang} t={t} />
+              ))}
             </Reveal>
           )}
 

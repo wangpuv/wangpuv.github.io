@@ -1,0 +1,138 @@
+<p>先不急着写 Agent。我们先把一件事做成：<strong>在 Python 里发出一个问题，让自己电脑上的模型返回回答。</strong></p>
+<p>接着再往前走一步：让模型从“小林买了 3 本笔记本”里提取姓名和数量，交给 Python 检查。做完这两步，你就有了后面课程可以继续使用的环境。</p>
+<p>原来的 Day 1 笔记直接进入 Token、生成参数和流式输出。整理成教程时，我把安装与首次运行单独放在前面：先确认程序能连接模型，下一课再研究一次请求里发生了什么。本篇不占 22 节核心课的编号。</p>
+<h2 id="sec-d11579">先分清：Python、Ollama 和模型各做什么</h2>
+<p>我们写的 Python 程序负责准备问题、发送请求、接收结果。Ollama 负责加载和运行模型。下载到电脑上的模型负责根据输入生成内容。</p>
+<p>所以，<strong>装好 Ollama，并不等于已经装好了模型。</strong> 就像装好 Python 后，还需要拿到你要运行的程序。</p>
+<p>本篇只用一个聊天模型 <code>qwen3.5:9b</code>。后面的检索课会另外使用嵌入模型，把文字转换成向量；现在不用一起下载。</p>
+<figure class="lesson__fig"><img src="/course/llm-engineer/00-environment-01-local-request.webp" alt="Python 将问题交给本机 Ollama，Ollama 运行本地模型，再把回答返回程序" width="1672" height="941" loading="lazy" decoding="async"><figcaption>Python 将问题交给本机 Ollama，Ollama 运行本地模型，再把回答返回程序</figcaption></figure>
+<p>模型和依赖的首次下载需要联网。安装完成后，本篇的 Python 请求只发给本机 Ollama，不需要云模型账号或 API Key。</p>
+<h2 id="sec-327af2">这次用什么电脑、什么模型</h2>
+<p>我实际使用的是 <strong>M1 Pro、16GB 统一内存的 Mac</strong>，Python 3.13.7、Ollama 0.33.3。本篇实测模型是 <code>qwen3.5:9b</code>，模型文件约 6.59 GB。</p>
+<p>这个大小表示模型文件占用多少磁盘，不表示运行时只需要同样多的内存。模型运行还需要其他空间，电脑上同时打开的应用也会占用内存。</p>
+<p>下面的主线在这台 Mac 上跑过。Windows、Linux 可以参考官方安装入口，但本篇没有完成这两类系统的实际验收，也还没有确定最低硬件要求。先留出下载空间，关闭不必要的大型应用，再开始实验。</p>
+<h2 id="sec-28d319">第一步：安装工具，拿到代码</h2>
+<p>需要准备三个工具：</p>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>工具</th>
+<th>本篇用它做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ollama</td>
+<td>加载模型，接收 Python 的请求</td>
+</tr>
+<tr>
+<td>uv</td>
+<td>安装 Python 和课程依赖，运行代码</td>
+</tr>
+<tr>
+<td>Git</td>
+<td>下载和更新配套仓库</td>
+</tr>
+</tbody>
+</table></div><p>从 <a href="https://ollama.com/download">Ollama 下载页</a> 安装并启动应用。Linux 用户按<a href="https://docs.ollama.com/linux">官方安装说明</a>操作。</p>
+<p>uv 可以按<a href="https://docs.astral.sh/uv/getting-started/installation/">官方安装说明</a>安装。macOS / Linux 的命令是：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>curl -LsSf https://astral.sh/uv/install.sh | sh</code></pre>
+<p>Windows 可以在 PowerShell 中执行：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="powershell"><code>winget install --id=astral-sh.uv -e</code></pre>
+<p>安装后重新打开终端，确认命令可用：</p>
+<pre class="lesson__code" data-lang="sh"><code>uv --version
+ollama --version</code></pre>
+<p>配套代码：<a href="https://github.com/wangpuv/learn-llm-agent">learn-llm-agent</a>。安装 Git 后，在准备存放项目的目录打开终端，执行：</p>
+<pre class="lesson__code" data-lang="sh"><code>git clone https://github.com/wangpuv/learn-llm-agent.git
+cd learn-llm-agent</code></pre>
+<p>后面所有命令都在这个目录运行。你应该能在这里看到 <code>README.md</code> 和 <code>lessons/</code> 目录。</p>
+<p>安装 Python 和课程依赖：</p>
+<pre class="lesson__code" data-lang="sh"><code>uv python install 3.13
+uv sync --project lessons --frozen</code></pre>
+<p>第一条明确安装 Python 3.13；第二条按仓库的锁文件安装依赖，减少“作者和读者装了不同版本”的问题。<code>--project lessons</code> 指向课程的依赖配置，环境会放在 <code>lessons/.venv</code>。后面使用 <code>uv run</code>，不需要再手动激活它。</p>
+<h2 id="sec-7aa6f7">第二步：启动 Ollama，再下载本地模型</h2>
+<p>Ollama 应用需要保持运行。没有应用驻留或后台服务的环境，可以在另一个终端启动：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>ollama serve</code></pre>
+<p>这个窗口保持打开即可。服务已经运行时，不需要再启动一份。</p>
+<p>回到项目所在的终端，运行：</p>
+<pre class="lesson__code" data-lang="sh"><code>ollama pull qwen3.5:9b
+ollama list</code></pre>
+<p><code>pull</code> 是下载步骤，只有你主动执行才开始。已经装过这个型号，可以跳过下载，直接看 <code>list</code>。</p>
+<p>请保留完整的 <code>qwen3.5:9b</code>，不要省略标签或换成同系列的云模型。我们的程序还会检查本机模型的元数据，发现配置会转发到远端就停止。</p>
+<h2 id="sec-913c66">第三步：从 Python 收到回答</h2>
+<p>先检查连接：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l00_environment --mode check</code></pre>
+<p>这一步只查询服务版本和本机模型信息，不生成回答。看到下面这行，再继续：</p>
+<pre class="lesson__code lesson__code--tight"><code>本地模型检查通过：qwen3.5:9b</code></pre>
+<p>然后发送一次问题：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l00_environment --mode chat</code></pre>
+<p>程序会问模型：</p>
+<blockquote class="lesson__abstract">
+<p>请用一句中文解释：Python 程序为什么要通过 Ollama 调用本地模型？</p>
+</blockquote>
+<p>这里的“检查通过”只表示收到了完整、非空的回答，不代表回答中的每句话都正确。</p>
+<p>先看请求与回答怎样连接。下面只摘出关键步骤，省略的生成配置保留在完整代码中；<code>local_model</code> 是前面检查通过的模型信息，<code>prompt</code> 是要发送的问题：</p>
+<pre class="lesson__code" data-lang="python"><code>payload = {
+    &quot;model&quot;: local_model[&quot;model&quot;],
+    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+    &quot;stream&quot;: False,
+    # 其余生成配置见完整代码
+}
+body = request_json(BASE_URL, &quot;/api/chat&quot;, payload, timeout=120)
+answer = body[&quot;message&quot;][&quot;content&quot;]</code></pre>
+<p><code>model</code> 指定模型，<code>messages</code> 放入问题，<code>stream=False</code> 表示等待完整回答后再显示。请求返回后，从 <code>message</code> 的 <code>content</code> 字段取出回答文字。完整程序还会检查回答是否正常结束。</p>
+<p>本课先运行已经配置好的代码。生成参数、Token 用量和等待时间，留到下一课逐项检查。</p>
+<p>注意：Python 等待超时，不等于 Ollama 已停止计算。遇到超时时，先看服务状态和本机负载，不要立刻连续重发。</p>
+<h2 id="sec-f9825c">再做一个小实验：回答能否交给程序使用</h2>
+<p>聊天窗口里的一段文字，人可以自己读。程序还需要知道：哪些是姓名，哪些是数量，数量是不是整数。</p>
+<p>这次输入固定为：</p>
+<blockquote class="lesson__aside">
+<p>小林买了 3 本笔记本。</p>
+</blockquote>
+<p>运行：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l00_environment --mode probe --output runs/environment-probe-01.json</code></pre>
+<p><code>probe</code> 是这个小实验的模式名。我们先告诉模型：返回结果只能包含姓名 <code>name</code> 和数量 <code>count</code>，姓名用字符串，数量用整数。这份格式要求叫 JSON Schema。模型返回以后，Python 还会再检查字段、类型和具体的值。</p>
+<p>2026 年 9 月 8 日，本地 <code>qwen3.5:9b</code> 的这次输出是：</p>
+<pre class="lesson__code"><code>本地模型检查通过：qwen3.5:9b
+{&quot;name&quot;: &quot;小林&quot;, &quot;count&quot;: 3}
+检查通过</code></pre>
+<p>检查内容包括：姓名是否为“小林”、数量是否为整数 <code>3</code>、有没有多出来的字段。字符串 <code>&quot;3&quot;</code> 和整数 <code>3</code> 对程序来说不同，不能因为看起来一样就放过。</p>
+<figure class="lesson__fig"><img src="/course/llm-engineer/00-environment-02-environment-checks.webp" alt="分三步检查环境：本机连接、收到回答、核对返回字段" width="1860" height="846" loading="lazy" decoding="async"><figcaption>分三步检查环境：本机连接、收到回答、核对返回字段</figcaption></figure>
+<p>这一次通过，只证明这组模型、参数和输入完成了这个小任务。换一句话、换一个模型，都需要重新检查。第 2 课会详细讲格式约束、字段校验以及失败后怎样有限修复，本篇先建立这个习惯：<strong>收到结果后，让程序再检查一次。</strong></p>
+<p><code>--output</code> 会保存模型版本摘要、请求参数、原始回答和检查结果。你可以打开 <code>runs/environment-probe-01.json</code> 查看。再跑一次时，把文件名改为 <code>environment-probe-02.json</code>；程序不会覆盖已有报告。</p>
+<h2 id="sec-8093ee">跑不通时，先看卡在哪一步</h2>
+<div class="lesson__table"><table><thead>
+<tr>
+<th>现象</th>
+<th>先做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>找不到 <code>uv</code> 或 <code>ollama</code></td>
+<td>安装后重新打开终端，检查版本命令</td>
+</tr>
+<tr>
+<td>连接被拒绝</td>
+<td>确认 Ollama 已启动，本机服务使用默认的 11434 端口</td>
+</tr>
+<tr>
+<td>模型未在本机明确安装</td>
+<td>用 <code>ollama list</code> 检查精确型号，缺少时手动执行 <code>pull</code></td>
+</tr>
+<tr>
+<td>提示模型会转发到远端</td>
+<td>检查是否选到了云模型，使用本篇指定的本地型号</td>
+</tr>
+<tr>
+<td>等待很久、超时或内存不足</td>
+<td>查看 Ollama 输出和本机资源占用，先停止连续重试</td>
+</tr>
+<tr>
+<td>回答出来了，但字段检查失败</td>
+<td>打开报告，看是生成不完整、类型不对，还是值不对；不要先删掉检查</td>
+</tr>
+</tbody>
+</table></div><p>完整代码见 <a href="https://github.com/wangpuv/learn-llm-agent/tree/main/lessons/l00_environment">本课代码目录</a>，安装、模型配置和运行命令见 <a href="https://github.com/wangpuv/learn-llm-agent/blob/main/lessons/l00_environment/README.md">本课运行说明</a>。想看程序做了什么，先读 <code>__main__.py</code>；本地模型检查放在共用的 <code>lessons/local_ollama.py</code> 中。</p>
+<p>完成本篇后，你应该能做三件事：确认本地模型可用、从 Python 收到回答、查看一次字段检查的原始记录。</p>
+<p>下一课回到 Day 1 笔记中的问题：<strong>发出一次请求后，怎样检查参数、用量和等待时间？</strong></p>
+

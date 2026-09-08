@@ -48,7 +48,7 @@ export default function Lesson({ course }) {
   if (!lesson) return <NotFound />
 
   const c = lesson[lang]
-  const isPreface = lesson.number === 0
+  const isPreface = lesson.slug === '00-preface'
 
   return (
     <article
@@ -68,7 +68,7 @@ export default function Lesson({ course }) {
             </Link>
             <span className="lesson__crumb-sep meta" aria-hidden="true">/</span>
             <span className="meta">
-              {isPreface
+              {lesson.number === 0
                 ? c.topic
                 : lang === 'zh' ? `第 ${lesson.number} 课` : `Lesson ${pad(lesson.number)}`}
             </span>

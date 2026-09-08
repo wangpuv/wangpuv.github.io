@@ -715,6 +715,48 @@ export const publishedLessons = {
         "kicker": "22 课，从调用模型到构建 Agent",
         "description": "从真实学习笔记出发，用 Python 手写一个本地 Agent。22 课学习调用模型、使用工具、检索资料、多步执行与应用交付，无需购买云模型 API 额度。"
       }
+    },
+    {
+      "slug": "00-environment",
+      "number": 0,
+      "date": "2026-09-08",
+      "minutes": 8,
+      "toc": [
+        {
+          "id": "sec-d11579",
+          "text": "先分清：Python、Ollama 和模型各做什么"
+        },
+        {
+          "id": "sec-327af2",
+          "text": "这次用什么电脑、什么模型"
+        },
+        {
+          "id": "sec-28d319",
+          "text": "第一步：安装工具，拿到代码"
+        },
+        {
+          "id": "sec-7aa6f7",
+          "text": "第二步：启动 Ollama，再下载本地模型"
+        },
+        {
+          "id": "sec-913c66",
+          "text": "第三步：从 Python 收到回答"
+        },
+        {
+          "id": "sec-f9825c",
+          "text": "再做一个小实验：回答能否交给程序使用"
+        },
+        {
+          "id": "sec-8093ee",
+          "text": "跑不通时，先看卡在哪一步"
+        }
+      ],
+      "zh": {
+        "title": "环境准备：让 Python 收到本地模型的第一条回答",
+        "topic": "环境准备",
+        "kicker": "让 Python 收到本地模型的第一条回答",
+        "description": "装好 Ollama 和 Python 环境，运行本地模型，再用一个小实验检查返回的数据。这是 22 课开始前的准备篇。"
+      }
     }
   ]
 }

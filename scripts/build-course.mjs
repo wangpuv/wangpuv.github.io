@@ -46,7 +46,7 @@ const COURSES = [
     src: process.env.LLM_COURSE_SRC
       || join(VAULT, 'Learn LLM Engineer/发布预览/公众号版'),
     preface: { topic: '发刊词', kicker: '22 课，从调用模型到构建 Agent' },
-    include: ['00-发刊词'],
+    include: ['00-发刊词', '00-环境准备'],
   },
 ]
 
@@ -167,20 +167,23 @@ function cleanBody(body) {
     .trim()
 }
 
-// Lesson 0 is the 发刊词; its filename is Chinese, so it gets an explicit slug.
-const slugFor = (stem) => (stem.startsWith('00-') ? '00-preface' : stem)
+// Chinese stems get explicit URL-safe slugs.
+const slugMap = { '00-发刊词': '00-preface', '00-环境准备': '00-environment' }
+const slugFor = (stem) => slugMap[stem] ?? stem
 
 // Source titles read "第 N 课：<主题> —— <副题>" in the Claude Code course and
 // "第 N 课：<问题>" in the LLM one. The contents page sets the subject large and
 // the subtitle small, so split them once here rather than re-parsing the same
 // string in three components.
-function splitTitle(title, number, course) {
-  if (number === 0) return { ...course.preface }
+function splitTitle(title, number, course, slug) {
+  if (slug === '00-preface') return { ...course.preface }
   const parts = title.match(/^第\s*\d+\s*课[：:]\s*(.+?)\s*——\s*(.+)$/)
   if (parts) return { topic: parts[1], kicker: parts[2] }
-  // No subtitle: strip the lesson number, which the row already prints.
   const bare = title.match(/^第\s*\d+\s*课[：:]\s*(.+)$/)
-  return { topic: bare ? bare[1] : title, kicker: '' }
+  if (bare) return { topic: bare[1], kicker: '' }
+  const plain = title.match(/^(.+?)[：:]\s*(.+)$/)
+  if (plain) return { topic: plain[1], kicker: plain[2] }
+  return { topic: title, kicker: '' }
 }
 
 // ── figures ────────────────────────────────────────────────
@@ -257,7 +260,7 @@ async function buildCourse(course) {
       toc,
       zh: {
         title: data.title ?? stem,
-        ...splitTitle(data.title ?? stem, number, course),
+        ...splitTitle(data.title ?? stem, number, course, slug),
         description: data.description ?? '',
       },
     })

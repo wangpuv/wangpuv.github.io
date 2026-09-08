@@ -193,5 +193,11 @@ export default {
       description:
         'Starting from real learning notes, writing a local agent by hand in Python. 22 lessons covering model calls, tools, retrieval, multi-step execution and delivery, with no cloud API credit required.',
     },
+    '00-environment': {
+      topic: 'Environment setup',
+      kicker: 'Getting Python to receive the first answer from a local model',
+      description:
+        'Install Ollama and set up the Python environment, run a local model, and verify the returned data with a small experiment. This is the preparation lesson before the 22 core lessons.',
+    },
   },
 }
