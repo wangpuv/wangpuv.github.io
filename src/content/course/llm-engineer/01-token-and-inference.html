@@ -19,6 +19,16 @@ messages = [
 # 收到响应后，取出回答文字
 answer = response[&quot;message&quot;][&quot;content&quot;]</code></pre>
 <p><code>role=&quot;user&quot;</code> 表示这条消息来自提问的人，<code>content</code> 就是提问内容。响应里除了正文，还会带有用量和耗时等信息，后面再看。</p>
+<h3 id="sec-142438">把这次问答运行起来</h3>
+<p>沿用环境准备篇的 Python、uv、Ollama 和已下载的本地 <code>qwen3.5:9b</code>，本课不增加第三方依赖。</p>
+<p>如果还没有代码，在终端执行：</p>
+<pre class="lesson__code" data-lang="sh"><code>git clone https://github.com/wangpuv/learn-llm-agent.git
+cd learn-llm-agent
+uv sync --project lessons --frozen</code></pre>
+<p>已经下载过项目，就在原项目目录执行 <code>git pull</code>，再执行上面的 <code>uv sync</code>。下面所有命令都在仓库根目录运行。</p>
+<p>先打开 <code>lessons/l01_token_inference/01_chat.py</code>，从问题、请求字典一直看到回答与用量的打印。然后运行一次问答：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference.01_chat --output runs/l01-chat-01.json</code></pre>
+<p>它只问一次，终端会显示回答和 Token 用量。可以先修改文件中的 <code>prompt</code>，换一个输出文件名再试。</p>
 <p>现在先把目光从 Python 字典移到模型内部：这四个字是怎样生成的？</p>
 <h2 id="sec-84a227">二、Token 是什么，模型怎样接着往下写？</h2>
 <p>Python 可以直接用字符串表示一句话，模型计算时用的却是数字。</p>
@@ -87,23 +97,13 @@ result = run_inference(prompt, temperature=cfg[&quot;temperature&quot;])</code><
     &quot;top_p&quot;: top_p,
 }</code></pre>
 <figure class="lesson__fig"><img src="/course/llm-engineer/01-token-and-inference-01-request-parameters.webp" alt="参数从实验配置进入请求，再实际发送；检查请求中的参数和值" width="1672" height="941" loading="lazy" decoding="async"><figcaption>参数从实验配置进入请求，再实际发送；检查请求中的参数和值</figcaption></figure>
-<h3 id="sec-f36323">下载代码，先看请求</h3>
-<p>沿用环境准备篇的 Python、uv、Ollama 和已下载的本地 <code>qwen3.5:9b</code>，本课不增加第三方依赖。</p>
-<p>如果还没有代码，在终端执行：</p>
-<pre class="lesson__code" data-lang="sh"><code>git clone https://github.com/wangpuv/learn-llm-agent.git
-cd learn-llm-agent
-uv sync --project lessons --frozen</code></pre>
-<p>已经下载过项目，就在原项目目录执行 <code>git pull</code>，再执行上面的 <code>uv sync</code>。下面所有命令都在仓库根目录运行。</p>
-<p>先打开 <code>lessons/l01_token_inference/01_chat.py</code>，从问题、请求字典一直看到回答与用量的打印。然后运行一次问答：</p>
-<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference.01_chat --output runs/l01-chat-01.json</code></pre>
-<p>它只问一次，终端会显示回答和 Token 用量。可以先修改文件中的 <code>prompt</code>，换一个输出文件名再试。</p>
 <p>接下来打开 <code>02_sampling.py</code>。<code>ask()</code> 中写着实际发送的请求，<code>compare()</code> 中列出要比较的配置。程序在每次调用前打印同一份请求中的 <code>options</code>，你可以对照检查参数与值。</p>
 <h3 id="sec-52ab7a">运行店名实验</h3>
 <p>保持 Ollama 运行，执行：</p>
 <pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference.02_sampling --output runs/l01-sampling-01.json</code></pre>
 <p><code>02_sampling</code> 是采样实验脚本，<code>--output</code> 指定保存结果的位置。问题就是开头那句“给一家修理旧物的小店起一个中文名字”。</p>
 <p>程序做两组比较：改 <code>temperature</code> 时固定 <code>top_p=0.9</code>；改 <code>top_p</code> 时固定 <code>temperature=0.8</code>。每组配置各跑两次，第二轮调换高低值的先后顺序。先另外预热一次，不把预热结果放进对照表。</p>
-<p>下面是 2026 年 9 月 11 日保存的实际结果。三个脚本采用下面的对照设置，自己的运行结果以保存的报告为准：</p>
+<p>下面是 2026 年 9 月 11 日保存的实际结果。数据来自配套的 <code>02_sampling.py</code>，自己的运行结果以保存的报告为准：</p>
 <div class="lesson__table"><table><thead>
 <tr>
 <th>改哪个参数</th>
@@ -168,6 +168,7 @@ output_tokens = final.get(&quot;eval_count&quot;)</code></pre>
 <p>用中文写三句话，向 Python 初学者解释函数的作用。不要使用代码块。</p>
 </blockquote>
 <p>程序预热一次，再按“非流式、流式、流式、非流式”的顺序运行。输入与生成设置相同，只改变 <code>stream</code>。为了方便比较，这组使用 <code>temperature=0</code>、<code>seed=42</code>。</p>
+<p>下面是配套 <code>03_streaming.py</code> 的实测结果：</p>
 <div class="lesson__table"><table><thead>
 <tr>
 <th>运行顺序</th>
@@ -181,39 +182,39 @@ output_tokens = final.get(&quot;eval_count&quot;)</code></pre>
 <tr>
 <td>1</td>
 <td>非流式</td>
-<td>3.588 秒</td>
-<td>3.588 秒</td>
+<td>3.143 秒</td>
+<td>3.143 秒</td>
 <td>63</td>
 </tr>
 <tr>
 <td>2</td>
 <td>流式</td>
-<td>0.169 秒</td>
-<td>3.681 秒</td>
+<td>0.147 秒</td>
+<td>3.358 秒</td>
 <td>63</td>
 </tr>
 <tr>
 <td>3</td>
 <td>流式</td>
-<td>0.130 秒</td>
-<td>3.408 秒</td>
+<td>0.113 秒</td>
+<td>3.380 秒</td>
 <td>63</td>
 </tr>
 <tr>
 <td>4</td>
 <td>非流式</td>
-<td>4.334 秒</td>
-<td>4.334 秒</td>
+<td>3.415 秒</td>
+<td>3.415 秒</td>
 <td>63</td>
 </tr>
 </tbody>
 </table></div><p>这四次输入 Token 都是 31，回答文字也相同。第一轮流式比非流式更早拿到正文，但总耗时略长；第二轮的总耗时又是流式较短。</p>
 <p>所以本次最直接的观察是：<strong>流式让程序更早开始显示内容，总耗时则没有固定的胜负。</strong> 不要把“第一段来得早”写成“整个回答生成得更快”。</p>
-<p>还有一个条件需要留意：第一次对照请求没有命中输入缓存，后面三次报告了 27 个缓存 Token。重复请求时，服务可能复用先前处理过的一部分输入，省掉部分计算，这就是这里说的输入缓存。预热只让模型先运行一次，并没有把所有请求变成完全相同的缓存状态。不过，两次非流式调用中，命中缓存的那次用了 4.334 秒，反而比未命中的 3.588 秒更久。可见这里的总耗时差不能只用缓存解释。再加上只有四次调用，这张表适合解释等待体验，不适合做模型速度排名。</p>
+<p>还有一个条件需要留意：第一次对照请求没有命中输入缓存，后面三次报告了 27 个缓存 Token。重复请求时，服务可能复用先前处理过的一部分输入，省掉部分计算，这就是这里说的输入缓存。预热只让模型先运行一次，并没有把所有请求变成完全相同的缓存状态。不过，两次非流式调用中，命中缓存的那次用了 3.415 秒，反而比未命中的 3.143 秒更久。可见这里的总耗时差不能只用缓存解释。再加上只有四次调用，这张表适合解释等待体验，不适合做模型速度排名。</p>
 <p>本课的时间由 Python 在收到内容后、打印之前记录，测的是程序何时拿到文字，不是屏幕实际绘制的时间。非流式只有一次完整响应，因此记录中的第一段等待和总等待相同。</p>
 <h2 id="sec-bf876b">运行之后，自己看一次结果</h2>
 <p>三个脚本的报告都保存在 <code>runs/</code> 下。打开文件，先找 <code>rows</code>，再选其中一条记录。问答和采样脚本把请求放在 <code>request</code>，原始回答与用量放在 <code>response</code>；流式脚本则另有拼接后的 <code>text</code>、<code>usage</code> 和两个等待时间。具体字段位置见运行说明，不必一下读懂全部原始响应。</p>
-<p>再做一次时，把输出文件名里的 <code>01</code> 改成 <code>02</code>，已有文件不会被覆盖。可以加 <code>--repeats 3</code> 多做一轮，再看看：同样的设置是否仍得到相同回答？最早收到正文的那次，是否也最早结束？</p>
+<p>再做一次时，把输出文件名里的 <code>01</code> 改成 <code>02</code>，已有文件不会被覆盖。运行第二、第三个脚本时，可以加 <code>--repeats 3</code> 多做一轮，再看看：同样的设置是否仍得到相同回答？最早收到正文的那次，是否也最早结束？</p>
 <p>如果安装的是其他本地型号，在命令末尾加 <code>--model 你的模型名</code>，名称以 <code>ollama list</code> 为准。本文数字只对应本次实测型号，更换后需要重新观察结果。</p>
 <p>完整配置、报告字段和失败处理见<a href="https://github.com/wangpuv/learn-llm-agent/tree/main/lessons/l01_token_inference">第一课运行说明</a>。代码遇到未完整结束的回答会保留已收到的内容并停止后续实验，不自动重试。</p>
 <p>下一课，我们会从“收到一段回答”继续往前走：如果程序需要固定的字段和类型，怎样要求模型返回数据，又怎样检查它是否符合要求？</p>
