@@ -66,10 +66,28 @@ Each course is split into a generated half and a hand-written half.
 **Re-run `npm run course` after publishing a lesson**; nothing picks up new
 source automatically. Never hand-edit those three outputs.
 
-A course entry may carry an `include` list naming the source stems that ship.
-The LLM course keeps unfinished lessons in the same Obsidian folder as the
-published ones, so without it a half-written 第 8 课 would appear on the site
-with 3–7 still missing. Omit `include` to publish every `.md` in the folder.
+**Publishing a lesson is three edits**, and skipping any one of them shows:
+
+1. name its source stem in that course's `include` list in the build script;
+2. add its English shell to `english` in `src/data/courses/<slug>.js`;
+3. delete its row from `upcoming` in the same file — otherwise the contents
+   page lists it twice, once as a link and once as a greyed promise.
+
+Then re-run `npm run course`.
+
+Both courses carry an `include` list, and both need it: a lesson drafted in
+the vault is not a lesson published here. The LLM course keeps unfinished
+lessons in the same Obsidian folder as the published ones (without `include`
+a half-written 第 8 课 would appear with 3–7 still missing), and the Claude
+Code folder runs ahead of the WeChat account it mirrors. Omitting `include`
+publishes every `.md` in the folder, which is never what you want here.
+
+Source titles carry the subtitle after an em dash (`第 N 课：<主题> —— <副题>`)
+in the Claude Code course. The LLM course titles a lesson with a single
+question and has no dash to split, so those lessons name the subtitle in the
+frontmatter as `kicker:`. It wins over anything parsed out of the title, and
+both the contents row and the article header have a slot for it — without one
+the row loses a line and the header an empty paragraph.
 
 The hand-written half is one module per course under `src/data/courses/`:
 English titles for each published lesson, the stage groupings, the lessons
@@ -80,6 +98,14 @@ channel, and the spread's copy.
 
 Adding a third course: write `src/data/courses/<slug>.js`, add it to `COURSES`
 in the build script, and register it in `src/data/course.js`.
+
+Three kinds of blockquote come out of the sources and are styled apart in
+`app.css`: `lesson__abstract` (a lesson's opening summary, only ever above the
+first `h2`), `lesson__quote` (the thing the sentence just pointed at — a prompt
+sent to the model, a claim being quoted — recognised by a lead-in paragraph
+ending in a colon), and `lesson__aside` (marginalia standing on its own after a
+list or table). Introduce a quote with a colon and it is set apart in the serif
+display face; leave it standing alone and it is muted marginalia.
 
 Lesson bodies stay Chinese in both languages — English mode translates the
 chrome and contents page and shows a note on the article. The 公众号 cover

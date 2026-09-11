@@ -30,23 +30,33 @@ const VAULT = join(process.env.HOME, 'Documents/Obsidian/will-falcon-doc')
 // One entry per serialised course. `slug` is the URL segment and the
 // output folder; it must match the slug in src/data/courses/<slug>.js.
 //
-// `include` limits the build to specific source stems. The LLM course
-// keeps unfinished lessons in the same folder as the published ones, so
-// without it a half-written 第 8 课 would appear on the site with 3–7
-// still missing. Omit it to publish every .md in the folder.
+// `include` limits the build to specific source stems, and both courses
+// now carry one: a lesson drafted in the vault is not a lesson published
+// here. Without it the LLM course would ship a half-written 第 8 课 with
+// 3–7 still missing, and the Claude Code course would mirror a lesson the
+// WeChat account has not run yet. Naming the stem here is the first of the
+// three edits that publish a lesson; see src/data/courses/<slug>.js for
+// the other two.
 const COURSES = [
   {
     slug: 'claude-code',
     src: process.env.COURSE_SRC
       || join(VAULT, 'Learn Claude Code/发布预览/公众号版'),
     preface: { topic: '发刊词', kicker: '17 课，从能用到自动化' },
+    include: [
+      '00-发刊词',
+      '01-init-claude-md', '02-context-management', '03-model-and-plan-mode',
+      '04-code-review', '05-memory-and-rewind', '06-resume',
+      '07-agents-and-mcp', '08-permissions-and-auto-mode', '09-effort-and-fast',
+      '10-diff-and-usage', '11-help-and-discovery', '12-batch-parallel-changes',
+    ],
   },
   {
     slug: 'llm-engineer',
     src: process.env.LLM_COURSE_SRC
       || join(VAULT, 'Learn LLM Engineer/发布预览/公众号版'),
     preface: { topic: '发刊词', kicker: '22 课，从调用模型到构建 Agent' },
-    include: ['00-发刊词', '00-环境准备'],
+    include: ['00-发刊词', '00-环境准备', '01-token-and-inference'],
   },
 ]
 
@@ -78,12 +88,15 @@ const md = new MarkdownIt({ html: false, linkify: true, breaks: false })
 md.core.ruler.push('site-course', (state) => {
   const out = []
   let seenQuote = false
+  let openedSection = false
 
   state.tokens.forEach((token, i) => {
     // A `---` immediately before a section heading doubles up with the rule
     // the heading already draws for itself.
     const next = state.tokens[i + 1]
     if (token.type === 'hr' && (!next || next.type === 'heading_open')) return
+
+    if (token.type === 'heading_open' && token.tag === 'h2') openedSection = true
 
     if (token.type === 'heading_open' && (token.tag === 'h2' || token.tag === 'h3')) {
       // `.content` is the raw inline markdown, so a heading like
@@ -98,12 +111,34 @@ md.core.ruler.push('site-course', (state) => {
       if (token.tag === 'h2') toc.push({ id, text })
     }
 
-    // First blockquote of a lesson is its abstract (what the lesson answers,
-    // who it is for, and the version it was checked against); later ones are
-    // asides in the flow of the argument.
+    // Three different things arrive as blockquotes, and they are not
+    // interchangeable on the page:
+    //
+    //   lesson__quote    the thing the sentence just pointed at — a prompt
+    //                    sent to the model, a claim being quoted, a rule set
+    //                    apart. Always introduced by a lead-in paragraph
+    //                    ending in a colon, which is what distinguishes it.
+    //   lesson__abstract the opening summary of a lesson (what it answers,
+    //                    who it is for, the version it was checked against).
+    //                    Only ever above the first section heading.
+    //   lesson__aside    marginalia in the flow of the argument, standing on
+    //                    its own after a list or a table.
+    //
+    // The LLM course writes no abstract and quotes the prompts it sends to
+    // the model instead, so a plain "first quote wins" rule mounted a
+    // question to the model on the abstract's card, halfway down the article.
     if (token.type === 'blockquote_open') {
-      token.attrJoin('class', seenQuote ? 'lesson__aside' : 'lesson__abstract')
-      seenQuote = true
+      const leadIn = state.tokens[i - 1]?.type === 'paragraph_close'
+        ? (state.tokens[i - 2]?.content ?? '')
+        : ''
+      const pointedAt = /[：:]\s*$/.test(leadIn)
+      token.attrJoin(
+        'class',
+        pointedAt ? 'lesson__quote'
+          : seenQuote || openedSection ? 'lesson__aside'
+            : 'lesson__abstract',
+      )
+      if (!pointedAt) seenQuote = true
     }
 
     // The 📌 line is a version-checked-on stamp, not body copy.
@@ -175,8 +210,17 @@ const slugFor = (stem) => slugMap[stem] ?? stem
 // "第 N 课：<问题>" in the LLM one. The contents page sets the subject large and
 // the subtitle small, so split them once here rather than re-parsing the same
 // string in three components.
-function splitTitle(title, number, course, slug) {
+//
+// A title that is a single question carries no subtitle to split off, and the
+// contents row and article header both have a slot for one. Those lessons name
+// it in the frontmatter as `kicker:`; it wins over anything parsed out of the
+// title.
+function splitTitle(title, number, course, slug, kicker) {
   if (slug === '00-preface') return { ...course.preface }
+  if (kicker) {
+    const subject = title.match(/^第\s*\d+\s*课[：:]\s*(.+?)(?:\s*——\s*.+)?$/)
+    return { topic: subject ? subject[1] : title, kicker }
+  }
   const parts = title.match(/^第\s*\d+\s*课[：:]\s*(.+?)\s*——\s*(.+)$/)
   if (parts) return { topic: parts[1], kicker: parts[2] }
   const bare = title.match(/^第\s*\d+\s*课[：:]\s*(.+)$/)
@@ -260,7 +304,7 @@ async function buildCourse(course) {
       toc,
       zh: {
         title: data.title ?? stem,
-        ...splitTitle(data.title ?? stem, number, course, slug),
+        ...splitTitle(data.title ?? stem, number, course, slug, data.kicker),
         description: data.description ?? '',
       },
     })

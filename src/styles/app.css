@@ -2671,6 +2671,20 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   padding: 0.5rem 0.9rem;
   border-radius: var(--radius);
 }
+/* …and a command longer than the plate wraps rather than scrolling. `pre`
+   turned it into a silent horizontal scroller with no scrollbar and no edge,
+   so `--mode sampling --output runs/…` simply ended off the page and the
+   reader copied a truncated command. Breaking at the space before a flag is
+   where a shell line wants to break anyway; the hanging continuation keeps it
+   readable as one command. Listings keep `pre` — there, indentation is the
+   structure, and wrapping it would be a lie about the code. */
+.lesson__code--tight code {
+  display: block;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  padding-left: 1.4em;
+  text-indent: -1.4em;
+}
 .lesson__code[data-lang]::after {
   content: attr(data-lang);
   position: absolute;
@@ -2736,7 +2750,7 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
 }
 .lesson__table tr:last-child td { border-bottom: 0; }
 
-/* ---------------- Abstract & asides ---------------- */
+/* ---------------- Abstract, quotes & asides ---------------- */
 /* The opening quote of every lesson states what it answers, who it is for,
    and the version it was checked against. That is a masthead, not a pull
    quote, so it gets the board treatment and sits above the first rule. */
@@ -2775,6 +2789,32 @@ a.lesson-row:focus-visible { outline-offset: -2px; }
   background: var(--course-ink, var(--accent));
 }
 .lesson__aside > * + * { margin-top: 0.7rem; }
+
+/* The other kind of set-apart block: the thing the sentence just pointed at
+   — the prompt sent to the model, the claim being quoted, the rule stated
+   once. The reader has to read it, so it cannot be muted like an aside.
+   The serif display face does the separating instead of a plate: the body is
+   Geist / PingFang, so Fraunces / Songti reads as quoted material at a
+   glance, and the article is already carrying enough grey boards.
+
+   Set at the text measure, not full width — it is prose being quoted, not a
+   listing. Ink and rule weight are what tell it apart from an aside. */
+.lesson__quote {
+  position: relative;
+  padding-left: var(--space-m);
+  font-family: var(--font-display);
+  font-size: var(--step-0);
+  line-height: 1.75;
+  color: var(--ink);
+}
+.lesson__quote::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.35em; bottom: 0.35em;
+  width: 2px;
+  background: var(--course-ink, var(--accent));
+}
+.lesson__quote > * + * { margin-top: 0.7rem; }
 
 /* ---------------- Section rail ---------------- */
 .lesson-toc { max-height: calc(100vh - 9rem); overflow-y: auto; }

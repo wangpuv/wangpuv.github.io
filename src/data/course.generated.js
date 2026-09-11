@@ -757,6 +757,48 @@ export const publishedLessons = {
         "kicker": "让 Python 收到本地模型的第一条回答",
         "description": "装好 Ollama 和 Python 环境，运行本地模型，再用一个小实验检查返回的数据。这是 22 课开始前的准备篇。"
       }
+    },
+    {
+      "slug": "01-token-and-inference",
+      "number": 1,
+      "date": "2026-09-11",
+      "minutes": 12,
+      "toc": [
+        {
+          "id": "sec-bcf336",
+          "text": "一、先查请求，再比较回答"
+        },
+        {
+          "id": "sec-41c0de",
+          "text": "二、只改一个参数，看看发生了什么"
+        },
+        {
+          "id": "sec-eca691",
+          "text": "三、Token 数从哪里看"
+        },
+        {
+          "id": "sec-9b473f",
+          "text": "四、先想清楚：你关心哪一种等待"
+        },
+        {
+          "id": "sec-5738e3",
+          "text": "五、把两种返回方式放在一起跑"
+        },
+        {
+          "id": "sec-3e42ae",
+          "text": "六、打开报告，看一次完整记录"
+        },
+        {
+          "id": "sec-2fab06",
+          "text": "自己改一次，再解释结果"
+        }
+      ],
+      "zh": {
+        "title": "第 1 课：发出一次请求后，怎样检查参数、用量和等待时间？",
+        "topic": "发出一次请求后，怎样检查参数、用量和等待时间？",
+        "kicker": "认识 Token，核对 temperature、top_p 是否真的进了请求",
+        "description": "从一次参数没有传入请求的错误开始，检查实际请求、读取模型报告的 Token 数，再比较流式与非流式的等待时间。"
+      }
     }
   ]
 }

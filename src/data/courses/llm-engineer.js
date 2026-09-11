@@ -3,12 +3,17 @@
 //
 // Same split as the Claude Code course: `npm run course` generates the
 // Chinese lesson bodies into src/content/course/llm-engineer/, and
-// everything here is written by hand. Only the 发刊词 is published so
-// far; lessons 1–22 come from its appendix and are listed as planned.
+// everything here is written by hand. The lessons not written yet come
+// from the appendix of the 发刊词 and are listed as planned.
 //
 // The build script's `include` list decides what actually ships, so
 // half-written lessons sitting in the same Obsidian folder stay off
 // the site until they are named there.
+//
+// Publishing a lesson is three edits: name its stem in that `include` list,
+// add its English shell to `english` below, and delete its row from
+// `upcoming` — otherwise it appears twice, once as a link and once as a
+// greyed row promising the same lesson.
 // ───────────────────────────────────────────────────────────
 
 export default {
@@ -68,15 +73,11 @@ export default {
     },
   ],
 
-  // All 22 lessons, taken from the appendix of the 发刊词. None are written
-  // yet; they appear as greyed, inert rows so the arc of the course is
-  // visible without pretending anything is published.
+  // The lessons still to come, taken from the appendix of the 发刊词. They
+  // appear as greyed, inert rows so the arc of the course is visible without
+  // pretending anything is published; a lesson moves out of this list when it
+  // ships.
   upcoming: [
-    {
-      number: 1,
-      en: { topic: 'Checking parameters, usage and waiting time', kicker: 'What one request actually sent, and how long it took' },
-      zh: { topic: '发出一次请求后，怎样检查参数、用量和等待时间？', kicker: '认识 Token，核对 temperature、top_p 是否真的进了请求' },
-    },
     {
       number: 2,
       en: { topic: 'Data the program actually validates', kicker: 'Fields, types and ranges, with a capped repair loop' },
@@ -198,6 +199,12 @@ export default {
       kicker: 'Getting Python to receive the first answer from a local model',
       description:
         'Install Ollama and set up the Python environment, run a local model, and verify the returned data with a small experiment. This is the preparation lesson before the 22 core lessons.',
+    },
+    '01-token-and-inference': {
+      topic: 'Checking parameters, usage and waiting time',
+      kicker: 'What one request actually sent, and how long it took',
+      description:
+        'Starting from a run where the parameter never reached the request: read the request that actually went out, take the token counts the service reports rather than counting characters, and time streaming against non-streaming for first text and for the whole answer.',
     },
   },
 }

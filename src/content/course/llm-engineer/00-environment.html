@@ -66,7 +66,7 @@ ollama list</code></pre>
 <p>然后发送一次问题：</p>
 <pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l00_environment --mode chat</code></pre>
 <p>程序会问模型：</p>
-<blockquote class="lesson__abstract">
+<blockquote class="lesson__quote">
 <p>请用一句中文解释：Python 程序为什么要通过 Ollama 调用本地模型？</p>
 </blockquote>
 <p>这里的“检查通过”只表示收到了完整、非空的回答，不代表回答中的每句话都正确。</p>
@@ -85,7 +85,7 @@ answer = body[&quot;message&quot;][&quot;content&quot;]</code></pre>
 <h2 id="sec-f9825c">再做一个小实验：回答能否交给程序使用</h2>
 <p>聊天窗口里的一段文字，人可以自己读。程序还需要知道：哪些是姓名，哪些是数量，数量是不是整数。</p>
 <p>这次输入固定为：</p>
-<blockquote class="lesson__aside">
+<blockquote class="lesson__quote">
 <p>小林买了 3 本笔记本。</p>
 </blockquote>
 <p>运行：</p>
