@@ -202,9 +202,9 @@ export default {
     },
     '01-token-and-inference': {
       topic: 'Checking parameters, usage and waiting time',
-      kicker: 'What one request actually sent, and how long it took',
+      kicker: 'Understand how the model writes, then run the experiments',
       description:
-        'Starting from a run where the parameter never reached the request: read the request that actually went out, take the token counts the service reports rather than counting characters, and time streaming against non-streaming for first text and for the whole answer.',
+        'Starting from one plain question and answer: what a token is and how the model writes one step at a time, then hands on to compare sampling parameters, read the usage the service reports, and time streaming against non-streaming.',
     },
   },
 }

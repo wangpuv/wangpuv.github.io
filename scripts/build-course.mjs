@@ -49,6 +49,7 @@ const COURSES = [
       '04-code-review', '05-memory-and-rewind', '06-resume',
       '07-agents-and-mcp', '08-permissions-and-auto-mode', '09-effort-and-fast',
       '10-diff-and-usage', '11-help-and-discovery', '12-batch-parallel-changes',
+      '13-background-fork-branch',
     ],
   },
   {

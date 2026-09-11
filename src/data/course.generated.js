@@ -679,6 +679,52 @@ export const publishedLessons = {
         "kicker": "/batch 不是“大改动按钮”",
         "description": "什么任务适合 /batch？先确认规则明确、单元独立、结果可验收，再让子代理在各自的 worktree 中并行实现。本课讲清任务拆分、方案确认和 PR 合并的边界。"
       }
+    },
+    {
+      "slug": "13-background-fork-branch",
+      "number": 13,
+      "date": "2026-09-10",
+      "minutes": 9,
+      "toc": [
+        {
+          "id": "sec-8611cd",
+          "text": "一、先问：谁去后台，你留在哪？"
+        },
+        {
+          "id": "sec-7ebfa5",
+          "text": "二、/branch：换一条思路，自己接着聊"
+        },
+        {
+          "id": "sec-9909fe",
+          "text": "三、/fork：复制一份去后台，自己留在原对话"
+        },
+        {
+          "id": "sec-9398bb",
+          "text": "四、/background：让眼前这份会话继续工作"
+        },
+        {
+          "id": "sec-559b37",
+          "text": "五、看进度：/tasks 和 claude agents 不是同一个入口"
+        },
+        {
+          "id": "sec-443dd7",
+          "text": "六、最容易踩的坑：对话分开，不等于文件隔离"
+        },
+        {
+          "id": "sec-5d57e3",
+          "text": "七、课后练习：先做一轮只读分工"
+        },
+        {
+          "id": "sec-8ea868",
+          "text": "本课小结"
+        }
+      ],
+      "zh": {
+        "title": "第 13 课：后台、分叉与分支 —— 谁去后台，你留在哪？",
+        "topic": "后台、分叉与分支",
+        "kicker": "谁去后台，你留在哪？",
+        "description": "/branch、/fork、/background 看起来相似，却把你和任务送到不同位置。本课讲清对话分支、独立后台会话、子任务回报，以及 /tasks 和 claude agents 各自管理什么。"
+      }
     }
   ],
   "llm-engineer": [
@@ -762,42 +808,42 @@ export const publishedLessons = {
       "slug": "01-token-and-inference",
       "number": 1,
       "date": "2026-09-11",
-      "minutes": 12,
+      "minutes": 14,
       "toc": [
         {
-          "id": "sec-bcf336",
-          "text": "一、先查请求，再比较回答"
+          "id": "sec-213729",
+          "text": "一、先看一次简单的问答"
         },
         {
-          "id": "sec-41c0de",
-          "text": "二、只改一个参数，看看发生了什么"
+          "id": "sec-84a227",
+          "text": "二、Token 是什么，模型怎样接着往下写？"
         },
         {
-          "id": "sec-eca691",
-          "text": "三、Token 数从哪里看"
+          "id": "sec-0dc8ef",
+          "text": "三、为什么同一个问题可能得到不同回答？"
         },
         {
-          "id": "sec-9b473f",
-          "text": "四、先想清楚：你关心哪一种等待"
+          "id": "sec-06126e",
+          "text": "四、动手比较之前，确认参数真的发出去了"
         },
         {
-          "id": "sec-5738e3",
-          "text": "五、把两种返回方式放在一起跑"
+          "id": "sec-ce8eb9",
+          "text": "五、一次问答处理了多少 Token？"
         },
         {
-          "id": "sec-3e42ae",
-          "text": "六、打开报告，看一次完整记录"
+          "id": "sec-20cadf",
+          "text": "六、回答怎样显示，会影响等待的感觉"
         },
         {
-          "id": "sec-2fab06",
-          "text": "自己改一次，再解释结果"
+          "id": "sec-bf876b",
+          "text": "运行之后，自己看一次结果"
         }
       ],
       "zh": {
         "title": "第 1 课：发出一次请求后，怎样检查参数、用量和等待时间？",
         "topic": "发出一次请求后，怎样检查参数、用量和等待时间？",
-        "kicker": "认识 Token，核对 temperature、top_p 是否真的进了请求",
-        "description": "从一次参数没有传入请求的错误开始，检查实际请求、读取模型报告的 Token 数，再比较流式与非流式的等待时间。"
+        "kicker": "先理解模型怎样生成文字，再动手做实验",
+        "description": "从一次简单问答开始，理解 Token、模型逐步生成文字的过程，再动手比较采样参数、用量和等待时间。"
       }
     }
   ]

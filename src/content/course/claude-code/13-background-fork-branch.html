@@ -1,0 +1,121 @@
+<blockquote class="lesson__abstract">
+<p><strong>本课回答一个问题</strong>：想换个思路，或者让 Claude 在后台继续干活，应该用哪个命令？</p>
+<p>适合：已经会进行连续对话，准备同时推进几件事的人。</p>
+<p class="lesson__stamp">📌 按 2026 年 9 月官方文档核对。本文主要介绍 <strong>Claude Code v2.1.212 及以后、agent view 开启时</strong>的行为；相关功能仍在研究预览阶段。旧版本和关闭 agent view 的情况，见文中版本提醒。</p>
+</blockquote>
+<h2 id="sec-8611cd">一、先问：谁去后台，你留在哪？</h2>
+<p>上一课，我们讨论了 <code>/batch</code> 如何组织大规模并行改动。这一课先不追求“同时干很多事”，而是弄清楚几个容易混淆的命令。</p>
+<p>假设你已经和 Claude 讨论了一轮登录模块的设计。现在有三个不同的想法：</p>
+<ul>
+<li>想保留现有讨论，自己换个方案继续聊；</li>
+<li>想让另一份会话去调查问题，自己留在原来的对话；</li>
+<li>想让眼前这份会话继续工作，先把终端腾出来。</li>
+</ul>
+<p>这分别对应 <code>/branch</code>、<code>/fork</code> 和 <code>/background</code>。</p>
+<figure class="lesson__fig"><img src="/course/claude-code/13-background-fork-branch-01-three-command-paths.webp" alt="三个命令分别决定：进入对话副本、留在原对话，还是把当前会话送到后台" width="1200" height="675" loading="lazy" decoding="async"><figcaption>三个命令分别决定：进入对话副本、留在原对话，还是把当前会话送到后台</figcaption></figure>
+<p>记住这个顺序就容易了：</p>
+<p><strong><code>/branch</code>：你进入副本。</strong></p>
+<p><strong><code>/fork</code>：副本去后台，你留在原处。</strong></p>
+<p><strong><code>/background</code>：当前会话去后台，终端腾出来。</strong></p>
+<p>它们解决的是“对话怎么继续”，不是三个不同档位的加速按钮。</p>
+<h2 id="sec-7ebfa5">二、<code>/branch</code>：换一条思路，自己接着聊</h2>
+<p>在当前 Claude Code 对话中输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/branch login-plan-b</code></pre>
+<p>它会从当前位置复制一份对话，并把你切换到副本。原来的对话保留，可以通过 <code>/resume</code> 找回。</p>
+<p>例如，你已经讨论了方案 A，现在想试试方案 B：</p>
+<pre class="lesson__code"><code>先不要修改文件。
+基于已有需求，改用方案 B 分析登录流程。
+比较它与方案 A 的实现复杂度、兼容风险和测试成本。</code></pre>
+<p>这样做的好处，是两条讨论路线可以分别展开。你不必先删除方案 A 的讨论，也不用从头重述需求。</p>
+<p>但一定要注意：<strong>这里的 branch 是对话分支，不是 Git 分支，更不是一份自动隔离的代码目录。</strong></p>
+<p>如果你在副本中修改了文件，再恢复原对话，磁盘上的修改不会因为切回聊天记录就消失。</p>
+<p>所以，比较方案时可以先限制为“只讨论、不改文件”。决定实际实现两套代码时，再安排独立的 worktree、明确各自的起点和验收方式。</p>
+<h2 id="sec-9909fe">三、<code>/fork</code>：复制一份去后台，自己留在原对话</h2>
+<p>如果不是自己换条路线，而是想让另一份会话去处理一件事，可以输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/fork 检查登录模块的测试覆盖，只阅读文件，不修改代码。列出缺失场景和对应文件位置。</code></pre>
+<p>在本文介绍的新版本行为中，副本会继承分叉前的对话，并作为独立后台会话执行这条指令；你仍然留在原对话里。</p>
+<p>如果只输入 <code>/fork</code> 而不附带任务，副本会等待你的第一条指令，不会自动猜测接下来要做什么。</p>
+<p>这里的“独立”很重要：**副本后来发生的对话，不会自动写回原对话。**它不是“叫一个助手，做完自动把结果交回来”的同义词。</p>
+<h3 id="sec-e21bd3">如果我就是想让它做完回报呢？</h3>
+<p>当前版本对应的是 <code>/subtask</code>：</p>
+<pre class="lesson__code lesson__code--tight"><code>/subtask 检查登录模块的测试覆盖，只阅读文件，不修改代码。完成后返回缺失场景清单。</code></pre>
+<p>它启动继承当前对话的后台子代理，结果会返回当前会话。</p>
+<p>可以这样选择：</p>
+<ul>
+<li><strong>想单独跟进另一份完整对话</strong>：考虑 <code>/fork</code>。</li>
+<li><strong>想委派一个旁支任务，拿回结果继续主线</strong>：考虑 <code>/subtask</code>。</li>
+</ul>
+<h3 id="sec-7b307f">旧教程为什么说得不一样？</h3>
+<p>在 v2.1.161–v2.1.211 中，<code>/fork</code> 的确是后台子代理用法。v2.1.212 起，这一用法改由 <code>/subtask</code> 承担。</p>
+<p>另外，<strong>关闭 agent view 时，<code>/fork</code> 仍保留子代理行为，<code>/subtask</code> 不可用</strong>。</p>
+<p>如果你的界面与本文不一致，先在系统终端运行 <code>claude --version</code>，再在 Claude Code 中查看 <code>/help</code>，确认版本和功能是否开启。不要只凭命令名称判断行为。</p>
+<h2 id="sec-9398bb">四、<code>/background</code>：让眼前这份会话继续工作</h2>
+<p>假设当前会话已经掌握任务上下文，你希望它接着分析，只是暂时不占用这个终端：</p>
+<pre class="lesson__code lesson__code--tight"><code>/background 继续整理当前调查结果，列出证据、待确认问题和下一步建议，不修改代码。</code></pre>
+<p>也可以使用简写 <code>/bg</code>。</p>
+<p>与 <code>/fork</code> 不同，这次送到后台的是当前会话，而不是留着当前对话、再派一个副本出去。</p>
+<p>后台也不是无人值守的保证。任务可能需要你回答问题、处理权限提示，或者补充缺失信息。</p>
+<p>这里的后台会话进程运行在你的电脑上，<strong>并不是把执行环境迁移到云端</strong>；模型请求仍使用当前配置的服务，不代表模型推理也完全在本机进行。</p>
+<p>关机后任务不会继续执行。机器休眠时会话可以保留，但不要把休眠时间按任务持续运行来规划。</p>
+<p>我建议第一次尝试时，先用一项边界明确的只读调查：让它列清单、给证据，自己稍后回来检查。熟悉状态和接管方式后，再安排会修改代码的任务。</p>
+<h2 id="sec-559b37">五、看进度：<code>/tasks</code> 和 <code>claude agents</code> 不是同一个入口</h2>
+<p>“后台任务”听起来像一个篮子，但实际需要区分两层。</p>
+<figure class="lesson__fig"><img src="/course/claude-code/13-background-fork-branch-02-two-management-entries.webp" alt="当前会话内部的后台工作用 tasks 查看，独立后台会话用系统终端里的 claude agents 管理" width="1200" height="675" loading="lazy" decoding="async"><figcaption>当前会话内部的后台工作用 tasks 查看，独立后台会话用系统终端里的 claude agents 管理</figcaption></figure>
+<h3 id="sec-f37e3b">当前会话里面的后台工作</h3>
+<p>在 Claude Code 对话中输入：</p>
+<pre class="lesson__code lesson__code--tight"><code>/tasks</code></pre>
+<p>它用于查看和管理当前会话内的后台工作，例如后台命令和子代理，也会显示已完成的子代理。<code>/bashes</code> 是它的别名。</p>
+<h3 id="sec-6c3cf4">独立的后台会话</h3>
+<p>在<strong>系统终端</strong>输入：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="bash"><code>claude agents</code></pre>
+<p>这是 agent view 的入口，用来查看和接管独立后台会话，包括本文介绍的 <code>/fork</code> 副本与 <code>/background</code> 会话。</p>
+<p>注意，它前面没有斜杠，也不是在 Claude 对话里输入 <code>/agents</code>。这两个写法不能互换。</p>
+<p>进入列表后，可以这样查看和接管：</p>
+<ol>
+<li>用方向键选中目标会话，按 <code>Space</code> 查看近期输出，也可以在查看面板中回复它。</li>
+<li>想进入完整对话时，选中该会话后按 <code>Enter</code>。</li>
+<li>在会话的空输入框中按 <code>←</code>，脱离会话并返回列表；这不会停止后台会话。</li>
+</ol>
+<p>**给已有会话追加指令，要在它的查看面板或完整对话中输入。**列表中的新任务输入框会创建另一份后台会话，不是给选中的会话追加消息。具体按键以当前界面提示为准。</p>
+<p>查看时，我建议按这个顺序检查：</p>
+<ol>
+<li>它是在工作，还是在等我输入？</li>
+<li>是否出现权限、依赖或任务范围问题？</li>
+<li>结果放在哪里，有哪些证据可供核验？</li>
+<li>如果修改了代码，改动是否在预期的工作目录？</li>
+</ol>
+<p>**退出查看界面、停止执行、删除会话，是三种不同动作。**不要为了返回终端而随手删除任务；尤其存在代码改动时，先确认成果已经保留。</p>
+<h2 id="sec-443dd7">六、最容易踩的坑：对话分开，不等于文件隔离</h2>
+<p>想象两个会话同时处理登录模块：一个改接口响应，另一个改测试。如果它们实际操作同一个目录，就可能互相影响。</p>
+<p>命令执行成功，只能说明会话安排好了，不能代替工作目录检查。</p>
+<p>当前文档说明，v2.1.221 起，<code>/fork</code> 在非原地编辑的情形下会指示副本先创建自己的 worktree 再改代码。但这有配置和环境上的例外，不能概括成“用了 <code>/fork</code> 就一定自动隔离”。</p>
+<p>真正要并行改代码之前，先让每个会话报告：</p>
+<pre class="lesson__code"><code>开始修改前，请确认并报告：
+1. 当前工作目录；
+2. 当前 Git 分支与起始提交；
+3. 这次允许修改的文件范围；
+4. 验证方式。
+如果目录或任务范围与其他会话冲突，先停下来说明，不要直接修改。</code></pre>
+<p>这是一条操作建议，不是权限沙箱。还需要核对实际目录和变更，不能只看一句“已确认”。</p>
+<p>另外，多个任务同时运行会共同消耗使用额度，也会竞争本机资源。先用一个小任务跑通“派出、查看、接管、验收”，比一次开很多任务更容易发现问题。</p>
+<h2 id="sec-5d57e3">七、课后练习：先做一轮只读分工</h2>
+<p>选一个你熟悉的小模块，按下面的顺序练习：</p>
+<ol>
+<li>在主会话中说清模块目标，并明确“本轮不修改代码”。</li>
+<li>用 <code>/branch</code> 开一条讨论路线，比较另一种设计。</li>
+<li>用 <code>/resume</code> 回到原对话后，用 <code>/fork</code> 派出一项只读调查。</li>
+<li>新开一个终端窗口或标签页，运行 <code>claude agents</code>，找到副本并按 <code>Space</code> 查看结果。原终端仍保留主会话。</li>
+<li>切回原终端，在主会话中用 <code>/subtask</code> 做一项小调查，观察结果回到主会话的区别。</li>
+<li>等这项子任务完成后，在主会话中输入 <code>/background 整理本轮调查结论与待确认问题，不修改代码</code>。然后运行 <code>claude agents</code>，找到它，按 <code>Enter</code> 进入完整对话；查看后，在空输入框按 <code>←</code> 返回列表，完成一轮“后台运行—查看—接管—返回”。</li>
+</ol>
+<p>不需要故意制造大任务。只要能说清楚“我在哪一份对话里、另一项工作在哪里、结果应该去哪里找”，这课的核心就掌握了。</p>
+<h2 id="sec-8ea868">本课小结</h2>
+<ul>
+<li><strong><code>/branch</code></strong>：保留原对话，自己进入副本。</li>
+<li><strong><code>/fork</code></strong>：副本去后台，自己留在原对话；注意版本与 agent view 设置。</li>
+<li><strong><code>/background</code></strong>：当前会话去后台，释放终端。</li>
+<li><strong><code>/subtask</code></strong>：委派后台子代理，让结果回到当前会话。</li>
+<li><strong><code>/tasks</code> / <code>claude agents</code></strong>：分别查看会话内后台工作和独立后台会话。</li>
+</ul>
+<p>最后记住一句话：<strong>先弄清对话在哪里，再确认代码改在哪里。</strong></p>
+

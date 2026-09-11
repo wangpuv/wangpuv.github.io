@@ -62,16 +62,11 @@ export default {
     },
   ],
 
-  // Lessons 13–17, announced in the 发刊词 but not yet written. They appear
+  // Lessons 14–17, announced in the 发刊词 but not yet written. They appear
   // on the contents page as plain, unlinked rows: the arc is part of what
   // the course is, and pretending the list stops at the last published
   // lesson would undersell it.
   upcoming: [
-    {
-      number: 13,
-      en: { topic: 'Background, forks, branches, tasks', kicker: 'Four ways to run more than one thing' },
-      zh: { topic: '后台、分叉、分支与任务面板', kicker: '同时推进多件事的四种方式' },
-    },
     {
       number: 14,
       en: { topic: 'Running and verifying the app', kicker: 'Green tests are not a working product' },
@@ -184,6 +179,12 @@ export default {
       kicker: '/batch is not a “big change” button',
       description:
         'What actually suits /batch: rules already settled, units that are independent, results you can sign off. Then the split, the plan you approve, and the merge nobody else can do for you.',
+    },
+    '13-background-fork-branch': {
+      topic: 'Background, forks and branches',
+      kicker: 'Which one leaves, and where do you stay?',
+      description:
+        '/branch, /fork and /background look alike and put you in different places. Conversation branches, separate background sessions, subtasks that report back, and what /tasks and claude agents each manage.',
     },
   },
 }

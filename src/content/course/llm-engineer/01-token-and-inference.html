@@ -1,86 +1,109 @@
-<p>我在最初的 Day 1 实验里写了三组 <code>top_p</code>，想看看不同参数会生成什么店名。</p>
-<p>终端依次打印 <code>0.1</code>、<code>0.5</code>、<code>1.0</code>，看起来实验正在正常进行。后来检查代码才发现：<strong>变的只是日志，发给模型的请求根本没带这个参数。</strong></p>
-<p>这节课就从这个错误开始。我们不只看模型回答了什么，还要确认三件事：</p>
-<ul>
-<li>想改的参数，有没有真正发出去？</li>
-<li>模型这次处理了多少 Token？</li>
-<li>要等多久才能看到文字，多久才能收齐回答？</li>
-</ul>
-<p>完成环境准备篇后，就可以运行本课。仍用本地 <code>qwen3.5:9b</code>，不增加第三方依赖。</p>
-<h2 id="sec-bcf336">一、先查请求，再比较回答</h2>
-<p>原来的循环大致是这样：</p>
-<pre class="lesson__code" data-lang="python"><code>for cfg in configs:
-    print(&quot;top_p =&quot;, cfg[&quot;top_p&quot;])
-    result = run_inference(
-        prompt,
-        temperature=cfg[&quot;temperature&quot;],
-    )</code></pre>
-<p><code>top_p</code> 被打印了出来，却没有传给 <code>run_inference()</code>。函数内部也只把 <code>temperature</code> 放进模型请求。</p>
-<p>假如这几次回答不同，我很容易把差异归因于 <code>top_p</code>。但请求没有变，这个结论从第一步就站不住。</p>
-<p>本课把构造请求单独写成函数，让参数去向一眼可见。下面只展示 <code>core.py</code> 中与参数传递有关的部分，其余固定设置暂时省略；运行时使用仓库里的完整版本：</p>
-<pre class="lesson__code" data-lang="python"><code>def build_request(model, prompt, *, temperature=0.8,
-                  top_p=0.9, stream=False):
-    return {
-        &quot;model&quot;: model,
-        &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
-        &quot;stream&quot;: stream,
-        &quot;options&quot;: {
-            &quot;temperature&quot;: temperature,
-            &quot;top_p&quot;: top_p,
-            # 其余固定设置见完整代码
-        },
-    }</code></pre>
-<p>这次，两个参数都明确进入了 <code>options</code>。发送的请求也会收录在实验报告中。离线测试还会检查 HTTP 请求中的实际字节，避免出现“保存对了，发送时又漏了”的问题。</p>
-<figure class="lesson__fig"><img src="/course/llm-engineer/01-token-and-inference-01-request-parameters.webp" alt="参数从实验配置进入请求，再实际发送；检查请求中的参数和值" width="1672" height="941" loading="lazy" decoding="async"><figcaption>参数从实验配置进入请求，再实际发送；检查请求中的参数和值</figcaption></figure>
-<p>模型会把文字拆成小片段来处理，这些片段叫 <strong>Token</strong>。一个片段可能是一个字、一个词，也可能只是词的一部分。下面几个参数会用到这个单位。</p>
+<p>上一篇，我们装好 Ollama，让 Python 收到了本地模型的回答。</p>
+<p>程序能运行了，但看着返回的文字，很容易冒出几个问题：同一个问题再问一次，答案为什么可能不同？回答是一下子生成的，还是一点点生成的？一段很短的文字，模型处理起来也一定很短吗？</p>
+<p>这些问题都与模型生成文字的过程有关。这一课先把这个过程讲清楚，再动手调整参数、查看用量，并比较两种返回方式的等待时间。</p>
+<h2 id="sec-213729">一、先看一次简单的问答</h2>
+<p>我们请模型给一家小店起名：</p>
+<blockquote class="lesson__quote">
+<p>给一家修理旧物的小店起一个中文名字，只写名字，不要解释。</p>
+</blockquote>
+<p>在本课的一次实际运行中，本地 <code>qwen3.5:9b</code> 返回了：</p>
+<blockquote class="lesson__quote">
+<p>拾光修物</p>
+</blockquote>
+<p>从程序这一侧看，我们发出问题，收到回答。问题放在请求的 <code>messages</code> 中，回答文字则出现在响应的 <code>message.content</code> 中。先只看这两处，下面是数据结构的节选，不是一份完整运行脚本：</p>
+<pre class="lesson__code" data-lang="python"><code># 发给模型的问题
+messages = [
+    {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;给一家修理旧物的小店起一个中文名字，只写名字，不要解释。&quot;}
+]
+
+# 收到响应后，取出回答文字
+answer = response[&quot;message&quot;][&quot;content&quot;]</code></pre>
+<p><code>role=&quot;user&quot;</code> 表示这条消息来自提问的人，<code>content</code> 就是提问内容。响应里除了正文，还会带有用量和耗时等信息，后面再看。</p>
+<p>现在先把目光从 Python 字典移到模型内部：这四个字是怎样生成的？</p>
+<h2 id="sec-84a227">二、Token 是什么，模型怎样接着往下写？</h2>
+<p>Python 可以直接用字符串表示一句话，模型计算时用的却是数字。</p>
+<p>文字要先经过一个叫<strong>分词器</strong>的工具，转换成一串编号。每个编号对应词表中的一个片段，这种处理单位叫 <strong>Token</strong>。它可能对应一个字、一个词，也可能只是词的一部分；空格和标点也参与编码。</p>
+<p>可以把这个过程先理解成：</p>
+<pre class="lesson__code"><code>输入文字 → 分词器转换成 Token 编号 → 模型计算
+模型生成 Token 编号 → 转回文字 → 显示给用户</code></pre>
+<p>这里不能简单规定“一个汉字就是一个 Token”。不同模型使用的词表和切分方式可能不同，同一段话得到的数量也可能不同。Python 的 <code>len(text)</code> 数的是字符，不能直接拿来当模型的 Token 用量。</p>
+<p>生成回答时，模型也不是先写好整篇文章再拆开。对本课这种文本生成任务，可以先理解为一个反复进行的过程：</p>
+<ol>
+<li>根据问题和已经生成的内容，计算下一步各种 Token 的可能性。</li>
+<li>按当前的选择规则，选出一个 Token，接到已有内容后面。</li>
+<li>带着新内容继续计算，直到结束，或达到程序设置的长度上限。</li>
+</ol>
+<p>例如，“今天的天气很”后面可以接“好”，也可能接“冷”。这里只是用完整的字帮助理解候选内容，并不是某个模型的真实分词结果或概率记录。</p>
+<p>每次新接上的内容，都会影响后续选择。因此，同一个问题如果在某一步选了不同的片段，后面的回答也可能逐渐不同。</p>
+<p>模型为某段内容给出较高概率，表示它更倾向于这样续写，并不表示这段内容一定符合事实。以后让模型查资料、做计算时，程序仍需要检查依据和结果。</p>
+<h3 id="sec-7fc8a6">一次可以放进多少内容？</h3>
+<p>模型本次能够容纳的 Token 数量有限，这个容量通常叫<strong>上下文窗口</strong>。问题、消息格式以及已经生成的内容，都需要占用空间。</p>
+<p>本课把 <code>num_ctx</code> 设为 4096，表示使用 4096 Token 的上下文容量；把 <code>num_predict</code> 设为 256，限制最多生成 256 个 Token。前者像本次可用的总空间，后者限制回答最多写多长，并不是要求回答一定写满 256 个。</p>
+<p>这两个设置先保持不变。我们接下来只观察：每一步从候选内容中怎样选择，会怎样影响回答。</p>
+<h2 id="sec-0dc8ef">三、为什么同一个问题可能得到不同回答？</h2>
+<p>模型已经算出了候选内容的概率，接下来不一定总挑最高的那个。按概率做选择的过程，叫<strong>采样</strong>。</p>
+<p>本课比较两个参数：<code>temperature</code> 和 <code>top_p</code>。名字可以暂时记不牢，先看它们分别改变什么。</p>
+<h3 id="sec-10c6c3">temperature：改变候选内容之间的概率差距</h3>
+<p><code>temperature</code> 通常译为“温度”，不是电脑的温度。</p>
+<p>较低的正数温度会让选择更集中在高概率候选上；温度升高，则会让原本概率较低的候选更有机会被选中。本课使用的 <code>temperature=0</code> 按最高概率候选进行选择。</p>
+<p>这能影响回答的变化程度，却不能直接设置“创意有多少”或“正确率有多高”。温度高时仍可能重复，温度低时也可能反复给出同一个错误答案。</p>
+<h3 id="sec-899059">top_p：缩小参与选择的候选范围</h3>
+<p>假设某一步只有四个候选片段，概率从高到低分别是：</p>
 <div class="lesson__table"><table><thead>
 <tr>
-<th>设置</th>
-<th>用来做什么</th>
+<th>候选片段</th>
+<th>概率</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>temperature</code></td>
-<td>调整模型选择后续内容时的随机程度；不是答案正确率的开关</td>
+<td>A</td>
+<td>60%</td>
 </tr>
 <tr>
-<td><code>top_p</code></td>
-<td>限制下一步从哪些 Token 中选择，下面用一个例子说明</td>
+<td>B</td>
+<td>25%</td>
 </tr>
 <tr>
-<td><code>num_ctx</code></td>
-<td>设置本次可容纳的 Token 数，本课为 4096；输入和生成的内容共同占用这份空间</td>
+<td>C</td>
+<td>10%</td>
 </tr>
 <tr>
-<td><code>num_predict</code></td>
-<td>限制最多生成多少 Token，本课固定为 256</td>
-</tr>
-<tr>
-<td><code>seed</code></td>
-<td>固定随机种子，方便在同一条件下比较，本课设为 42</td>
+<td>D</td>
+<td>5%</td>
 </tr>
 </tbody>
-</table></div><p>例如，假设模型下一步有四个候选片段，概率分别是 60%、25%、10%、5%。只看 <code>top_p</code> 这一步筛选，设为 0.8 时，前两个片段的概率加起来达到 85%，就保留这两个供后续选择。它不是“保留 80% 的词”，也不表示答案有 80% 的概率正确。</p>
-<p>完整代码还固定了几项设置：<code>top_k=40</code>、<code>min_p=0</code> 用于候选片段筛选；<code>think=False</code> 请求关闭思考模式；<code>keep_alive=&quot;5m&quot;</code> 让模型在请求结束后继续驻留 5 分钟，方便接着实验。它不是回答的超时时限。完整参数含义可以按需查 <a href="https://docs.ollama.com/modelfile">Ollama 参数说明</a>。现在不用把每个参数都背下来，先知道自己在比较什么。</p>
-<p>还有一个区别：<strong>确认参数进入请求，不等于证明某个模型内部一定按预想的方式使用了它。</strong> 所以接下来仍要实际运行并查看结果。</p>
-<h2 id="sec-41c0de">二、只改一个参数，看看发生了什么</h2>
-<p>先进入配套项目目录。如果还没下载代码，从<a href="https://github.com/wangpuv/learn-llm-agent">代码仓库</a>获取；已经下载的读者更新后继续。本课目录是 <code>lessons/l01_token_inference/</code>。</p>
+</table></div><p>只看 <code>top_p</code> 这一步筛选：设为 <code>0.8</code> 时，从最高概率开始累加。A 的 60% 还不够，加上 B 达到 85%，于是保留 A、B，后续只在它们之间选择。设为 <code>0.1</code> 时，A 自己已经超过门槛，候选范围就只剩 A。</p>
+<p>所以，<code>top_p=0.8</code> 不是“保留 80% 的词”，也不是“答案有 80% 的概率正确”。它使用的是<strong>概率加起来达到多少</strong>这个门槛。</p>
+<p>两者的区别是：温度调整概率之间的差距，<code>top_p</code> 决定保留多大的候选范围。做对照实验时，一次只改变其中一个，才能知道自己在观察什么。</p>
+<h2 id="sec-06126e">四、动手比较之前，确认参数真的发出去了</h2>
+<p>比较参数时，有一种很容易忽略的错误：终端打印了不同的值，发出的请求却没有改变。比如下面这段代码，<code>top_p</code> 只出现在打印语句里，调用函数时没有传进去。</p>
+<pre class="lesson__code" data-lang="python"><code>print(&quot;top_p =&quot;, cfg[&quot;top_p&quot;])
+result = run_inference(prompt, temperature=cfg[&quot;temperature&quot;])</code></pre>
+<p>如果函数内部也只把 <code>temperature</code> 放进请求，即使几次回答不同，也不能归因于 <code>top_p</code>，因为它根本没有改变。</p>
+<p>Ollama 的采样参数要放进请求的 <code>options</code>。本课代码中，与这两个参数有关的部分如下，其余固定设置省略：</p>
+<pre class="lesson__code" data-lang="python"><code>&quot;options&quot;: {
+    &quot;temperature&quot;: temperature,
+    &quot;top_p&quot;: top_p,
+}</code></pre>
+<figure class="lesson__fig"><img src="/course/llm-engineer/01-token-and-inference-01-request-parameters.webp" alt="参数从实验配置进入请求，再实际发送；检查请求中的参数和值" width="1672" height="941" loading="lazy" decoding="async"><figcaption>参数从实验配置进入请求，再实际发送；检查请求中的参数和值</figcaption></figure>
+<h3 id="sec-f36323">下载代码，先看请求</h3>
+<p>沿用环境准备篇的 Python、uv、Ollama 和已下载的本地 <code>qwen3.5:9b</code>，本课不增加第三方依赖。</p>
+<p>如果还没有代码，在终端执行：</p>
 <pre class="lesson__code" data-lang="sh"><code>git clone https://github.com/wangpuv/learn-llm-agent.git
 cd learn-llm-agent
 uv sync --project lessons --frozen</code></pre>
-<p>已经有项目时，不必再次 clone；在原项目目录运行 <code>git pull</code> 即可。Ollama 保持运行，沿用环境准备篇下载的 <code>qwen3.5:9b</code>。</p>
-<p>先运行默认模式：</p>
-<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference</code></pre>
-<p>默认预览只打印采样实验的 8 条请求，不调用模型，也不包含后面的计时实验。输出较长，可以先看 <code>rows</code> 中第一条的 <code>request.options</code>，确认 <code>temperature</code>、<code>top_p</code> 与这条记录的 <code>case</code> 一致。</p>
-<p>确认后运行参数实验：</p>
-<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference --mode sampling --output runs/l01-sampling-01.json</code></pre>
-<p>问题固定为：</p>
-<blockquote class="lesson__quote">
-<p>给一家修理旧物的小店起一个中文名字，只写名字，不要解释。</p>
-</blockquote>
+<p>已经下载过项目，就在原项目目录执行 <code>git pull</code>，再执行上面的 <code>uv sync</code>。下面所有命令都在仓库根目录运行。</p>
+<p>先打开 <code>lessons/l01_token_inference/01_chat.py</code>，从问题、请求字典一直看到回答与用量的打印。然后运行一次问答：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference.01_chat --output runs/l01-chat-01.json</code></pre>
+<p>它只问一次，终端会显示回答和 Token 用量。可以先修改文件中的 <code>prompt</code>，换一个输出文件名再试。</p>
+<p>接下来打开 <code>02_sampling.py</code>。<code>ask()</code> 中写着实际发送的请求，<code>compare()</code> 中列出要比较的配置。程序在每次调用前打印同一份请求中的 <code>options</code>，你可以对照检查参数与值。</p>
+<h3 id="sec-52ab7a">运行店名实验</h3>
+<p>保持 Ollama 运行，执行：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference.02_sampling --output runs/l01-sampling-01.json</code></pre>
+<p><code>02_sampling</code> 是采样实验脚本，<code>--output</code> 指定保存结果的位置。问题就是开头那句“给一家修理旧物的小店起一个中文名字”。</p>
 <p>程序做两组比较：改 <code>temperature</code> 时固定 <code>top_p=0.9</code>；改 <code>top_p</code> 时固定 <code>temperature=0.8</code>。每组配置各跑两次，第二轮调换高低值的先后顺序。先另外预热一次，不把预热结果放进对照表。</p>
-<p>下面是 2026 年 9 月 11 日的实际结果：</p>
+<p>下面是 2026 年 9 月 11 日保存的实际结果。三个脚本采用下面的对照设置，自己的运行结果以保存的报告为准：</p>
 <div class="lesson__table"><table><thead>
 <tr>
 <th>改哪个参数</th>
@@ -118,54 +141,28 @@ uv sync --project lessons --frozen</code></pre>
 </table></div><p>两组对照的高值其实是同一组设置：<code>temperature=0.8、top_p=0.9</code>，作为两组共用的基线。表中的两行分别实际运行了两次，并非把同一次结果填了两遍；因此四行对应三组不同配置。</p>
 <p>这次，<code>temperature=0</code> 和 <code>top_p=0.1</code> 都得到了“拾光修物”。前者选择概率最高的候选；后者缩小候选范围，如果最高概率的候选已经达到 0.1，这一步也只剩它可选。这可以帮助理解两种设置为什么可能得到相同答案，但报告没有记录每一步的候选概率，不能据此认定本次两种设置的选择过程完全一样。</p>
 <p>这是固定种子下的一次小样本观察，不代表其他问题也会如此。两个店名哪个更好，表格同样回答不了。</p>
-<p>注意，<code>temperature=0.8</code> 的两次回答也一样。我们固定了随机种子，重复运行的目的是看相同条件下的表现，并不是在抽样统计模型能想出多少种名字。不能只凭这两次结果说“温度高就一定每次都不同”，也不能承诺换电脑、换模型版本仍然逐字相同。</p>
+<p>注意，<code>temperature=0.8</code> 的两次回答也一样。程序用 <code>seed=42</code> 固定了随机种子，也就是让随机选择尽量从同一个起点开始。重复运行的目的是看相同条件下的表现，并不是在抽样统计模型能想出多少种名字。不能只凭这两次结果说“温度高就一定每次都不同”，也不能承诺换电脑、换模型版本仍然逐字相同。</p>
 <p>本次使用 M1 Pro、16GB 统一内存，Python 3.13.7、Ollama 0.34.0。报告保留了模型摘要和全部请求设置，后面比较结果时能查回当时的条件。</p>
-<h2 id="sec-eca691">三、Token 数从哪里看</h2>
-<p>前面提到的文字片段，会按模型使用的词表转换成编号。模型接收的是这些编号组成的序列，统计 Token 用量时数的也是序列中的项数。</p>
-<p>因此，<code>len(text)</code> 得到的字符数，不能直接当作 Token 数。同一句话用不同模型的编码方式切分，数量也可能不同。</p>
-<p>原 Day 1 代码用 <code>tiktoken</code> 的 <code>cl100k_base</code> 编码重新计算输入和回答的长度。这个工具可以帮助观察文字如何切分，<strong>但它算出的是指定编码下的数量，不是本地 Qwen 模型报告的用量</strong>。只计算提示词，还会漏掉消息角色等请求格式带来的内容。</p>
-<p>本课不另装分词器，直接保留 Ollama 返回的两个字段：</p>
-<pre class="lesson__code" data-lang="python"><code>usage = {
-    &quot;prompt_eval_count&quot;: final.get(&quot;prompt_eval_count&quot;),
-    &quot;eval_count&quot;: final.get(&quot;eval_count&quot;),
-}</code></pre>
+<h2 id="sec-ce8eb9">五、一次问答处理了多少 Token？</h2>
+<p>现在我们知道 Token 是模型处理内容的单位，就可以看一次问答的输入和输出各有多少了。</p>
+<p>记录用量，是为了判断程序每次让模型处理了多长的内容。以后加入整篇资料、历史对话或连续工具调用，输入和输出都会增加；这些数能帮助我们检查是否接近容量限制，以及任务用量增长在哪里。</p>
+<p>Ollama 在回答结束时提供两个计数字段。代码只需从最终响应中取出它们：</p>
+<pre class="lesson__code" data-lang="python"><code>input_tokens = final.get(&quot;prompt_eval_count&quot;)
+output_tokens = final.get(&quot;eval_count&quot;)</code></pre>
+<p><code>prompt_eval_count</code> 是服务报告的输入 Token 数，<code>eval_count</code> 是输出 Token 数。这里用 <code>.get()</code>，字段缺失就得到 <code>None</code>，不会把“没收到计数”误记成零。</p>
+<p>刚才的店名实验中，输入计数都是 31。“拾光修物”对应的输出计数是 5，“时光修补铺”对应 4。较短的文字反而对应较大的服务计数，正好说明不能直接按字数推算用量。</p>
+<p>你也可能见过用 <code>tiktoken</code> 计算 Token 数的代码。这个工具需要指定编码，例如 <code>cl100k_base</code>；它适合观察该编码怎样切分文字，但不能拿它的结果替代本地 Qwen 的服务计数。只数问题文本，还会漏掉消息角色等格式带来的内容。本课直接保留 Ollama 的返回值，不另装分词器。</p>
+<h2 id="sec-20cadf">六、回答怎样显示，会影响等待的感觉</h2>
+<p>前面讲过，模型逐步生成内容。但生成一点就显示一点，还是等生成结束后一次显示，是两种不同的返回方式。</p>
+<p><strong>非流式</strong>会等完整响应返回后再显示。<strong>流式</strong>则陆续返回片段，程序收到后就可以继续显示。流式片段不保证恰好是一个 Token，不能数片段来计算用量。</p>
+<p>比如，同样一段回答，等三秒后一次看到全部，和先看到一部分、后面继续出现，等待的感觉会不同。因此我们分别测量：</p>
 <ul>
-<li><code>prompt_eval_count</code>：服务报告的输入 Token 数。</li>
-<li><code>eval_count</code>：服务报告的输出 Token 数。</li>
+<li><strong>第一段等待时间</strong>：发出请求后，多久收到第一段非空白正文。</li>
+<li><strong>总等待时间</strong>：发出请求后，多久收到回答结束标记。</li>
 </ul>
-<p>字段缺失就保留 <code>None</code>，不要用字符数或另一个编码器的结果补进去。</p>
-<p>刚才的店名实验里，输入计数都是 31。返回“拾光修物”时，输出计数是 5；返回“时光修补铺”时，输出计数是 4。较短的文字反而对应较大的服务计数，直接按字数估算就会出错。</p>
-<p>记录这些数，是为了知道长输入、长回答会让本机承担多少处理工作，也方便以后设置任务用量上限。本课不把 Token 数换算成云 API 费用。</p>
-<h2 id="sec-9b473f">四、先想清楚：你关心哪一种等待</h2>
-<p>在终端里等三秒后一次看到完整回答，和半秒后先看到一部分、后面继续显示，感觉会不同。只记录总耗时，看不出这个区别。</p>
-<p>我们分别记录：</p>
-<ol>
-<li><strong>第一段等待时间</strong>：从发出请求，到程序收到第一段非空白正文。</li>
-<li><strong>总等待时间</strong>：从发出请求，到收到回答结束标记。</li>
-</ol>
-<p>流式返回时，Ollama 会陆续发来一行行 JSON。每一行可能携带一小段文字，最后一条还会带上结束状态和用量信息。程序收到正文后立即打印，不把每个片段都当作一个 Token。</p>
 <figure class="lesson__fig"><img src="/course/llm-engineer/01-token-and-inference-02-response-timing.webp" alt="非流式等待完整回答后显示，流式先显示第一段再继续接收；分别测量第一段和完整回答的等待时间" width="1672" height="941" loading="lazy" decoding="async"><figcaption>非流式等待完整回答后显示，流式先显示第一段再继续接收；分别测量第一段和完整回答的等待时间</figcaption></figure>
-<p>计时部分的关键逻辑如下，省略了报告保存和错误处理：</p>
-<pre class="lesson__code" data-lang="python"><code>start = time.perf_counter()
-first_content_seconds = None
-
-for body in response_events(base_url, payload):
-    elapsed = time.perf_counter() - start
-    content = body.get(&quot;message&quot;, {}).get(&quot;content&quot;, &quot;&quot;)
-
-    if content.strip() and first_content_seconds is None:
-        first_content_seconds = elapsed
-    if content:
-        print(content, end=&quot;&quot;, flush=True)
-
-    if body.get(&quot;done&quot;) is True:
-        total_seconds = elapsed
-        break</code></pre>
-<p><code>perf_counter()</code> 用来计算时间间隔。我们在打印前记下片段到达的时间，所以测到的是“程序何时拿到可以显示的文字”，不是屏幕实际完成绘制的时间。</p>
-<p>非流式调用只有一份完整响应，因此在本课的记录方法里，它的第一段等待和总等待相同。空字符串、纯空白以及单独的结束消息，都不算第一段正文。</p>
-<h2 id="sec-5738e3">五、把两种返回方式放在一起跑</h2>
-<p>执行：</p>
-<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference --mode timing --output runs/l01-timing-01.json</code></pre>
+<p>Ollama 请求里的 <code>stream</code> 用来选择返回方式：<code>False</code> 是非流式，<code>True</code> 是流式。打开 <code>03_streaming.py</code> 的 <code>receive()</code>，可以看到请求怎样发送、JSON 怎样逐行读取、文字怎样打印，以及时间怎样记录。程序会依次运行两种返回方式：</p>
+<pre class="lesson__code lesson__code--tight" data-lang="sh"><code>uv run --project lessons --frozen python -m lessons.l01_token_inference.03_streaming --output runs/l01-timing-01.json</code></pre>
 <p>问题换成：</p>
 <blockquote class="lesson__quote">
 <p>用中文写三句话，向 Python 初学者解释函数的作用。不要使用代码块。</p>
@@ -213,52 +210,11 @@ for body in response_events(base_url, payload):
 </table></div><p>这四次输入 Token 都是 31，回答文字也相同。第一轮流式比非流式更早拿到正文，但总耗时略长；第二轮的总耗时又是流式较短。</p>
 <p>所以本次最直接的观察是：<strong>流式让程序更早开始显示内容，总耗时则没有固定的胜负。</strong> 不要把“第一段来得早”写成“整个回答生成得更快”。</p>
 <p>还有一个条件需要留意：第一次对照请求没有命中输入缓存，后面三次报告了 27 个缓存 Token。重复请求时，服务可能复用先前处理过的一部分输入，省掉部分计算，这就是这里说的输入缓存。预热只让模型先运行一次，并没有把所有请求变成完全相同的缓存状态。不过，两次非流式调用中，命中缓存的那次用了 4.334 秒，反而比未命中的 3.588 秒更久。可见这里的总耗时差不能只用缓存解释。再加上只有四次调用，这张表适合解释等待体验，不适合做模型速度排名。</p>
-<p>Ollama 也返回自己的生成、加载耗时，单位是纳秒；报告原样保留。它们和 Python 测到的等待时间范围不同，不能混在同一列里比较。</p>
-<h2 id="sec-3e42ae">六、打开报告，看一次完整记录</h2>
-<p>两个 JSON 文件都保存在 <code>runs/</code>。挑一条 <code>rows</code> 记录，顺着看：</p>
-<div class="lesson__table"><table><thead>
-<tr>
-<th>位置</th>
-<th>看什么</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>request</code></td>
-<td>实际模型名、问题、stream 和 options</td>
-</tr>
-<tr>
-<td><code>text</code></td>
-<td>拼接后的完整回答</td>
-</tr>
-<tr>
-<td><code>usage</code></td>
-<td>Ollama 返回的 Token 数和耗时</td>
-</tr>
-<tr>
-<td><code>first_content_seconds</code></td>
-<td>第一段正文何时到达</td>
-</tr>
-<tr>
-<td><code>total_seconds</code></td>
-<td>收到结束标记时的总等待</td>
-</tr>
-<tr>
-<td><code>success</code>、<code>error</code></td>
-<td>是否完整结束，失败原因是什么</td>
-</tr>
-</tbody>
-</table></div><p>如果缺少结束标记，程序会保留已经收到的内容，但不把它算成成功。生成达到长度上限也会明确标记，后面的请求随即停止，不自动重试。</p>
-<p>报告文件不覆盖。再做一次实验时，把文件名中的 <code>01</code> 改成 <code>02</code>。遇到超时先检查 Ollama 和本机负载；Python 停止等待，不表示模型一定已经停止计算。</p>
-<h2 id="sec-2fab06">自己改一次，再解释结果</h2>
-<p>如果环境准备时安装了其他本地型号，可以在运行命令末尾加 <code>--model 你的模型名</code>，名称以 <code>ollama list</code> 为准。换型号后需要重新观察结果，本文数字只对应本次实测的 <code>qwen3.5:9b</code>。</p>
-<p>这次练习先不换模型，只把 <code>--repeats</code> 改为 <code>3</code>，各多做一轮。对着新报告回答：</p>
-<ul>
-<li>每次真正发出的参数，是否与想改的一致？</li>
-<li>同一段输入，服务报告的输入计数是否相同？</li>
-<li>最早看到正文的那次，是否也是最早结束的那次？</li>
-</ul>
-<p>答案不必与本文相同，关键是能指出报告中的依据。</p>
-<p>完整代码使用<a href="https://github.com/wangpuv/learn-llm-agent">配套仓库</a>里的 <code>lessons/l01_token_inference/</code>，该目录 README 提供运行说明。先读 <code>core.py</code>，再看 <code>__main__.py</code> 怎样安排实验。</p>
-<p>下一课，我们会让模型返回固定的数据结构，再检查字段、类型和取值：<strong>让模型返回的数据，真正通过程序校验。</strong></p>
+<p>本课的时间由 Python 在收到内容后、打印之前记录，测的是程序何时拿到文字，不是屏幕实际绘制的时间。非流式只有一次完整响应，因此记录中的第一段等待和总等待相同。</p>
+<h2 id="sec-bf876b">运行之后，自己看一次结果</h2>
+<p>三个脚本的报告都保存在 <code>runs/</code> 下。打开文件，先找 <code>rows</code>，再选其中一条记录。问答和采样脚本把请求放在 <code>request</code>，原始回答与用量放在 <code>response</code>；流式脚本则另有拼接后的 <code>text</code>、<code>usage</code> 和两个等待时间。具体字段位置见运行说明，不必一下读懂全部原始响应。</p>
+<p>再做一次时，把输出文件名里的 <code>01</code> 改成 <code>02</code>，已有文件不会被覆盖。可以加 <code>--repeats 3</code> 多做一轮，再看看：同样的设置是否仍得到相同回答？最早收到正文的那次，是否也最早结束？</p>
+<p>如果安装的是其他本地型号，在命令末尾加 <code>--model 你的模型名</code>，名称以 <code>ollama list</code> 为准。本文数字只对应本次实测型号，更换后需要重新观察结果。</p>
+<p>完整配置、报告字段和失败处理见<a href="https://github.com/wangpuv/learn-llm-agent/tree/main/lessons/l01_token_inference">第一课运行说明</a>。代码遇到未完整结束的回答会保留已收到的内容并停止后续实验，不自动重试。</p>
+<p>下一课，我们会从“收到一段回答”继续往前走：如果程序需要固定的字段和类型，怎样要求模型返回数据，又怎样检查它是否符合要求？</p>
 
