@@ -48,3 +48,16 @@ on refresh of nested routes like `/work/aurora-analytics`, enable SPA fallback:
 - **Vercel / Netlify**: rewrite all routes to `/index.html` (Netlify: add a
   `public/_redirects` file with `/*  /index.html  200`).
 - **GitHub Pages**: copy `index.html` to `404.html` after build.
+
+### LittleSteps privacy policy
+
+`public/littlesteps-privacy/index.html` preserves the original bilingual policy
+from `wangpuv/littlesteps-privacy` as a standalone static page. Vite copies it
+to `dist/littlesteps-privacy/index.html`; it must be served before the SPA fallback.
+
+The App Store's existing `https://wangpuv.github.io/littlesteps-privacy/` URL
+redirects to `https://wangpuv.com/littlesteps-privacy/` because the GitHub user
+site has a custom domain. Keep this path available in the personal site's
+Cloudflare deployment. After deployment, check both the HTTP status and policy
+content through the original URL: the SPA fallback can return HTTP 200 for a
+page that visually displays 404.
